@@ -1478,18 +1478,472 @@
       }
     }
 
-    function speakText(text) {
-      if (state.muted) return;
+    // =====================================================
+    // 3B. AMAZON FIRE KIDS TABLET & CROSS-BROWSER VOICE ENGINE
+    //     - Preserves native Web Speech API (speechSynthesis) on desktop/phones
+    //     - Fixes Android/Fire OS cancel() + speak() race condition (60ms debounce)
+    //     - Normalizes en-US / en_US voice matching without forcing broken voice refs
+    //     - Automatically falls back to standard HTML5 Media Audio (same channel as SFX)
+    //       when Amazon Kids Web Browser / WebView blocks or mutes speechSynthesis
+    // =====================================================
+    const DICTIONARY_WORD_MP3S = {
+      moment: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/moment--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/moment-us.mp3'
+      ],
+      frozen: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/frozen--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/frozen-us.mp3'
+      ],
+      tadpole: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/tadpole--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/tadpole-us.mp3'
+      ],
+      explode: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/explode--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/explode-us.mp3'
+      ],
+      oatmeal: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/oatmeal--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/oatmeal-us.mp3'
+      ],
+      raincoat: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/raincoat--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/raincoat-us.mp3'
+      ],
+      snowball: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/snowball--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/snowball-us.mp3'
+      ],
+      elbow: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/elbow--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/elbow-us.mp3'
+      ],
+      toenail: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/toenail--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/toenail-us.mp3'
+      ],
+      goes: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/goes--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/goes-us.mp3'
+      ],
+      tad: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/tad--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/tad-us.mp3'
+      ],
+      pole: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/pole--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/pole-us.mp3'
+      ],
+      oat: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/oat--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/oat-us.mp3'
+      ],
+      meal: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/meal--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/meal-us.mp3'
+      ],
+      rain: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/rain--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/rain-us.mp3'
+      ],
+      coat: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/coat--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/coat-us.mp3'
+      ],
+      snow: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/snow--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/snow-us.mp3'
+      ],
+      ball: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/ball--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/ball-us.mp3'
+      ],
+      toe: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/toe--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/toe-us.mp3'
+      ],
+      nail: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/nail--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/nail-us.mp3'
+      ]
+    };
+
+    const uaString = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : '';
+    const isFireOrAndroidTablet = /\b(Silk|KF[A-Z0-9]+|AF[A-Z0-9]+|Amazon|Fire|Android|wv)\b/i.test(uaString);
+    const isFireKidsOrSilk = /\b(Silk|KF[A-Z0-9]+|AF[A-Z0-9]+|Amazon|Fire)\b/i.test(uaString);
+
+    let cachedSpeechVoices = [];
+    let speechSynthVerifiedWorking = false;
+    let tabletMediaFallbackSticky = false;
+    let activeSpeechSeqId = 0;
+    let speechCancelDebounceTimer = null;
+    let speechStartWatchdogTimer = null;
+    let sharedFallbackAudio = null;
+
+    function refreshSpeechVoices() {
       try {
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const utter = new SpeechSynthesisUtterance(text);
-          utter.rate = 0.92;
-          utter.pitch = 1.08;
-          window.speechSynthesis.speak(utter);
+        if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
+          const list = window.speechSynthesis.getVoices();
+          if (Array.isArray(list) && list.length > 0) {
+            cachedSpeechVoices = list;
+          }
         }
       } catch (e) {
-        // Ignore speech synthesis errors
+        // Ignore getVoices errors in restricted WebViews
+      }
+    }
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      refreshSpeechVoices();
+      try {
+        if ('onvoiceschanged' in window.speechSynthesis) {
+          window.speechSynthesis.onvoiceschanged = refreshSpeechVoices;
+        } else if (typeof window.speechSynthesis.addEventListener === 'function') {
+          window.speechSynthesis.addEventListener('voiceschanged', refreshSpeechVoices);
+        }
+      } catch (e) {
+        // Ignore listener errors
+      }
+    }
+
+    function pickBestEnglishVoice() {
+      refreshSpeechVoices();
+      if (!cachedSpeechVoices || cachedSpeechVoices.length === 0) return null;
+      // Normalize en-US and Android/Fire OS en_US locale formats
+      const enUsVoices = cachedSpeechVoices.filter((v) => v && v.lang && /^en[-_]US/i.test(v.lang));
+      const anyEnVoices = cachedSpeechVoices.filter((v) => v && v.lang && /^en([-_]|$)/i.test(v.lang));
+      const pool = enUsVoices.length > 0 ? enUsVoices : anyEnVoices;
+      if (pool.length === 0) return null;
+      const preferred = pool.find((v) => /natural|google|samantha|ava|allison|zira|aria|jenny|female|default/i.test(v.name || ''));
+      return preferred || pool.find((v) => v.default) || pool[0];
+    }
+
+    function ensureFallbackAudioElement() {
+      if (!sharedFallbackAudio && typeof Audio !== 'undefined') {
+        sharedFallbackAudio = new Audio();
+        sharedFallbackAudio.preload = 'auto';
+        try {
+          sharedFallbackAudio.referrerPolicy = 'no-referrer';
+        } catch (e) {
+          // Ignore if unsupported
+        }
+      }
+      return sharedFallbackAudio;
+    }
+
+    function stopFallbackAudioPlayback() {
+      if (speechCancelDebounceTimer) {
+        clearTimeout(speechCancelDebounceTimer);
+        speechCancelDebounceTimer = null;
+      }
+      if (speechStartWatchdogTimer) {
+        clearTimeout(speechStartWatchdogTimer);
+        speechStartWatchdogTimer = null;
+      }
+      if (sharedFallbackAudio) {
+        try {
+          sharedFallbackAudio.onended = null;
+          sharedFallbackAudio.onerror = null;
+          sharedFallbackAudio.pause();
+        } catch (e) {
+          // Ignore pause errors
+        }
+      }
+    }
+
+    function buildStreamTtsUrls(textChunk) {
+      const encoded = encodeURIComponent(textChunk.trim());
+      return [
+        `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-US&q=${encoded}`,
+        `https://dict.youdao.com/dictvoice?audio=${encoded}&type=2`
+      ];
+    }
+
+    function splitIntoSpeakableSegments(rawText) {
+      const cleaned = String(rawText || '').replace(/\s+/g, ' ').trim();
+      if (!cleaned) return [];
+      const singleClean = cleaned.toLowerCase().replace(/[^a-z]/g, '');
+      if (DICTIONARY_WORD_MP3S[singleClean] && !cleaned.includes(' ')) {
+        return [{ type: 'word', word: singleClean, text: cleaned }];
+      }
+      // Split sentences while keeping short chunks <= 160 chars for media TTS endpoints
+      const roughParts = cleaned.match(/[^.!?]+[.!?]*/g) || [cleaned];
+      const segments = [];
+      roughParts.forEach((part) => {
+        const trimmed = part.trim();
+        if (!trimmed) return;
+        const wordOnly = trimmed.toLowerCase().replace(/[^a-z]/g, '');
+        if (DICTIONARY_WORD_MP3S[wordOnly] && trimmed.split(/\s+/).length === 1) {
+          segments.push({ type: 'word', word: wordOnly, text: trimmed });
+        } else if (trimmed.length <= 165) {
+          segments.push({ type: 'phrase', text: trimmed });
+        } else {
+          const words = trimmed.split(/\s+/);
+          let buf = '';
+          words.forEach((w) => {
+            if ((buf + ' ' + w).trim().length > 155) {
+              if (buf.trim()) segments.push({ type: 'phrase', text: buf.trim() });
+              buf = w;
+            } else {
+              buf = (buf + ' ' + w).trim();
+            }
+          });
+          if (buf.trim()) segments.push({ type: 'phrase', text: buf.trim() });
+        }
+      });
+      return segments;
+    }
+
+    function extractEmbeddedWeeklyWords(text) {
+      const lower = String(text || '').toLowerCase();
+      const matches = [];
+      const words = lower.match(/[a-z]+/g) || [];
+      words.forEach((w) => {
+        if (DICTIONARY_WORD_MP3S[w]) {
+          matches.push(w);
+        }
+      });
+      return matches;
+    }
+
+    function playSyllableChimeCadence(text) {
+      // Offline last-resort cadence through Web Audio API if tablet Wi-Fi is off
+      if (state.muted) return;
+      try {
+        ensureAudio();
+        if (!audioCtx) return;
+        const words = String(text || '').trim().split(/\s+/).slice(0, 6);
+        const baseNotes = [523.25, 659.25, 587.33, 783.99];
+        const now = audioCtx.currentTime;
+        words.forEach((w, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(baseNotes[idx % baseNotes.length], now + idx * 0.14);
+          gain.gain.setValueAtTime(0.14, now + idx * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.12);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.12);
+        });
+      } catch (e) {
+        // Ignore audio errors
+      }
+    }
+
+    function playCandidateUrlsWithAudio(urlCandidates, seqId, onComplete, onAllFailed) {
+      if (state.muted || seqId !== activeSpeechSeqId) return;
+      const player = ensureFallbackAudioElement();
+      if (!player || !urlCandidates || urlCandidates.length === 0) {
+        if (onAllFailed) onAllFailed();
+        return;
+      }
+
+      let candidateIdx = 0;
+      const tryNextUrl = () => {
+        if (state.muted || seqId !== activeSpeechSeqId) return;
+        if (candidateIdx >= urlCandidates.length) {
+          if (onAllFailed) onAllFailed();
+          return;
+        }
+        const currentUrl = urlCandidates[candidateIdx++];
+        let settled = false;
+        const advanceOnFail = () => {
+          if (settled) return;
+          settled = true;
+          tryNextUrl();
+        };
+
+        player.onended = () => {
+          if (settled || seqId !== activeSpeechSeqId) return;
+          settled = true;
+          if (onComplete) onComplete();
+        };
+        player.onerror = advanceOnFail;
+        player.src = currentUrl;
+        try {
+          const playPromise = player.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(advanceOnFail);
+          }
+        } catch (err) {
+          advanceOnFail();
+        }
+      };
+
+      tryNextUrl();
+    }
+
+    function playTabletMediaFallback(text, seqId) {
+      if (state.muted || seqId !== activeSpeechSeqId) return;
+      const segments = splitIntoSpeakableSegments(text);
+      if (segments.length === 0) return;
+
+      let segIdx = 0;
+      const playNextSegment = () => {
+        if (state.muted || seqId !== activeSpeechSeqId || segIdx >= segments.length) return;
+        const seg = segments[segIdx++];
+
+        if (seg.type === 'word' && DICTIONARY_WORD_MP3S[seg.word]) {
+          const urls = [
+            ...DICTIONARY_WORD_MP3S[seg.word],
+            ...buildStreamTtsUrls(seg.word)
+          ];
+          playCandidateUrlsWithAudio(
+            urls,
+            seqId,
+            () => setTimeout(playNextSegment, 90),
+            () => {
+              playSyllableChimeCadence(seg.word);
+              setTimeout(playNextSegment, 180);
+            }
+          );
+        } else {
+          const phraseUrls = buildStreamTtsUrls(seg.text);
+          playCandidateUrlsWithAudio(
+            phraseUrls,
+            seqId,
+            () => setTimeout(playNextSegment, 90),
+            () => {
+              // If full-sentence TTS stream is blocked by Amazon Kids web filter,
+              // play the dictionary MP3s for any spelling words inside the sentence!
+              const embeddedWords = extractEmbeddedWeeklyWords(seg.text);
+              if (embeddedWords.length > 0) {
+                let wIdx = 0;
+                const playEmbeddedWord = () => {
+                  if (state.muted || seqId !== activeSpeechSeqId || wIdx >= embeddedWords.length) {
+                    playNextSegment();
+                    return;
+                  }
+                  const w = embeddedWords[wIdx++];
+                  playCandidateUrlsWithAudio(
+                    DICTIONARY_WORD_MP3S[w],
+                    seqId,
+                    () => setTimeout(playEmbeddedWord, 140),
+                    () => {
+                      playSyllableChimeCadence(w);
+                      setTimeout(playEmbeddedWord, 180);
+                    }
+                  );
+                };
+                playEmbeddedWord();
+              } else {
+                playSyllableChimeCadence(seg.text);
+                setTimeout(playNextSegment, 180);
+              }
+            }
+          );
+        }
+      };
+
+      playNextSegment();
+    }
+
+    function speakText(text) {
+      if (state.muted || !text) return;
+      activeSpeechSeqId += 1;
+      const seqId = activeSpeechSeqId;
+
+      stopFallbackAudioPlayback();
+      ensureFallbackAudioElement();
+
+      // If this device was already verified as blocking speechSynthesis (e.g. Amazon Kids Browser),
+      // go straight to the media audio channel inside the synchronous user tap gesture
+      if (tabletMediaFallbackSticky || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+        playTabletMediaFallback(text, seqId);
+        return;
+      }
+
+      refreshSpeechVoices();
+      // On Amazon Fire / Silk where getVoices() is empty (no OS TTS voice exposed in Kids Profile),
+      // trigger the media audio fallback immediately while still allowing speechSynthesis if it wakes up
+      if (isFireKidsOrSilk && cachedSpeechVoices.length === 0 && !speechSynthVerifiedWorking) {
+        tabletMediaFallbackSticky = true;
+        playTabletMediaFallback(text, seqId);
+        return;
+      }
+
+      try {
+        const synth = window.speechSynthesis;
+        const wasActive = synth.speaking || synth.pending;
+        if (wasActive || isFireOrAndroidTablet) {
+          synth.cancel();
+        }
+
+        // Fix 1: 60ms pause between cancel() and speak() on Fire/Android tablets (or when canceling active speech)
+        // prevents the Chromium/Android cancel() race condition from muting the new utterance
+        const launchDelayMs = (isFireOrAndroidTablet || wasActive) ? 60 : 0;
+
+        const queueUtterance = () => {
+          if (state.muted || seqId !== activeSpeechSeqId) return;
+          try {
+            if (synth.paused) {
+              synth.resume();
+            }
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = 0.92;
+            utter.pitch = 1.08;
+
+            // Fix 2: Only assign a specific voice object if a valid English voice is present;
+            // otherwise let the tablet use its default system voice
+            const matchedVoice = pickBestEnglishVoice();
+            if (matchedVoice && !isFireKidsOrSilk) {
+              utter.voice = matchedVoice;
+            }
+
+            let utterStarted = false;
+            utter.onstart = () => {
+              utterStarted = true;
+              speechSynthVerifiedWorking = true;
+              if (speechStartWatchdogTimer) {
+                clearTimeout(speechStartWatchdogTimer);
+                speechStartWatchdogTimer = null;
+              }
+            };
+
+            utter.onerror = () => {
+              if (speechStartWatchdogTimer) {
+                clearTimeout(speechStartWatchdogTimer);
+                speechStartWatchdogTimer = null;
+              }
+              if (!utterStarted && seqId === activeSpeechSeqId && !state.muted) {
+                if (isFireOrAndroidTablet) tabletMediaFallbackSticky = true;
+                playTabletMediaFallback(text, seqId);
+              }
+            };
+
+            // Fix 3: 300ms watchdog — if Amazon Kids Web Browser silently drops speechSynthesis.speak()
+            // without firing onstart, automatically stream through the media audio channel
+            if (!speechSynthVerifiedWorking || isFireOrAndroidTablet) {
+              speechStartWatchdogTimer = setTimeout(() => {
+                if (!utterStarted && !synth.speaking && seqId === activeSpeechSeqId && !state.muted) {
+                  if (isFireOrAndroidTablet) tabletMediaFallbackSticky = true;
+                  try {
+                    synth.cancel();
+                  } catch (e) {
+                    // Ignore cancel error
+                  }
+                  playTabletMediaFallback(text, seqId);
+                }
+              }, 300);
+            }
+
+            synth.speak(utter);
+          } catch (innerErr) {
+            playTabletMediaFallback(text, seqId);
+          }
+        };
+
+        if (launchDelayMs > 0) {
+          speechCancelDebounceTimer = setTimeout(queueUtterance, launchDelayMs);
+        } else {
+          queueUtterance();
+        }
+      } catch (e) {
+        playTabletMediaFallback(text, seqId);
       }
     }
 
@@ -1667,8 +2121,11 @@
       state.muted = !state.muted;
       document.getElementById('muteIcon').textContent = state.muted ? '🔇' : '🔊';
       document.getElementById('muteLabel').textContent = state.muted ? 'Muted' : 'SFX On';
-      if (state.muted && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+      if (state.muted) {
+        stopFallbackAudioPlayback();
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
       }
     });
 
@@ -2964,13 +3421,13 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'violets_championship_quest_game.html';
+      a.download = 'index.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       playSound('fanfare');
-      showBanner('💾', 'Downloaded self-contained violets_championship_quest_game.html with all points & Parent Hub progress baked in!', 'emerald');
+      showBanner('💾', 'Downloaded self-contained index.html with all points & Parent Hub progress baked in!', 'emerald');
     });
 
     // Export Portable JSON Sync File
