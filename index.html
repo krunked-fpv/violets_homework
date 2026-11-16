@@ -43,8 +43,21 @@
       animation: floatSlow 2.6s ease-in-out infinite;
     }
   </style>
+  <!-- Baked-In Weekly Session & Progress Snapshot (Vinyl Vault Self-Contained Pattern) -->
+  <script id="baked-state-script">
+    window.__VIOLET_QUEST_STATE__ = null;
+  </script>
 </head>
 <body class="pb-16 selection:bg-amber-400 selection:text-slate-950">
+
+  <!-- Inline Hidden Form for Portable State Persistence (Discogs Vinyl Vault Pattern) -->
+  <form id="quest-inline-state-form" class="hidden" aria-hidden="true">
+    <input type="hidden" id="quest-hidden-week-id" value="2026-11-16_championship_quest" />
+    <input type="hidden" id="quest-hidden-coins" value="0" />
+    <input type="hidden" id="quest-hidden-stars" value="0" />
+    <input type="hidden" id="quest-hidden-signoffs" value="" />
+    <input type="hidden" id="quest-hidden-state-json" value="" />
+  </form>
 
   <!-- Confetti & FX Overlay Canvas -->
   <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
@@ -58,12 +71,15 @@
           🐸
         </div>
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center flex-wrap gap-1.5">
             <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40">
               Week of Nov 16 • Paris Ridge 2nd Grade
             </span>
             <span id="streakPill" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
               🔥 0 Streak
+            </span>
+            <span id="syncStatusPill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-400/30">
+              🟢 Local Sync Ready
             </span>
           </div>
           <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight">
@@ -72,34 +88,34 @@
         </div>
       </div>
 
-      <!-- Score, Timer & Controls -->
-      <div class="flex items-center flex-wrap gap-2">
+      <!-- Score, Timer & Top Action Controls -->
+      <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
         <!-- Champion Coins -->
-        <div class="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 rounded-xl px-3 py-1.5">
-          <span class="text-lg">🪙</span>
+        <div class="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 rounded-xl px-2.5 py-1">
+          <span class="text-base">🪙</span>
           <div class="leading-tight">
-            <div class="text-[10px] uppercase tracking-wider text-amber-200 font-semibold">Champion Coins</div>
-            <div id="coinDisplay" class="text-base font-extrabold text-amber-300 game-font">0</div>
+            <div class="text-[10px] uppercase tracking-wider text-amber-200 font-semibold">Coins</div>
+            <div id="coinDisplay" class="text-sm sm:text-base font-extrabold text-amber-300 game-font">0</div>
           </div>
         </div>
 
         <!-- 5 Gold Quest Stars -->
-        <div class="flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-400/50 rounded-xl px-3 py-1.5">
-          <span class="text-lg">⭐</span>
+        <div class="flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-400/50 rounded-xl px-2.5 py-1">
+          <span class="text-base">⭐</span>
           <div class="leading-tight">
-            <div class="text-[10px] uppercase tracking-wider text-indigo-200 font-semibold">Arena Stars</div>
-            <div id="starDisplay" class="text-base font-extrabold text-indigo-200 game-font">0 / 5</div>
+            <div class="text-[10px] uppercase tracking-wider text-indigo-200 font-semibold">Stars</div>
+            <div id="starDisplay" class="text-sm sm:text-base font-extrabold text-indigo-200 game-font">0 / 5</div>
           </div>
         </div>
 
         <!-- Sprint Timer Control -->
-        <div class="flex items-center gap-1.5 bg-slate-800/90 border border-slate-600/60 rounded-xl px-2.5 py-1">
-          <span class="text-sm">⏱️</span>
-          <span id="timerReadout" class="font-mono font-bold text-sm text-emerald-300 min-w-[46px]">10:00</span>
-          <button id="timerToggleBtn" type="button" class="text-xs font-bold px-2 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">
+        <div class="flex items-center gap-1.5 bg-slate-800/90 border border-slate-600/60 rounded-xl px-2 py-1">
+          <span class="text-xs">⏱️</span>
+          <span id="timerReadout" class="font-mono font-bold text-xs sm:text-sm text-emerald-300 min-w-[42px]">10:00</span>
+          <button id="timerToggleBtn" type="button" class="text-xs font-bold px-2 py-0.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">
             Start
           </button>
-          <select id="timerPresetSelect" aria-label="Sprint timer preset" class="text-xs bg-slate-900 text-slate-200 rounded-lg px-1.5 py-1 border border-slate-700">
+          <select id="timerPresetSelect" aria-label="Sprint timer preset" class="text-xs bg-slate-900 text-slate-200 rounded-lg px-1 py-0.5 border border-slate-700">
             <option value="600">Sprint 1 (10m)</option>
             <option value="300">Break (5m)</option>
             <option value="900">Sprint 2 (15m)</option>
@@ -107,16 +123,28 @@
           </select>
         </div>
 
-        <!-- Audio Mute Toggle -->
-        <button id="muteBtn" type="button" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-sm font-semibold flex items-center gap-1 transition" title="Toggle Sound Effects">
-          <span id="muteIcon">🔊</span>
-          <span id="muteLabel" class="hidden md:inline text-xs">SFX On</span>
+        <!-- TOP BAR: RESET DAILY PROGRESS BUTTON -->
+        <button id="topResetDailyBtn" type="button" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/50 text-xs font-extrabold text-rose-200 transition flex items-center gap-1" title="Reset today's practice boards while keeping weekly coins, stars &amp; Parent Hub sign-offs">
+          <span>🔄</span>
+          <span>Reset Daily</span>
+        </button>
+
+        <!-- TOP BAR: LOCAL SYNC & EXPORT BUTTON -->
+        <button id="topSyncBtn" type="button" class="px-2.5 py-1.5 rounded-xl bg-sky-500/25 hover:bg-sky-500/40 border border-sky-400/50 text-xs font-extrabold text-sky-200 transition flex items-center gap-1" title="Local Sync, Bake HTML &amp; Resync Progress">
+          <span>💾</span>
+          <span>Local Sync</span>
         </button>
 
         <!-- Parent Resources Modal Button -->
-        <button id="openHubBtn" type="button" class="px-3 py-2 rounded-xl bg-purple-600/80 hover:bg-purple-500 border border-purple-400/50 text-xs font-bold text-white transition flex items-center gap-1">
+        <button id="openHubBtn" type="button" class="px-2.5 py-1.5 rounded-xl bg-purple-600/80 hover:bg-purple-500 border border-purple-400/50 text-xs font-bold text-white transition flex items-center gap-1">
           <span>📋</span>
           <span>Parent Hub</span>
+        </button>
+
+        <!-- Audio Mute Toggle -->
+        <button id="muteBtn" type="button" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-semibold flex items-center gap-1 transition" title="Toggle Sound Effects">
+          <span id="muteIcon">🔊</span>
+          <span id="muteLabel" class="hidden lg:inline text-[11px]">SFX On</span>
         </button>
       </div>
     </div>
@@ -908,18 +936,83 @@
   </main>
 
   <!-- ==========================================
-       PARENT HUB & SIGN-OFF DRAWER MODAL
+       PARENT HUB, LOCAL SYNC & SIGN-OFF DRAWER MODAL
+       (Includes Discogs Vinyl Vault v4.0/v5.0 Local Sync Pattern)
        ========================================== -->
-  <div id="parentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card rounded-3xl max-w-2xl w-full p-6 border-2 border-purple-400/50 space-y-5 max-h-[90vh] overflow-y-auto">
+  <div id="parentModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card rounded-3xl max-w-3xl w-full p-6 border-2 border-purple-400/50 space-y-5 max-h-[92vh] overflow-y-auto">
       <div class="flex items-center justify-between">
         <div>
-          <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Alex &amp; Marisa • Co-Host Control Center</span>
-          <h2 class="text-2xl font-extrabold text-white">📋 Weekly Workspace Suite &amp; Sign-Off Tracker</h2>
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Alex &amp; Marisa • Co-Host Control Center &amp; Local Sync Engine</span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white">📋 Parent Hub, Weekly Sign-Off &amp; Local Sync</h2>
         </div>
         <button id="closeHubBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold">
           Close ✕
         </button>
+      </div>
+
+      <!-- Live Session Telemetry Bar (Vinyl Vault Style) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-amber-400/30">
+          <div class="text-[10px] font-bold uppercase text-amber-300">Weekly Session Metadata</div>
+          <div id="telemetrySessionTitle" class="text-sm font-extrabold text-white mt-0.5">Week of Nov 16 • Long /O/</div>
+          <div id="telemetryLastSync" class="text-[11px] text-slate-400 mt-0.5">Auto-synced to browser &amp; inline form</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-400/30">
+          <div class="text-[10px] font-bold uppercase text-emerald-300">Violet's Live Progress</div>
+          <div id="telemetryScoreText" class="text-sm font-extrabold text-white mt-0.5">0 Coins • 0/5 Arena Stars</div>
+          <div id="telemetryDailySolved" class="text-[11px] text-slate-400 mt-0.5">0 Chopped • 0/10 Sorted • 0/10 Locks</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-sky-400/30">
+          <div class="text-[10px] font-bold uppercase text-sky-300">Parent Hub Sign-Offs</div>
+          <div id="telemetrySignoffText" class="text-sm font-extrabold text-white mt-0.5">0 / 8 Sprints Signed Off</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Mon–Thu Phonics &amp; Math Sprints</div>
+        </div>
+      </div>
+
+      <!-- LOCAL SYNC & SELF-CONTAINED EXPORTER (Discogs Vinyl Vault Architecture) -->
+      <div class="bg-slate-900/95 rounded-2xl p-4 border-2 border-sky-400/40 space-y-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-sky-300">💾 Local Sync &amp; Self-Contained State Manager</span>
+            <p class="text-xs text-slate-300 mt-0.5">
+              Never lose points, stars, or Parent Hub sign-offs on page refresh! Bake your live session state directly into a downloadable <code class="text-amber-300">.html</code> file (just like <code class="text-sky-300">index.html</code> in your Discogs Vinyl Vault) or export/import a portable JSON sync file.
+            </p>
+          </div>
+          <button id="forceResyncBtn" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-extrabold transition">
+            🔄 Resync State Now
+          </button>
+        </div>
+
+        <!-- Primary Sync Action Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <button id="downloadBakedHtmlBtn" type="button" class="p-3 rounded-xl bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-300 hover:to-indigo-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow transition">
+            <span>💾</span>
+            <span>Download Updated Game HTML (Bake Progress In)</span>
+          </button>
+          <button id="exportJsonBtn" type="button" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-sky-400/40 text-sky-200 font-extrabold text-xs flex items-center justify-center gap-2 transition">
+            <span>📤</span>
+            <span>Export Sync JSON (violet_quest_sync.json)</span>
+          </button>
+          <label for="importJsonFileInput" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-400/40 text-amber-200 font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer transition text-center">
+            <span>📥</span>
+            <span>Import / Resync JSON File</span>
+            <input id="importJsonFileInput" type="file" accept=".json,application/json" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Quick Clipboard Snapshot Sync -->
+        <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <input id="syncJsonSnapshotInput" type="text" readonly placeholder="Live JSON sync snapshot..." class="flex-1 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-[11px] font-mono text-slate-300" />
+          <div class="flex items-center gap-1.5">
+            <button id="copySyncJsonBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 border border-slate-700 whitespace-nowrap">
+              📋 Copy Sync Code
+            </button>
+            <button id="applyPastedJsonBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-emerald-300 border border-slate-700 whitespace-nowrap">
+              📥 Paste &amp; Restore
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Direct Workspace Companion Links -->
@@ -944,9 +1037,12 @@
 
       <!-- Mon-Thu Daily Progress Sign-Off -->
       <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-700 space-y-3">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <h3 class="text-sm font-extrabold uppercase tracking-wider text-amber-300">Monday–Thursday Family Sign-Off Log</h3>
-          <button id="resetProgressBtn" type="button" class="text-xs text-rose-300 hover:underline">Reset All Progress</button>
+          <div class="flex items-center gap-3">
+            <button id="modalResetDailyBtn" type="button" class="text-xs text-amber-300 hover:underline font-bold">🔄 Reset Daily Boards Only</button>
+            <button id="resetProgressBtn" type="button" class="text-xs text-rose-300 hover:underline font-bold">Reset All Progress</button>
+          </div>
         </div>
         <div id="signOffList" class="space-y-2 text-xs sm:text-sm"></div>
       </div>
@@ -957,6 +1053,16 @@
     // =====================================================
     // 1. GROUNDED HOMEWORK DATA (WEEK OF NOV 16, 2026)
     // =====================================================
+    const SESSION_METADATA = {
+      weekId: '2026-11-16_championship_quest',
+      weekLabel: 'Week of Nov 16, 2026',
+      themeTitle: "Violet's Championship Quest: Long O & Metamorphosis Game Show!",
+      student: 'Violet Goresch (2nd Grade • Mrs. Molly Ulrich)',
+      coaches: 'Dad (Alex) & Marisa',
+      slidesUrl: 'https://docs.google.com/presentation/d/1oSDU7vfsShmhrNtLXLWaLAwuksxUnW3rqZwtxFD1Wv4/edit',
+      playbookUrl: 'https://docs.google.com/document/d/1toRghnHExDVKz3tHK-JaKdJVPER23ySkDWJlyjACcxU/edit'
+    };
+
     const SPELLING_WORDS = [
       { word: 'moment', pattern: 'o', vaultName: 'Open o', isCompound: false, syllables: 'mo • ment', sentence: 'Wait just one moment before we start the game show!' },
       { word: 'frozen', pattern: 'o', vaultName: 'Open o', isCompound: false, syllables: 'fro • zen', sentence: 'The pond water was frozen solid on the chilly morning.' },
@@ -1022,7 +1128,6 @@
     ];
 
     const FLASHCARD_DECK = [
-      // This week's +4 Challenger Pile
       { a: 6, b: 4, ans: 10, pile: 'plus4', label: '🔥 +4 Challenger', tip: '6 + 4 makes a Friendly 10!' },
       { a: 7, b: 4, ans: 11, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Think 7 + 3 = 10, plus 1 more is 11!' },
       { a: 8, b: 4, ans: 12, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Think 8 + 2 = 10, plus 2 more is 12!' },
@@ -1030,7 +1135,6 @@
       { a: 5, b: 4, ans: 9, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Near-Double! 4 + 4 is 8, plus 1 more is 9!' },
       { a: 4, b: 4, ans: 8, pile: 'plus4', label: '🔥 +4 Challenger (Double!)', tip: 'Double 4s make 8!' },
       { a: 3, b: 4, ans: 7, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Double 3s is 6, plus 1 more is 7!' },
-      // Confident Base Pile (Teens, +0, +1, +2, Doubles, +3)
       { a: 10, b: 7, ans: 17, pile: 'base', label: '⭐ Confident Base (Teens)', tip: '1 ten and 7 ones is 17!' },
       { a: 10, b: 4, ans: 14, pile: 'base', label: '⭐ Confident Base (Teens)', tip: '1 ten and 4 ones is 14!' },
       { a: 8, b: 8, ans: 16, pile: 'base', label: '⭐ Confident Base (Doubles)', tip: 'Double 8s equal 16!' },
@@ -1079,9 +1183,13 @@
     ];
 
     // =====================================================
-    // 2. PERSISTENT GAME STATE & SAFE STORAGE
+    // 2. PERSISTENT GAME STATE & VINYL-VAULT LOCAL SYNC ENGINE
     // =====================================================
+    const STORAGE_KEY = 'violet_quest_nov16_v1';
+
     const state = {
+      metadata: SESSION_METADATA,
+      lastSavedAt: null,
       coins: 0,
       streak: 0,
       muted: false,
@@ -1109,6 +1217,7 @@
       quoteGlow: true,
       pass1Done: false,
       pass2Done: false,
+      gratitudeText: '',
       gratitudeClaimed: false,
       // Stage 5: Math Lab
       mathMode: 'flashcards',
@@ -1130,38 +1239,128 @@
       }
     };
 
+    function getSerializablePayload() {
+      return {
+        metadata: SESSION_METADATA,
+        lastSavedAt: state.lastSavedAt || new Date().toLocaleTimeString(),
+        coins: state.coins,
+        streak: state.streak,
+        ritualChecks: state.ritualChecks,
+        stars: state.stars,
+        karateChopped: state.karateChopped,
+        karatePatternDone: state.karatePatternDone,
+        karateFused: state.karateFused,
+        sortedWords: state.sortedWords,
+        crackedLocks: state.crackedLocks,
+        spellTestCorrect: state.spellTestCorrect,
+        pass1Done: state.pass1Done,
+        pass2Done: state.pass2Done,
+        gratitudeText: document.getElementById('gratitudeInput') ? document.getElementById('gratitudeInput').value : state.gratitudeText,
+        flashSolvedCount: state.flashSolvedCount,
+        signOff: state.signOff
+      };
+    }
+
+    function applyPayloadToState(parsed) {
+      if (!parsed || typeof parsed !== 'object') return;
+      if (typeof parsed.coins === 'number') state.coins = parsed.coins;
+      if (typeof parsed.streak === 'number') state.streak = parsed.streak;
+      if (parsed.lastSavedAt) state.lastSavedAt = parsed.lastSavedAt;
+      if (parsed.ritualChecks) Object.assign(state.ritualChecks, parsed.ritualChecks);
+      if (parsed.stars) Object.assign(state.stars, parsed.stars);
+      if (parsed.karateChopped) state.karateChopped = { ...parsed.karateChopped };
+      if (parsed.karatePatternDone) state.karatePatternDone = { ...parsed.karatePatternDone };
+      if (parsed.karateFused) state.karateFused = { ...parsed.karateFused };
+      if (parsed.sortedWords) state.sortedWords = { ...parsed.sortedWords };
+      if (parsed.crackedLocks) state.crackedLocks = { ...parsed.crackedLocks };
+      if (parsed.spellTestCorrect) state.spellTestCorrect = { ...parsed.spellTestCorrect };
+      if (typeof parsed.pass1Done === 'boolean') state.pass1Done = parsed.pass1Done;
+      if (typeof parsed.pass2Done === 'boolean') state.pass2Done = parsed.pass2Done;
+      if (typeof parsed.gratitudeText === 'string') {
+        state.gratitudeText = parsed.gratitudeText;
+        const gEl = document.getElementById('gratitudeInput');
+        if (gEl) gEl.value = parsed.gratitudeText;
+      }
+      if (typeof parsed.flashSolvedCount === 'number') state.flashSolvedCount = parsed.flashSolvedCount;
+      if (parsed.signOff) Object.assign(state.signOff, parsed.signOff);
+    }
+
+    function syncInlineFormAndTelemetry() {
+      const payload = getSerializablePayload();
+      const jsonStr = JSON.stringify(payload);
+      window.__VIOLET_QUEST_STATE__ = payload;
+
+      const hiddenJson = document.getElementById('quest-hidden-state-json');
+      const hiddenCoins = document.getElementById('quest-hidden-coins');
+      const hiddenStars = document.getElementById('quest-hidden-stars');
+      const hiddenSignoffs = document.getElementById('quest-hidden-signoffs');
+      if (hiddenJson) hiddenJson.value = jsonStr;
+      if (hiddenCoins) hiddenCoins.value = String(state.coins);
+      const starCount = Object.values(state.stars).filter(Boolean).length;
+      if (hiddenStars) hiddenStars.value = String(starCount);
+      const signedKeys = Object.keys(state.signOff).filter((k) => state.signOff[k]);
+      if (hiddenSignoffs) hiddenSignoffs.value = signedKeys.join(',');
+
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      if (snapInput) snapInput.value = jsonStr;
+
+      const syncPill = document.getElementById('syncStatusPill');
+      if (syncPill && state.lastSavedAt) {
+        syncPill.textContent = `🟢 Synced ${state.lastSavedAt}`;
+      }
+
+      // Update Parent Hub Telemetry Cards
+      const tScore = document.getElementById('telemetryScoreText');
+      const tDaily = document.getElementById('telemetryDailySolved');
+      const tSign = document.getElementById('telemetrySignoffText');
+      const tSync = document.getElementById('telemetryLastSync');
+      if (tScore) tScore.textContent = `${state.coins} Coins • ${starCount}/5 Arena Stars`;
+      if (tDaily) {
+        const cCount = Object.values(state.karateFused).filter(Boolean).length;
+        const sCount = Object.keys(state.sortedWords).length;
+        const mCount = Object.keys(state.crackedLocks).length;
+        tDaily.textContent = `${cCount}/5 Chopped • ${sCount}/10 Sorted • ${mCount}/10 Locks`;
+      }
+      if (tSign) tSign.textContent = `${signedKeys.length} / 8 Sprints Signed Off`;
+      if (tSync) tSync.textContent = state.lastSavedAt ? `Last local sync: ${state.lastSavedAt}` : 'Auto-synced to browser & inline form';
+    }
+
     function loadSavedState() {
+      // Priority 1: Check if baked-in state exists inside HTML (from "Download Updated Game HTML")
+      if (window.__VIOLET_QUEST_STATE__ && typeof window.__VIOLET_QUEST_STATE__ === 'object') {
+        applyPayloadToState(window.__VIOLET_QUEST_STATE__);
+      } else {
+        const hiddenJson = document.getElementById('quest-hidden-state-json');
+        if (hiddenJson && hiddenJson.value) {
+          try {
+            applyPayloadToState(JSON.parse(hiddenJson.value));
+          } catch (e) {
+            // Ignore malformed hidden JSON
+          }
+        }
+      }
+      // Priority 2: Reconcile with browser localStorage if newer/present
       try {
-        const raw = localStorage.getItem('violet_quest_nov16_v1');
+        const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
-          if (typeof parsed.coins === 'number') state.coins = parsed.coins;
-          if (parsed.ritualChecks) Object.assign(state.ritualChecks, parsed.ritualChecks);
-          if (parsed.stars) Object.assign(state.stars, parsed.stars);
-          if (parsed.karateFused) Object.assign(state.karateFused, parsed.karateFused);
-          if (parsed.sortedWords) Object.assign(state.sortedWords, parsed.sortedWords);
-          if (parsed.crackedLocks) Object.assign(state.crackedLocks, parsed.crackedLocks);
-          if (parsed.signOff) Object.assign(state.signOff, parsed.signOff);
+          applyPayloadToState(parsed);
         }
       } catch (e) {
         // Ignore storage errors in sandboxed iframes
       }
+      syncInlineFormAndTelemetry();
     }
 
     function saveState() {
+      state.lastSavedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const payload = getSerializablePayload();
       try {
-        localStorage.setItem('violet_quest_nov16_v1', JSON.stringify({
-          coins: state.coins,
-          ritualChecks: state.ritualChecks,
-          stars: state.stars,
-          karateFused: state.karateFused,
-          sortedWords: state.sortedWords,
-          crackedLocks: state.crackedLocks,
-          signOff: state.signOff
-        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       } catch (e) {
         // Ignore storage errors
       }
+      syncInlineFormAndTelemetry();
     }
 
     // =====================================================
@@ -1189,8 +1388,8 @@
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(587.33, now); // D5
-          osc.frequency.setValueAtTime(880, now + 0.09); // A5
+          osc.frequency.setValueAtTime(587.33, now);
+          osc.frequency.setValueAtTime(880, now + 0.09);
           gain.gain.setValueAtTime(0.18, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
           osc.connect(gain);
@@ -1604,7 +1803,6 @@
       const current = COMPOUND_WORDS[state.karateIdx];
       document.getElementById('karateCoachTip').textContent = `💡 Coach Tip: ${current.tip}`;
 
-      // Render letters + karate chop buttons between each letter
       const chopRow = document.getElementById('karateChopContainer');
       chopRow.innerHTML = '';
       const isChopped = !!state.karateChopped[current.word];
@@ -1649,7 +1847,6 @@
         document.getElementById('karatePart2Display').textContent = current.part2;
         document.getElementById('karateWholeDisplay').textContent = current.word;
 
-        // Render pattern buttons
         const patternContainer = document.getElementById('karatePatternChoices');
         patternContainer.innerHTML = '';
         VAULT_DEFS.forEach((v) => {
@@ -1761,7 +1958,6 @@
         awardStar('vaults', '5 Secret Long /O/ Vaults Detective');
       }
 
-      // Render 2A: Unsorted Word Bank & 5 Vault Columns
       const bankEl = document.getElementById('unsortedWordBank');
       bankEl.innerHTML = '';
       const remaining = SPELLING_WORDS.filter((w) => !state.sortedWords[w.word]);
@@ -1831,7 +2027,6 @@
         colsEl.appendChild(col);
       });
 
-      // Render 2B: Mystery Letter Challenge
       const mystGrid = document.getElementById('mysteryGrid');
       mystGrid.innerHTML = '';
       MYSTERY_WORDS.forEach((m, idx) => {
@@ -1880,7 +2075,6 @@
         mystGrid.appendChild(card);
       });
 
-      // Render 2C: Audio Spelling Test
       const testWord = SPELLING_WORDS[state.spellTestIdx];
       const testSolvedCount = Object.keys(state.spellTestCorrect).length;
       document.getElementById('spellTestProgress').textContent = `Word ${state.spellTestIdx + 1} of ${SPELLING_WORDS.length}`;
@@ -2069,7 +2263,6 @@
       const h = pondCanvas.height;
       pondCtx.clearRect(0, 0, w, h);
 
-      // Deep pond water background
       const grad = pondCtx.createLinearGradient(0, 0, 0, h);
       grad.addColorStop(0, '#022c22');
       grad.addColorStop(1, '#0f172a');
@@ -2079,7 +2272,6 @@
       const cellW = w / pondGame.cols;
       const cellH = h / pondGame.rows;
 
-      // Draw lily pads
       for (let r = 0; r < pondGame.rows; r++) {
         for (let c = 0; c < pondGame.cols; c++) {
           const cx = c * cellW + cellW / 2;
@@ -2098,7 +2290,6 @@
         }
       }
 
-      // Draw target Long /O/ word bubble
       const bx = pondGame.targetBubble.col * cellW + cellW / 2;
       const by = pondGame.targetBubble.row * cellH + cellH / 2;
       pondCtx.beginPath();
@@ -2115,7 +2306,6 @@
       pondCtx.textBaseline = 'middle';
       pondCtx.fillText(pondGame.targetBubble.word, bx, by);
 
-      // Draw player creature
       const px = pondGame.playerCol * cellW + cellW / 2;
       const py = pondGame.playerRow * cellH + cellH / 2;
       const evo = getPondEvolutionStage();
@@ -2184,6 +2374,12 @@
           ? 'quote-segment px-2 py-0.5 rounded-lg bg-amber-400/25 text-amber-200 border border-amber-400/50 font-extrabold'
           : 'quote-segment';
       });
+      document.getElementById('pass1DoneBtn').textContent = state.pass1Done
+        ? '✅ Pass 1: Warm-Up Lap Completed!'
+        : '⬜ Pass 1: Warm-Up Lap (Accuracy & Arm-Tapping)';
+      document.getElementById('pass2DoneBtn').textContent = state.pass2Done
+        ? '✅ Pass 2: Sportscaster Broadcast Voice Completed!'
+        : '⬜ Pass 2: Live TV Sportscaster Voice (" " Expression!)';
     }
 
     document.querySelectorAll('.script-tab').forEach((btn) => {
@@ -2212,29 +2408,27 @@
       btn.addEventListener('click', () => playSound(btn.getAttribute('data-sfx')));
     });
 
-    document.getElementById('pass1DoneBtn').addEventListener('click', (e) => {
+    document.getElementById('pass1DoneBtn').addEventListener('click', () => {
       state.pass1Done = !state.pass1Done;
-      e.currentTarget.textContent = state.pass1Done
-        ? '✅ Pass 1: Warm-Up Lap Completed!'
-        : '⬜ Pass 1: Warm-Up Lap (Accuracy & Arm-Tapping)';
+      renderSportscasterStage();
+      saveState();
       if (state.pass1Done) addCoins(20, 'Pass 1 Warm-Up Reading Lap Complete!');
     });
 
-    document.getElementById('pass2DoneBtn').addEventListener('click', (e) => {
+    document.getElementById('pass2DoneBtn').addEventListener('click', () => {
       state.pass2Done = !state.pass2Done;
-      e.currentTarget.textContent = state.pass2Done
-        ? '✅ Pass 2: Sportscaster Broadcast Voice Completed!'
-        : '⬜ Pass 2: Live TV Sportscaster Voice (" " Expression!)';
+      renderSportscasterStage();
+      saveState();
       if (state.pass2Done) {
         playSound('cheer');
         addCoins(20, 'Pass 2 Live TV Sportscaster Broadcast Complete!');
       }
     });
 
-    // Gratitude Sentence Checker
     const gratInput = document.getElementById('gratitudeInput');
     function evaluateGratitudeSentence() {
       const val = gratInput.value.trim();
+      state.gratitudeText = val;
       const hasCap = /^[A-Z"]/.test(val) && /[A-Z]/.test(val.slice(0, 2));
       const hasSpellWord = SPELLING_WORDS.some((w) => new RegExp(`\\b${w.word}\\b`, 'i').test(val));
       const hasQuotes = val.includes('"');
@@ -2255,7 +2449,10 @@
       return hasCap && (hasSpellWord || hasQuotes) && hasPunct;
     }
 
-    gratInput.addEventListener('input', evaluateGratitudeSentence);
+    gratInput.addEventListener('input', () => {
+      evaluateGratitudeSentence();
+      saveState();
+    });
 
     document.querySelectorAll('.insert-word-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -2267,6 +2464,7 @@
         gratInput.value = `${before}${spacer}${word}${after}`;
         gratInput.focus();
         evaluateGratitudeSentence();
+        saveState();
       });
     });
 
@@ -2373,7 +2571,6 @@
       btn.addEventListener('click', () => switchMathMode(btn.getAttribute('data-math-mode')));
     });
 
-    // PART 5A: FLASHCARDS
     function getFilteredFlashcards() {
       if (state.flashFilter === 'plus4') return FLASHCARD_DECK.filter((c) => c.pile === 'plus4');
       if (state.flashFilter === 'base') return FLASHCARD_DECK.filter((c) => c.pile === 'base');
@@ -2440,7 +2637,6 @@
       renderFlashcard();
     });
 
-    // PART 5B: EXPLODE DOUBLE-DIGIT ADDITION LAB
     function setExplodeProblem(a, b) {
       state.activeExplode = { a, b };
       document.getElementById('explodeMainEq').textContent = `${a} + ${b}`;
@@ -2515,7 +2711,6 @@
       }
     });
 
-    // PART 5C: PART-PART-WHOLE & TADPOLE HOP SUBTRACTION
     function renderHopProblem() {
       const prob = HOP_PROBLEMS[state.hopIdx];
       state.hopPpwUnlocked = false;
@@ -2575,7 +2770,6 @@
         <line x1="40" y1="105" x2="660" y2="105" stroke="#475569" stroke-width="4" stroke-linecap="round" />
       `;
 
-      // Draw ticks for start, friendly tens, and answer
       const ticks = new Set([prob.start, prob.start - prob.onesHop, prob.ans, prob.ans + 10, prob.ans + 20]);
       ticks.forEach((t) => {
         if (t >= minVal && t <= maxVal) {
@@ -2587,7 +2781,6 @@
         }
       });
 
-      // Draw hop arcs
       state.hopHistory.forEach((hop) => {
         const x1 = mapX(hop.from);
         const x2 = mapX(hop.to);
@@ -2600,7 +2793,6 @@
         `;
       });
 
-      // Draw frog marker at current spot
       const curX = mapX(state.hopCurrentVal);
       html += `<text x="${curX}" y="90" font-size="24" text-anchor="middle">🐸</text>`;
 
@@ -2660,7 +2852,8 @@
     });
 
     // =====================================================
-    // 12. PARENT HUB & SIGN-OFF TRACKER
+    // 12. RESET DAILY PROGRESS VS. FULL WEEKLY RESET
+    //     & VINYL-VAULT LOCAL SYNC / HTML BAKER
     // =====================================================
     const SIGN_OFF_ITEMS = [
       { key: 'monPhonics', label: 'Monday: Phonics Karate Chop' },
@@ -2672,6 +2865,48 @@
       { key: 'thuPhonics', label: 'Thursday: Kids Excel Sportscaster & Gratitude' },
       { key: 'thuMath', label: 'Thursday: Full Championship Review' }
     ];
+
+    function refreshAllViews() {
+      updateHeaderReadouts();
+      renderRitual();
+      renderKarateStage();
+      renderVaultStage();
+      initRetellPuzzle();
+      renderSportscasterStage();
+      evaluateGratitudeSentence();
+      renderFlashcard();
+      renderExplodeProblem();
+      renderHopProblem();
+      renderSignOffList();
+      syncInlineFormAndTelemetry();
+    }
+
+    // RESET DAILY PROGRESS: Clears today's interactive exercise boards for a fresh daily run
+    // while keeping Weekly Coins, 5 Arena Stars, and Mon-Thu Parent Hub Sign-Offs intact!
+    function resetDailyProgressOnly() {
+      state.streak = 0;
+      state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
+      state.karateChopped = {};
+      state.karatePatternDone = {};
+      state.karateFused = {};
+      state.sortedWords = {};
+      state.crackedLocks = {};
+      state.spellTestCorrect = {};
+      state.pass1Done = false;
+      state.pass2Done = false;
+      pondGame.bubblesCaught = 0;
+      pondGame.playerCol = 2;
+      pondGame.playerRow = 1;
+      spawnPondBubble();
+      drawPondGame();
+      saveState();
+      refreshAllViews();
+      playSound('onair');
+      showBanner('🔄', 'Daily Practice Boards Reset for Today! (Your Weekly Coins, Arena Stars & Parent Hub Sign-Offs are safely kept!)', 'emerald');
+    }
+
+    document.getElementById('topResetDailyBtn').addEventListener('click', resetDailyProgressOnly);
+    document.getElementById('modalResetDailyBtn').addEventListener('click', resetDailyProgressOnly);
 
     function renderSignOffList() {
       const list = document.getElementById('signOffList');
@@ -2693,32 +2928,152 @@
       });
     }
 
-    document.getElementById('openHubBtn').addEventListener('click', () => {
+    function openParentAndSyncModal() {
+      saveState();
       renderSignOffList();
       document.getElementById('parentModal').classList.remove('hidden');
-    });
+    }
+
+    document.getElementById('openHubBtn').addEventListener('click', openParentAndSyncModal);
+    document.getElementById('topSyncBtn').addEventListener('click', openParentAndSyncModal);
 
     document.getElementById('closeHubBtn').addEventListener('click', () => {
       document.getElementById('parentModal').classList.add('hidden');
     });
 
+    // Force Resync button
+    document.getElementById('forceResyncBtn').addEventListener('click', () => {
+      loadSavedState();
+      saveState();
+      refreshAllViews();
+      playSound('coin');
+      showBanner('💾', `Local Sync Verified at ${state.lastSavedAt}! Coins, Stars & Parent Hub Sign-Offs are locked in.`, 'emerald');
+    });
+
+    // Download Self-Contained Updated HTML (Vinyl Vault index.html Baker Pattern)
+    document.getElementById('downloadBakedHtmlBtn').addEventListener('click', () => {
+      saveState();
+      const payload = getSerializablePayload();
+      const serialized = JSON.stringify(payload);
+      let htmlSource = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      htmlSource = htmlSource.replace(
+        /<script id="baked-state-script">[\s\S]*?<\/script>/,
+        `<script id="baked-state-script">\n    window.__VIOLET_QUEST_STATE__ = ${serialized};\n  <\/script>`
+      );
+      const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'violets_championship_quest_game.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      playSound('fanfare');
+      showBanner('💾', 'Downloaded self-contained violets_championship_quest_game.html with all points & Parent Hub progress baked in!', 'emerald');
+    });
+
+    // Export Portable JSON Sync File
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      saveState();
+      const payload = getSerializablePayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'violet_quest_sync.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      playSound('coin');
+      showBanner('📤', 'Exported violet_quest_sync.json snapshot!', 'emerald');
+    });
+
+    // Import / Resync JSON File
+    document.getElementById('importJsonFileInput').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          applyPayloadToState(parsed);
+          saveState();
+          refreshAllViews();
+          playSound('fanfare');
+          spawnConfetti(45);
+          showBanner('📥', 'Resynced session metadata, points, stars, and Parent Hub sign-offs from JSON file!', 'emerald');
+        } catch (err) {
+          playSound('oops');
+          showBanner('⚠️', 'Could not parse that JSON sync file. Please check the file and try again.', 'amber');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Copy & Paste Snapshot JSON Controls
+    document.getElementById('copySyncJsonBtn').addEventListener('click', () => {
+      saveState();
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      snapInput.select();
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(snapInput.value);
+        } else {
+          document.execCommand('copy');
+        }
+      } catch (e) {
+        document.execCommand('copy');
+      }
+      playSound('coin');
+      showBanner('📋', 'Copied live Local Sync JSON code to clipboard!', 'emerald');
+    });
+
+    document.getElementById('applyPastedJsonBtn').addEventListener('click', () => {
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      if (snapInput.hasAttribute('readonly')) {
+        snapInput.removeAttribute('readonly');
+        snapInput.value = '';
+        snapInput.placeholder = 'Paste your saved Sync JSON code here, then click Paste & Restore again...';
+        snapInput.focus();
+        return;
+      }
+      try {
+        const parsed = JSON.parse(snapInput.value.trim());
+        snapInput.setAttribute('readonly', 'readonly');
+        applyPayloadToState(parsed);
+        saveState();
+        refreshAllViews();
+        playSound('fanfare');
+        showBanner('📥', 'Restored session progress from pasted Sync Code!', 'emerald');
+      } catch (e) {
+        playSound('oops');
+        showBanner('⚠️', 'Invalid Sync JSON code — paste the full JSON string copied from Copy Sync Code.', 'amber');
+      }
+    });
+
+    // Full Weekly Reset
     document.getElementById('resetProgressBtn').addEventListener('click', () => {
       state.coins = 0;
       state.streak = 0;
       state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
       state.stars = { karate: false, vaults: false, metamorphosis: false, sportscaster: false, mathlab: false };
       state.karateChopped = {};
+      state.karatePatternDone = {};
       state.karateFused = {};
       state.sortedWords = {};
       state.crackedLocks = {};
+      state.spellTestCorrect = {};
+      state.pass1Done = false;
+      state.pass2Done = false;
+      state.gratitudeText = '';
+      if (document.getElementById('gratitudeInput')) document.getElementById('gratitudeInput').value = '';
+      state.flashSolvedCount = 0;
       Object.keys(state.signOff).forEach((k) => { state.signOff[k] = false; });
       saveState();
-      updateHeaderReadouts();
-      renderRitual();
-      renderKarateStage();
-      renderVaultStage();
-      renderSignOffList();
-      showBanner('🔄', 'All game progress reset for a fresh playthrough!', 'amber');
+      refreshAllViews();
+      showBanner('🔄', 'Full Weekly Progress Reset for a brand-new week!', 'amber');
     });
 
     // =====================================================
@@ -2736,9 +3091,11 @@
       spawnPondBubble();
       resizePondCanvas();
       renderSportscasterStage();
+      evaluateGratitudeSentence();
       renderFlashcard();
       renderExplodeProblem();
       renderHopProblem();
+      syncInlineFormAndTelemetry();
     });
   </script>
 </body>
