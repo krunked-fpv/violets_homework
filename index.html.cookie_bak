@@ -1,0 +1,3559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Violet's Championship Quest: Long O &amp; Metamorphosis Game Show!</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, .game-font {
+      font-family: 'Fredoka', 'Inter', sans-serif;
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+    .gold-glow {
+      box-shadow: 0 0 24px rgba(250, 204, 21, 0.35);
+    }
+    .emerald-glow {
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.35);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    .float-badge {
+      animation: floatSlow 2.6s ease-in-out infinite;
+    }
+  </style>
+  <!-- Baked-In Weekly Session & Progress Snapshot (Vinyl Vault Self-Contained Pattern) -->
+  <script id="baked-state-script">
+    window.__VIOLET_QUEST_STATE__ = null;
+  </script>
+</head>
+<body class="pb-16 selection:bg-amber-400 selection:text-slate-950">
+
+  <!-- Inline Hidden Form for Portable State Persistence (Discogs Vinyl Vault Pattern) -->
+  <form id="quest-inline-state-form" class="hidden" aria-hidden="true">
+    <input type="hidden" id="quest-hidden-week-id" value="2026-11-16_championship_quest" />
+    <input type="hidden" id="quest-hidden-coins" value="0" />
+    <input type="hidden" id="quest-hidden-stars" value="0" />
+    <input type="hidden" id="quest-hidden-signoffs" value="" />
+    <input type="hidden" id="quest-hidden-state-json" value="" />
+  </form>
+
+  <!-- Confetti & FX Overlay Canvas -->
+  <canvas id="fxCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- Top Game Show Header Bar -->
+  <header class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-indigo-500/30 px-3 py-2.5 sm:px-6">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <!-- Brand / Title -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-500 flex items-center justify-center text-2xl shadow-lg gold-glow">
+          🐸
+        </div>
+        <div>
+          <div class="flex items-center flex-wrap gap-1.5">
+            <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40">
+              Week of Nov 16 • Paris Ridge 2nd Grade
+            </span>
+            <span id="streakPill" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+              🔥 0 Streak
+            </span>
+            <span id="syncStatusPill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-400/30">
+              🟢 Local Sync Ready
+            </span>
+          </div>
+          <h1 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+            Violet's Championship Quest Game Show!
+          </h1>
+        </div>
+      </div>
+
+      <!-- Score, Timer & Top Action Controls -->
+      <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
+        <!-- Champion Coins -->
+        <div class="flex items-center gap-1.5 bg-amber-500/20 border border-amber-400/50 rounded-xl px-2.5 py-1">
+          <span class="text-base">🪙</span>
+          <div class="leading-tight">
+            <div class="text-[10px] uppercase tracking-wider text-amber-200 font-semibold">Coins</div>
+            <div id="coinDisplay" class="text-sm sm:text-base font-extrabold text-amber-300 game-font">0</div>
+          </div>
+        </div>
+
+        <!-- 5 Gold Quest Stars -->
+        <div class="flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-400/50 rounded-xl px-2.5 py-1">
+          <span class="text-base">⭐</span>
+          <div class="leading-tight">
+            <div class="text-[10px] uppercase tracking-wider text-indigo-200 font-semibold">Stars</div>
+            <div id="starDisplay" class="text-sm sm:text-base font-extrabold text-indigo-200 game-font">0 / 5</div>
+          </div>
+        </div>
+
+        <!-- Sprint Timer Control -->
+        <div class="flex items-center gap-1.5 bg-slate-800/90 border border-slate-600/60 rounded-xl px-2 py-1">
+          <span class="text-xs">⏱️</span>
+          <span id="timerReadout" class="font-mono font-bold text-xs sm:text-sm text-emerald-300 min-w-[42px]">10:00</span>
+          <button id="timerToggleBtn" type="button" class="text-xs font-bold px-2 py-0.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition">
+            Start
+          </button>
+          <select id="timerPresetSelect" aria-label="Sprint timer preset" class="text-xs bg-slate-900 text-slate-200 rounded-lg px-1 py-0.5 border border-slate-700">
+            <option value="600">Sprint 1 (10m)</option>
+            <option value="300">Break (5m)</option>
+            <option value="900">Sprint 2 (15m)</option>
+            <option value="180">Flashcards (3m)</option>
+          </select>
+        </div>
+
+        <!-- TOP BAR: RESET DAILY PROGRESS BUTTON -->
+        <button id="topResetDailyBtn" type="button" class="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/50 text-xs font-extrabold text-rose-200 transition flex items-center gap-1" title="Reset today's practice boards while keeping weekly coins, stars &amp; Parent Hub sign-offs">
+          <span>🔄</span>
+          <span>Reset Daily</span>
+        </button>
+
+        <!-- TOP BAR: LOCAL SYNC & EXPORT BUTTON -->
+        <button id="topSyncBtn" type="button" class="px-2.5 py-1.5 rounded-xl bg-sky-500/25 hover:bg-sky-500/40 border border-sky-400/50 text-xs font-extrabold text-sky-200 transition flex items-center gap-1" title="Local Sync, Bake HTML &amp; Resync Progress">
+          <span>💾</span>
+          <span>Local Sync</span>
+        </button>
+
+        <!-- Parent Resources Modal Button -->
+        <button id="openHubBtn" type="button" class="px-2.5 py-1.5 rounded-xl bg-purple-600/80 hover:bg-purple-500 border border-purple-400/50 text-xs font-bold text-white transition flex items-center gap-1">
+          <span>📋</span>
+          <span>Parent Hub</span>
+        </button>
+
+        <!-- Audio Mute Toggle -->
+        <button id="muteBtn" type="button" class="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-semibold flex items-center gap-1 transition" title="Toggle Sound Effects">
+          <span id="muteIcon">🔊</span>
+          <span id="muteLabel" class="hidden lg:inline text-[11px]">SFX On</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="max-w-6xl mx-auto mt-2.5 flex items-center gap-1.5 overflow-x-auto pb-1">
+      <button type="button" data-tab="ritual" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-amber-400 text-slate-950 shadow">
+        🚦 0. Ready Check
+      </button>
+      <button type="button" data-tab="karate" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700">
+        🥋 1. Karate Chop
+      </button>
+      <button type="button" data-tab="vaults" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700">
+        🔐 2. Long /O/ Vaults
+      </button>
+      <button type="button" data-tab="metamorphosis" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700">
+        🦋 3. 5-Finger Retell &amp; Pond Leap
+      </button>
+      <button type="button" data-tab="sportscaster" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700">
+        🎙️ 4. Sportscaster Studio
+      </button>
+      <button type="button" data-tab="mathlab" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700">
+        💥 5. Explode Math &amp; Tadpole Hops
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Stage Container -->
+  <main class="max-w-6xl mx-auto px-3 sm:px-6 pt-5">
+
+    <!-- Toast Feedback Banner -->
+    <div id="feedbackBanner" class="hidden mb-4 rounded-2xl px-4 py-3 border text-sm sm:text-base font-bold flex items-center justify-between gap-3 animate-pop">
+      <div class="flex items-center gap-2.5">
+        <span id="feedbackEmoji" class="text-2xl">🌟</span>
+        <span id="feedbackText">Awesome job, Violet!</span>
+      </div>
+      <button id="closeFeedbackBtn" type="button" class="text-xs px-2.5 py-1 rounded-lg bg-black/20 hover:bg-black/40">OK</button>
+    </div>
+
+    <!-- 5/5 Grand Prize Victory Banner (Unlocks when all 5 Arena Stars are earned) -->
+    <div id="grandPrizeBanner" class="hidden mb-5 rounded-3xl p-5 bg-gradient-to-r from-amber-500/30 via-emerald-500/30 to-indigo-500/30 border-2 border-amber-400 gold-glow flex flex-wrap items-center justify-between gap-4 animate-pop">
+      <div class="flex items-center gap-3">
+        <div class="text-4xl">🏆🐸👑</div>
+        <div>
+          <div class="text-xs font-extrabold uppercase tracking-wider text-amber-300">All 5 Championship Quest Stars Unlocked!</div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white">30+ Minutes of Free Creative Time Unlocked Tonight!</h2>
+          <p class="text-xs sm:text-sm text-emerald-200">Official Long /O/ &amp; Metamorphosis Champion • Coached by Dad Alex &amp; Marisa!</p>
+        </div>
+      </div>
+      <button id="celebrateAgainBtn" type="button" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow">
+        🎉 Launch Victory Confetti!
+      </button>
+    </div>
+
+    <!-- ==========================================
+         STAGE 0: PRE-SPRINT MTSS 3-STEP CHECK
+         ========================================== -->
+    <section id="view-ritual" class="stage-view space-y-5 animate-pop">
+      <div class="glass-card rounded-3xl p-5 sm:p-7 border-2 border-amber-400/40 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-2 max-w-2xl">
+            <span class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40">
+              🏆 Pre-Sprint Champion Ritual • Mrs. Ulrich's 3-Step Check
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+              Welcome to the Broadcast Desk, Contestant Violet!
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base">
+              Complete your 3-Step Champion Check with Dad or Marisa before starting the clock to earn your first <strong class="text-amber-300">+50 Champion Coins</strong> and unlock the 5 Game Show Arenas!
+            </p>
+          </div>
+          <div class="flex flex-col items-center justify-center bg-slate-900/90 border border-amber-400/30 rounded-2xl p-4 min-w-[180px]">
+            <div class="text-4xl mb-1 float-badge">🐸👑</div>
+            <div class="text-xs text-slate-400 font-semibold">Ready Check Progress</div>
+            <div id="ritualProgressText" class="text-lg font-extrabold text-amber-300 game-font">0 / 4 Checked</div>
+          </div>
+        </div>
+
+        <!-- Mrs. Ulrich's Daily Classroom Affirmation Banner -->
+        <div class="mt-4 p-3.5 rounded-2xl bg-indigo-950/70 border border-indigo-400/40 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">✨</span>
+            <div>
+              <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Mrs. Ulrich's Daily Classroom Affirmation</div>
+              <div class="text-sm sm:text-base font-extrabold text-white italic">"I am loved, I am special, I can change the universe, and we really can!"</div>
+            </div>
+          </div>
+          <button id="speakAffirmationBtn" type="button" class="px-3.5 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs transition">
+            🔊 Say It Together! (+15 Coins)
+          </button>
+        </div>
+
+        <!-- 4 Interactive Check Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-5">
+          <button type="button" data-ritual="deck" class="ritual-card text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border-2 border-slate-700 transition flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-3xl">🚰</span>
+              <span class="ritual-badge text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400">Tap to Check</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-white">1. Clear the Deck</h3>
+              <p class="text-xs text-slate-300 mt-1">Bathroom break done, water bottle ready, nose blown, and 1 pencil + scratch paper at your spot!</p>
+            </div>
+          </button>
+
+          <button type="button" data-ritual="body" class="ritual-card text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border-2 border-slate-700 transition flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-3xl">🧘‍♀️</span>
+              <span class="ritual-badge text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400">Tap to Check</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-white">2. Body Ready to Learn</h3>
+              <p class="text-xs text-slate-300 mt-1">Sitting on your stool or standing at the counter with feet grounded and workspace clear.</p>
+            </div>
+          </button>
+
+          <button type="button" data-ritual="eyes" class="ritual-card text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border-2 border-slate-700 transition flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-3xl">👀</span>
+              <span class="ritual-badge text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400">Tap to Check</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-white">3. Eyes on Speaker</h3>
+              <p class="text-xs text-slate-300 mt-1">Look right at Dad or Marisa while listening to the game mission instructions.</p>
+            </div>
+          </button>
+
+          <button type="button" data-ritual="retell" class="ritual-card text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border-2 border-slate-700 transition flex flex-col justify-between gap-3">
+            <div class="flex items-center justify-between">
+              <span class="text-3xl">🗣️</span>
+              <span class="ritual-badge text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400">Tap to Check</span>
+            </div>
+            <div>
+              <h3 class="font-bold text-base text-white">4. Repeat the Task</h3>
+              <p class="text-xs text-slate-300 mt-1">Explain the mission back in your own words before clicking the first challenge!</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- Quick Launch Arena Grid -->
+        <div class="mt-6 pt-5 border-t border-slate-700/70 flex flex-wrap items-center justify-between gap-3">
+          <div class="text-xs sm:text-sm text-slate-300">
+            💡 <strong class="text-amber-300">Mrs. Ulrich's Golden Rule:</strong> Slow down to spot the vowel team first, and remember that the <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300">/k/</code> sound at the start of a word root usually starts with <strong class="text-emerald-300">C</strong> instead of K!
+          </div>
+          <button id="launchStage1Btn" type="button" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-extrabold text-sm shadow-lg transition">
+            Enter Arena 1: Karate Chop 🥋 →
+          </button>
+        </div>
+      </div>
+
+      <!-- 10 Spelling Words Soundboard Preview -->
+      <div class="glass-card rounded-3xl p-5 sm:p-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-lg sm:text-xl font-bold text-white">🔊 This Week's 10 Long /O/ Spelling Words Soundboard</h3>
+            <p class="text-xs sm:text-sm text-slate-300">Tap any word to hear it read aloud and see its hidden Long /O/ pattern &amp; syllable tap!</p>
+          </div>
+          <button id="speakAllWordsBtn" type="button" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">
+            🔊 Read All 10 Words
+          </button>
+        </div>
+        <div id="wordSoundboardGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STAGE 1: COMPOUND WORD KARATE CHOP
+         ========================================== -->
+    <section id="view-karate" class="stage-view hidden space-y-5 animate-pop">
+      <div class="glass-card rounded-3xl p-5 sm:p-7 border-2 border-rose-500/40">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-400/40">
+              Arena 1 • Sprint 1 Phonics (5 Mins)
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              🥋 Tadpole-to-Frog Compound Word Karate Chop!
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              5 of your spelling words are compound words! Chop each word right between its 2 smaller base words, arm-tap both parts, and pick the hidden Long /O/ pattern.
+            </p>
+          </div>
+          <div class="bg-slate-900/90 border border-rose-400/40 rounded-2xl px-4 py-2.5 text-center">
+            <div class="text-xs text-slate-400 font-semibold">Words Chopped</div>
+            <div id="karateScoreText" class="text-xl font-extrabold text-rose-300 game-font">0 / 5</div>
+          </div>
+        </div>
+
+        <!-- Word Selector Pills -->
+        <div id="karateWordTabs" class="flex flex-wrap gap-2 mb-5"></div>
+
+        <!-- Active Karate Arena -->
+        <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 sm:p-6 space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <button id="karateSpeakBtn" type="button" class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm flex items-center gap-2 shadow transition">
+                <span>🔊</span>
+                <span>Hear Word</span>
+              </button>
+              <span id="karateCoachTip" class="text-xs sm:text-sm text-amber-300 font-medium bg-amber-500/10 border border-amber-400/30 px-3 py-1.5 rounded-xl"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 font-semibold">Arm-Tap Helper:</span>
+              <button type="button" id="armTap1Btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-xs font-bold border border-slate-600 transition">💪 Shoulder</button>
+              <button type="button" id="armTap2Btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-xs font-bold border border-slate-600 transition">💪 Elbow</button>
+              <button type="button" id="armTap3Btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-emerald-600 text-xs font-bold border border-slate-600 transition">✋ Wrist</button>
+            </div>
+          </div>
+
+          <!-- Interactive Letter Chop Row -->
+          <div class="text-center space-y-2">
+            <div class="text-xs uppercase tracking-wider text-rose-300 font-bold">
+              Step 1: Click the glowing 🥋 Icon between the two small words to KARATE CHOP!
+            </div>
+            <div id="karateChopContainer" class="flex items-center justify-center flex-wrap gap-1 py-4"></div>
+          </div>
+
+          <!-- Step 2 & 3 Unlocked after Chop -->
+          <div id="karatePostChopArea" class="hidden space-y-5 pt-4 border-t border-slate-800 animate-pop">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Base Words Display -->
+              <div class="bg-slate-950/80 rounded-2xl p-4 border border-emerald-500/30 flex items-center justify-around text-center">
+                <div>
+                  <div class="text-xs text-slate-400">Base Word 1</div>
+                  <div id="karatePart1Display" class="text-2xl font-extrabold text-emerald-300 game-font mt-1">tad</div>
+                </div>
+                <div class="text-2xl font-bold text-amber-400">+</div>
+                <div>
+                  <div class="text-xs text-slate-400">Base Word 2</div>
+                  <div id="karatePart2Display" class="text-2xl font-extrabold text-sky-300 game-font mt-1">pole</div>
+                </div>
+                <div class="text-2xl font-bold text-amber-400">=</div>
+                <div>
+                  <div class="text-xs text-slate-400">Compound Word</div>
+                  <div id="karateWholeDisplay" class="text-2xl font-extrabold text-amber-300 game-font mt-1">tadpole</div>
+                </div>
+              </div>
+
+              <!-- Step 2: Pick the Long O Pattern -->
+              <div class="bg-slate-950/80 rounded-2xl p-4 border border-indigo-500/30 space-y-2">
+                <div class="text-xs font-bold uppercase tracking-wider text-indigo-300">
+                  Step 2: Which Long /O/ pattern is hiding inside?
+                </div>
+                <div id="karatePatternChoices" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+              </div>
+            </div>
+
+            <!-- Step 3: Glue & Type It Together -->
+            <div class="bg-slate-950/80 rounded-2xl p-4 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div class="text-xs sm:text-sm font-bold text-amber-200">
+                Step 3: Type the whole compound word to fuse it back together:
+              </div>
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <input id="karateSpellInput" type="text" autocomplete="off" placeholder="Type word here..." class="w-full sm:w-52 px-4 py-2 rounded-xl bg-slate-900 border-2 border-slate-600 focus:border-amber-400 focus:outline-none text-white font-bold text-center text-lg tracking-wider" />
+                <button id="karateVerifyBtn" type="button" class="px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-sm transition whitespace-nowrap">
+                  Fuse Word! ⚡
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STAGE 2: THE 5 SECRET LONG /O/ VAULTS
+         ========================================== -->
+    <section id="view-vaults" class="stage-view hidden space-y-5 animate-pop">
+      <div class="glass-card rounded-3xl p-5 sm:p-7 border-2 border-sky-500/40">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/40">
+              Arena 2 • Sprint 1 Detective Sort &amp; Spelling Test (5 Mins)
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              🔐 The 5 Secret Long /O/ Vaults Detective Sort!
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Sort all 10 spelling words into their secret Long /O/ Vaults, crack the missing vowel letters, or take a full audio Spelling Test!
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-vault-mode="sort" class="vault-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-sky-400 text-slate-950 transition">
+              1. Vault Sorter (<span id="vaultSortCount">0/10</span>)
+            </button>
+            <button type="button" data-vault-mode="mystery" class="vault-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">
+              2. Mystery Letters (<span id="mysteryCrackCount">0/10</span>)
+            </button>
+            <button type="button" data-vault-mode="test" class="vault-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">
+              3. Live Spelling Test
+            </button>
+          </div>
+        </div>
+
+        <!-- SUB-VIEW 2A: VAULT SORTER -->
+        <div id="vaultMode-sort" class="space-y-5">
+          <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-sky-300">
+                Step 1: Select a Spelling Word Card below, then click the Vault where its Long /O/ sound belongs!
+              </span>
+              <button id="resetVaultSortBtn" type="button" class="text-xs text-slate-400 hover:text-white underline">Reset Sort</button>
+            </div>
+            <div id="unsortedWordBank" class="flex flex-wrap gap-2 min-h-[48px] pt-1"></div>
+          </div>
+
+          <!-- 5 Vault Columns -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="vaultColumnsContainer"></div>
+        </div>
+
+        <!-- SUB-VIEW 2B: MYSTERY LETTER CHALLENGE -->
+        <div id="vaultMode-mystery" class="hidden space-y-4">
+          <div class="bg-slate-900/90 border border-slate-700 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs sm:text-sm text-amber-200 font-semibold">
+              🕵️‍♀️ Pick the missing Long /O/ pattern (<code class="text-amber-300">o</code>, <code class="text-amber-300">o_e</code>, <code class="text-amber-300">oa</code>, <code class="text-amber-300">ow</code>, <code class="text-amber-300">oe</code>) to unlock all 10 Vault Locks!
+            </span>
+            <button id="resetMysteryBtn" type="button" class="text-xs px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Reset Locks</button>
+          </div>
+          <div id="mysteryGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        </div>
+
+        <!-- SUB-VIEW 2C: AUDIO SPELLING TEST -->
+        <div id="vaultMode-test" class="hidden space-y-4">
+          <div class="bg-slate-900/90 border border-indigo-500/40 rounded-3xl p-5 sm:p-6 text-center max-w-2xl mx-auto space-y-4">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-bold">
+              <span id="spellTestProgress">Word 1 of 10</span>
+              <span id="spellTestScore">Score: 0 / 10</span>
+            </div>
+            <div class="py-2">
+              <button id="spellTestSpeakBtn" type="button" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-extrabold text-base shadow-lg transition inline-flex items-center gap-2">
+                <span class="text-2xl">🔊</span>
+                <span>Hear Spelling Word &amp; Sentence</span>
+              </button>
+              <p id="spellTestSentence" class="text-sm text-slate-300 mt-3 italic"></p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5">
+              <input id="spellTestInput" type="text" autocomplete="off" placeholder="Type the spelling word..." class="w-full sm:w-64 px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-indigo-400/60 focus:border-amber-400 focus:outline-none text-white font-extrabold text-center text-xl tracking-wider" />
+              <button id="spellTestSubmitBtn" type="button" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-base transition">
+                Check Spelling ✓
+              </button>
+            </div>
+            <div class="flex items-center justify-center gap-3 pt-2">
+              <button id="spellTestHintBtn" type="button" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 hover:bg-amber-500/30 transition">
+                💡 Arm-Tap &amp; Pattern Hint (Don't Give Answer!)
+              </button>
+              <button id="spellTestNextBtn" type="button" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+                Skip / Next Word →
+              </button>
+            </div>
+            <div id="spellTestHintBox" class="hidden text-xs sm:text-sm text-amber-200 bg-amber-500/10 border border-amber-400/30 rounded-xl p-3"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STAGE 3: METAMORPHOSIS 5-FINGER RETELL & POND HOPPER
+         ========================================== -->
+    <section id="view-metamorphosis" class="stage-view hidden space-y-5 animate-pop">
+      <div class="glass-card rounded-3xl p-5 sm:p-7 border-2 border-emerald-500/40">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+              Arena 3 • 5-Minute Movement Break &amp; Cycles of Nature
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              🦋 The Metamorphosis Boss-Level 5-Finger Retell!
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Put the 5 life-cycle stages in order using Mrs. Ulrich's temporal words (<strong class="text-emerald-300">First, Then, Next, Then, Last</strong>), act out each move across the living room, and play the Pond Hopper arcade mini-game!
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" data-creature="frog" class="creature-btn px-4 py-2 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950 transition">
+              🐸 Frog Life Cycle (Tadpole!)
+            </button>
+            <button type="button" data-creature="butterfly" class="creature-btn px-4 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">
+              🦋 Butterfly Metamorphosis
+            </button>
+          </div>
+        </div>
+
+        <!-- 5-Finger Retell Interactive Sequencer -->
+        <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs sm:text-sm font-bold text-emerald-300">
+              🖐️ Step 1: Tap the mixed-up Stage Cards below in order from Finger 1 (FIRST) to Finger 5 (LAST)!
+            </div>
+            <button id="resetRetellBtn" type="button" class="text-xs text-slate-400 hover:text-white underline">Shuffle Stages</button>
+          </div>
+
+          <!-- Shuffled Pool -->
+          <div id="retellPool" class="grid grid-cols-1 sm:grid-cols-5 gap-2.5"></div>
+
+          <!-- 5 Finger Slots -->
+          <div id="retellSlots" class="grid grid-cols-1 sm:grid-cols-5 gap-2.5 pt-2"></div>
+        </div>
+
+        <!-- Arcade Canvas Mini-Game: Tadpole Pond Leap -->
+        <div class="bg-slate-900/95 border-2 border-emerald-500/40 rounded-3xl p-4 sm:p-5 mt-5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+                <span>🎮 Bonus Movement Mini-Game: Tadpole-to-Frog Pond Leap!</span>
+              </h3>
+              <p class="text-xs text-slate-300">
+                Use the on-screen buttons (or Arrow Keys) to hop across the lily pads and catch the glowing Long /O/ bubbles! Every 2 bubbles evolves your Tadpole through Metamorphosis!
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="pondStageBadge" class="text-xs font-extrabold px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                Stage 1: 🥚 Tiny Egg (0/8 Bubbles)
+              </span>
+              <button id="resetPondGameBtn" type="button" class="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs transition">
+                New Pond Wave
+              </button>
+            </div>
+          </div>
+
+          <div class="relative w-full h-64 sm:h-72 rounded-2xl overflow-hidden border border-emerald-500/30 bg-slate-950">
+            <canvas id="pondCanvas" class="w-full h-full block"></canvas>
+          </div>
+
+          <!-- Touch / Click Controls for Pond Game -->
+          <div class="flex items-center justify-center gap-3 pt-1">
+            <button type="button" data-move="left" class="pond-move-btn px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 active:scale-95 text-white font-extrabold text-sm border border-slate-600 transition">
+              ⬅️ Hop Left
+            </button>
+            <button type="button" data-move="up" class="pond-move-btn px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 active:scale-95 text-white font-extrabold text-sm border border-slate-600 transition">
+              ⬆️ Leap Up
+            </button>
+            <button type="button" data-move="down" class="pond-move-btn px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 active:scale-95 text-white font-extrabold text-sm border border-slate-600 transition">
+              ⬇️ Swim Down
+            </button>
+            <button type="button" data-move="right" class="pond-move-btn px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-emerald-600 active:scale-95 text-white font-extrabold text-sm border border-slate-600 transition">
+              ➡️ Hop Right
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STAGE 4: KIDS EXCEL SPORTSCASTER DESK & GRATITUDE MIC DROP
+         ========================================== -->
+    <section id="view-sportscaster" class="stage-view hidden space-y-5 animate-pop">
+      <div class="glass-card rounded-3xl p-5 sm:p-7 border-2 border-amber-500/40">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+              Arena 4 • Sprint 2 Reading &amp; November Gratitude Studio (15 Mins)
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              🎙️ Kids Excel Sportscaster Desk &amp; Gratitude Mic Drop!
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Practice reading with accuracy and big sportscaster expression whenever you spot <strong class="text-amber-300">quotation marks (" ")</strong>, then write and draw your Gratitude Mic Drop!
+            </p>
+          </div>
+          <!-- Sound Effects Board -->
+          <div class="flex items-center gap-1.5 bg-slate-900/90 p-2 rounded-2xl border border-amber-400/30">
+            <button type="button" data-sfx="onair" class="sfx-btn px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/40 text-rose-200 text-xs font-bold border border-rose-400/30 transition">🔴 On-Air Chime</button>
+            <button type="button" data-sfx="cheer" class="sfx-btn px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/40 text-amber-200 text-xs font-bold border border-amber-400/30 transition">🎉 Crowd Fanfare</button>
+            <button type="button" data-sfx="drum" class="sfx-btn px-2.5 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-200 text-xs font-bold border border-indigo-400/30 transition">🥁 Drumroll</button>
+          </div>
+        </div>
+
+        <!-- Teleprompter Passage Selector -->
+        <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Live Teleprompter Script:</span>
+              <button type="button" data-script="0" class="script-tab px-3 py-1 rounded-xl text-xs font-bold bg-amber-400 text-slate-950">Script 1: The Snowball Swim Meet</button>
+              <button type="button" data-script="1" class="script-tab px-3 py-1 rounded-xl text-xs font-bold bg-slate-800 text-slate-300">Script 2: The Tadpole Jump Finals</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="toggleQuoteGlowBtn" type="button" class="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-bold hover:bg-amber-500/30 transition">
+                ✨ Highlight "Quotation Marks"
+              </button>
+              <button id="readScriptAloudBtn" type="button" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition">
+                🔊 Model Sportscaster Read
+              </button>
+            </div>
+          </div>
+
+          <!-- Teleprompter Text Box -->
+          <div id="teleprompterBox" class="p-5 rounded-2xl bg-slate-950 border-2 border-amber-400/40 text-lg sm:text-xl leading-relaxed text-slate-100 font-medium"></div>
+
+          <!-- 2-Pass Broadcast Check -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <div class="flex flex-wrap items-center gap-3">
+              <button id="pass1DoneBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-emerald-600 text-xs sm:text-sm font-bold border border-slate-600 transition">
+                ⬜ Pass 1: Warm-Up Lap (Accuracy &amp; Arm-Tapping)
+              </button>
+              <button id="pass2DoneBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-xs sm:text-sm font-bold border border-slate-600 transition">
+                ⬜ Pass 2: Live TV Sportscaster Voice (" " Expression!)
+              </button>
+            </div>
+            <span class="text-xs text-slate-400">Check both passes for +40 Coins!</span>
+          </div>
+        </div>
+
+        <!-- Gratitude Mic Drop Writing & Drawing Pad -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-5">
+          <!-- Left: Gratitude Sentence Builder & Live 3-Star Checker -->
+          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 space-y-4">
+            <h3 class="text-lg font-extrabold text-white flex items-center gap-2">
+              <span>✍️ Pass 3: Gratitude Mic Drop Sentence</span>
+            </h3>
+            <p class="text-xs text-slate-300">
+              Write 1 sentence about something you are thankful for! Include at least one <strong class="text-amber-300">Long /O/ spelling word</strong> and try using <strong class="text-emerald-300">quotation marks (" ")</strong>!
+            </p>
+            <div class="flex flex-wrap gap-1.5 text-xs">
+              <span class="text-slate-400 font-semibold">Quick Word Insert:</span>
+              <button type="button" data-insert="oatmeal" class="insert-word-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold">oatmeal</button>
+              <button type="button" data-insert="snowball" class="insert-word-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold">snowball</button>
+              <button type="button" data-insert="raincoat" class="insert-word-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold">raincoat</button>
+              <button type="button" data-insert="tadpole" class="insert-word-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold">tadpole</button>
+              <button type="button" data-insert="moment" class="insert-word-btn px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold">moment</button>
+              <button type="button" data-insert='"' class="insert-word-btn px-2 py-0.5 rounded bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 font-bold">" "</button>
+            </div>
+            <textarea id="gratitudeInput" rows="3" placeholder='Example: "I am grateful for eating warm oatmeal in my raincoat when it snows!"' class="w-full p-3.5 rounded-2xl bg-slate-950 border-2 border-slate-700 focus:border-amber-400 focus:outline-none text-white text-base font-medium"></textarea>
+
+            <!-- Live Self-Check Checklist -->
+            <div class="space-y-2 bg-slate-950/70 p-3.5 rounded-2xl border border-slate-800">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400">3-Star Self-Check (Auto-Detects as You Type!)</div>
+              <div id="checkCap" class="text-xs sm:text-sm font-bold text-slate-400 flex items-center gap-2">
+                <span>⬜</span> <span>Starts with a Capital Letter</span>
+              </div>
+              <div id="checkWordOrQuote" class="text-xs sm:text-sm font-bold text-slate-400 flex items-center gap-2">
+                <span>⬜</span> <span>Uses a Long /O/ Spelling Word or Quotation Marks (" ")</span>
+              </div>
+              <div id="checkPunct" class="text-xs sm:text-sm font-bold text-slate-400 flex items-center gap-2">
+                <span>⬜</span> <span>Ends with proper punctuation ( . ! or ? )</span>
+              </div>
+            </div>
+
+            <button id="claimGratitudeBtn" type="button" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-extrabold text-sm shadow transition">
+              🎙️ Broadcast My Gratitude Mic Drop! (+50 Coins)
+            </button>
+          </div>
+
+          <!-- Right: Interactive Gratitude Scene Drawing Frame -->
+          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 flex flex-col justify-between space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-lg font-extrabold text-white">🎨 Draw Your Gratitude Scene</h3>
+              <div class="flex items-center gap-1.5">
+                <button type="button" data-color="#facc15" class="draw-color-btn w-6 h-6 rounded-full bg-amber-400 ring-2 ring-white"></button>
+                <button type="button" data-color="#34d399" class="draw-color-btn w-6 h-6 rounded-full bg-emerald-400"></button>
+                <button type="button" data-color="#38bdf8" class="draw-color-btn w-6 h-6 rounded-full bg-sky-400"></button>
+                <button type="button" data-color="#f472b6" class="draw-color-btn w-6 h-6 rounded-full bg-pink-400"></button>
+                <button type="button" data-color="#ffffff" class="draw-color-btn w-6 h-6 rounded-full bg-white"></button>
+                <button id="clearDrawBtn" type="button" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 ml-1">Clear</button>
+              </div>
+            </div>
+            <div class="relative w-full h-56 rounded-2xl overflow-hidden bg-slate-950 border-2 border-dashed border-slate-700">
+              <canvas id="drawCanvas" class="w-full h-full block cursor-crosshair touch-none"></canvas>
+            </div>
+            <p class="text-[11px] text-slate-400 text-center">Draw with your mouse, finger, or stylus!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STAGE 5: EXPLODE THE NUMBER LAB & TADPOLE HOPS
+         ========================================== -->
+    <section id="view-mathlab" class="stage-view hidden space-y-5 animate-pop">
+      <div class="glass-card rounded-3xl p-5 sm:p-7 border-2 border-purple-500/40">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/40">
+              Arena 5 • Sprint 2 Math Lab (15 Mins)
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+              💥 The "Explode" the Number Lab &amp; Tadpole Hop Number Lines!
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+              Warm up with your <strong class="text-amber-300">+4 Challenger Flashcards</strong>, <strong class="text-rose-300">EXPLODE</strong> double-digit numbers into Tens &amp; Ones, and hop the Tadpole back to a friendly 10!
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" data-math-mode="flashcards" class="math-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-purple-400 text-slate-950 transition">
+              ⚡ Part A: +4 Flashcard Sprint
+            </button>
+            <button type="button" data-math-mode="explode" class="math-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">
+              💥 Part B: Explode Addition Lab
+            </button>
+            <button type="button" data-math-mode="numberline" class="math-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">
+              🐸 Part C: Part-Whole &amp; Tadpole Hops
+            </button>
+          </div>
+        </div>
+
+        <!-- PART A: STAGED FLASHCARD SPRINT (+4 WEEK) -->
+        <div id="mathMode-flashcards" class="space-y-4">
+          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 sm:p-6 max-w-2xl mx-auto text-center space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span id="flashPileTag" class="text-xs font-extrabold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                🔥 Week of Nov 16 Challenger: +4 Facts
+              </span>
+              <div class="flex items-center gap-2">
+                <select id="flashDeckFilter" aria-label="Flashcard pile filter" class="text-xs bg-slate-950 text-slate-200 px-2.5 py-1.5 rounded-xl border border-slate-700">
+                  <option value="mixed">Mixed Deck (Base Pile + Challenger +4)</option>
+                  <option value="plus4">Only This Week's +4 Challenger Facts</option>
+                  <option value="base">Only Confident Base (Teens, +0, +1, +2, +3, Doubles)</option>
+                </select>
+                <span id="flashSolvedBadge" class="text-xs font-bold text-emerald-300">Solved: 0</span>
+              </div>
+            </div>
+
+            <!-- Big Flashcard Display -->
+            <div class="py-6 px-4 rounded-3xl bg-gradient-to-b from-slate-800 to-slate-950 border-2 border-purple-400/40 shadow-inner">
+              <div id="flashEquation" class="text-5xl sm:text-6xl font-extrabold text-white game-font tracking-wider">
+                7 + 4 = ?
+              </div>
+              <div id="flashVisualDots" class="hidden mt-4 pt-3 border-t border-slate-800 text-sm text-amber-200"></div>
+            </div>
+
+            <!-- Number Pad Choices -->
+            <div id="flashChoicesGrid" class="grid grid-cols-4 gap-2.5"></div>
+
+            <div class="flex items-center justify-between pt-2">
+              <button id="flashShowDotsBtn" type="button" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-400/30">
+                👀 Spot Ten-Frame Strategy (No Finger Counting!)
+              </button>
+              <button id="flashNextBtn" type="button" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300">
+                Next Card →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PART B: EXPLODE DOUBLE-DIGIT ADDITION LAB -->
+        <div id="mathMode-explode" class="hidden space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold text-rose-300 uppercase">Playbook &amp; Slides Problems:</span>
+              <button type="button" data-exp-idx="0" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500 text-white">Model: 58 + 42</button>
+              <button type="button" data-exp-idx="1" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Box 1: 36 + 24</button>
+              <button type="button" data-exp-idx="2" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Box 2: 47 + 35</button>
+              <button type="button" data-exp-idx="3" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Box 3: 63 + 28</button>
+              <button type="button" data-exp-idx="4" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Slides B: 45 + 37</button>
+            </div>
+            <button id="randomExplodeBtn" type="button" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white">
+              🎲 New Random Problem
+            </button>
+          </div>
+
+          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 sm:p-6 space-y-5">
+            <!-- Top Equation & Explode Trigger -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-800">
+              <div>
+                <div class="text-xs uppercase font-bold text-slate-400">Mrs. Ulrich's Expanded Form Strategy</div>
+                <div id="explodeMainEq" class="text-4xl sm:text-5xl font-extrabold text-white game-font mt-1">36 + 24</div>
+              </div>
+              <button id="triggerExplodeBtn" type="button" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-500 via-orange-500 to-amber-400 hover:from-rose-400 hover:to-amber-300 text-slate-950 font-extrabold text-base shadow-lg transition flex items-center gap-2">
+                <span>💥</span>
+                <span>1. CLICK TO EXPLODE INTO TENS &amp; ONES!</span>
+              </button>
+            </div>
+
+            <!-- Interactive Expanded Notation Workspace -->
+            <div id="explodeWorkspace" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Step 1: Explode Tens -->
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-sky-500/40 space-y-2">
+                  <div class="text-xs font-bold uppercase text-sky-300">Step A: Explode &amp; Add Tens</div>
+                  <div class="flex items-center gap-1.5 justify-center pt-1">
+                    <input id="expTen1" type="number" placeholder="Tens" class="w-16 p-2 rounded-xl bg-slate-900 border border-slate-700 text-center font-bold text-sky-300 text-lg" />
+                    <span class="font-bold text-slate-400">+</span>
+                    <input id="expTen2" type="number" placeholder="Tens" class="w-16 p-2 rounded-xl bg-slate-900 border border-slate-700 text-center font-bold text-sky-300 text-lg" />
+                    <span class="font-bold text-slate-400">=</span>
+                    <input id="expTenSum" type="number" placeholder="Sum" class="w-20 p-2 rounded-xl bg-slate-900 border-2 border-sky-400 text-center font-extrabold text-white text-lg" />
+                  </div>
+                </div>
+
+                <!-- Step 2: Explode Ones -->
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-emerald-500/40 space-y-2">
+                  <div class="text-xs font-bold uppercase text-emerald-300">Step B: Explode &amp; Add Ones</div>
+                  <div class="flex items-center gap-1.5 justify-center pt-1">
+                    <input id="expOne1" type="number" placeholder="Ones" class="w-16 p-2 rounded-xl bg-slate-900 border border-slate-700 text-center font-bold text-emerald-300 text-lg" />
+                    <span class="font-bold text-slate-400">+</span>
+                    <input id="expOne2" type="number" placeholder="Ones" class="w-16 p-2 rounded-xl bg-slate-900 border border-slate-700 text-center font-bold text-emerald-300 text-lg" />
+                    <span class="font-bold text-slate-400">=</span>
+                    <input id="expOneSum" type="number" placeholder="Sum" class="w-20 p-2 rounded-xl bg-slate-900 border-2 border-emerald-400 text-center font-extrabold text-white text-lg" />
+                  </div>
+                </div>
+
+                <!-- Step 3: Combine Total -->
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-amber-500/40 space-y-2">
+                  <div class="text-xs font-bold uppercase text-amber-300">Step C: Regroup &amp; Combine!</div>
+                  <div class="flex items-center gap-1.5 justify-center pt-1">
+                    <span id="combineHintLabel" class="text-sm font-bold text-slate-300">Tens + Ones =</span>
+                    <input id="expFinalTotal" type="number" placeholder="Total" class="w-24 p-2 rounded-xl bg-slate-900 border-2 border-amber-400 text-center font-extrabold text-amber-300 text-xl" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <span class="text-xs text-slate-300">
+                  💡 <strong class="text-amber-300">Tip:</strong> Clicking "CLICK TO EXPLODE" fills in the broken-apart Tens and Ones so Violet can focus on adding Tens, adding Ones, and regrouping 10 ones into a new ten!
+                </span>
+                <button id="verifyExplodeBtn" type="button" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm shadow transition">
+                  Check Expanded Addition ✓
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PART C: PART-PART-WHOLE & TADPOLE HOP SUBTRACTION -->
+        <div id="mathMode-numberline" class="hidden space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold text-emerald-300 uppercase">Tadpole Hop Missions:</span>
+              <button type="button" data-hop-idx="0" class="hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950">Playbook &amp; Slides: 53 - 23</button>
+              <button type="button" data-hop-idx="1" class="hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Mission 2: 44 - 14</button>
+              <button type="button" data-hop-idx="2" class="hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Mission 3: 62 - 32</button>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 space-y-5">
+            <!-- Story Problem & Rule 1: Part-Part-Whole Task Retell -->
+            <div class="p-4 rounded-2xl bg-slate-950 border border-indigo-500/40 space-y-3">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-300">
+                Rule 1 (Task Retell First): Spot the WHOLE and the PART before touching the number line!
+              </div>
+              <p id="hopStoryText" class="text-base sm:text-lg font-bold text-white"></p>
+              <div class="flex flex-wrap items-center gap-3 pt-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-300 font-bold">Which number is the big WHOLE we start with?</span>
+                  <select id="ppwWholeSelect" aria-label="Select Whole number" class="bg-slate-900 border border-indigo-400 rounded-xl px-3 py-1.5 text-sm font-extrabold text-amber-300"></select>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-300 font-bold">Which number is the PART hopping away?</span>
+                  <select id="ppwPartSelect" aria-label="Select Part number" class="bg-slate-900 border border-indigo-400 rounded-xl px-3 py-1.5 text-sm font-extrabold text-emerald-300"></select>
+                </div>
+                <button id="checkPpwBtn" type="button" class="px-4 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-extrabold text-xs transition">
+                  Unlock Tadpole Line 🔓
+                </button>
+              </div>
+            </div>
+
+            <!-- Rule 2: Interactive SVG Open Number Line -->
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="text-xs sm:text-sm font-bold text-emerald-300">
+                  Rule 2 (Hop Back to Friendly 10 First!): Click each hop button in order to jump your Tadpole back!
+                </div>
+                <div id="hopRemainingLabel" class="text-xs font-extrabold px-3 py-1 rounded-full bg-slate-800 text-amber-300">
+                  Current Spot: 53 • Left to Subtract: 23
+                </div>
+              </div>
+
+              <!-- Visual SVG Number Line -->
+              <div class="w-full bg-slate-950 rounded-2xl p-3 border border-emerald-500/30 overflow-x-auto">
+                <svg id="hopSvg" viewBox="0 0 700 150" class="w-full min-w-[520px] h-36"></svg>
+              </div>
+
+              <!-- Hop Action Controls -->
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2">
+                  <button id="hopOnesBtn" type="button" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm transition">
+                    🐸 Small Hop to Friendly 10 (-3)
+                  </button>
+                  <button id="hopTenBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm transition">
+                    🐸🐸 Big Jump Back (-10)
+                  </button>
+                  <button id="resetHopLineBtn" type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">
+                    Reset Line
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <span id="hopFinalEqLabel" class="text-sm font-extrabold text-white">53 - 23 =</span>
+                  <input id="hopFinalInput" type="number" placeholder="?" class="w-20 p-2 rounded-xl bg-slate-950 border-2 border-emerald-400 text-center font-extrabold text-xl text-emerald-300" />
+                  <button id="verifyHopFinalBtn" type="button" class="px-4 py-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-extrabold text-xs sm:text-sm transition">
+                    Check Answer ✓
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       PARENT HUB, LOCAL SYNC & SIGN-OFF DRAWER MODAL
+       (Includes Discogs Vinyl Vault v4.0/v5.0 Local Sync Pattern)
+       ========================================== -->
+  <div id="parentModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card rounded-3xl max-w-3xl w-full p-6 border-2 border-purple-400/50 space-y-5 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Alex &amp; Marisa • Co-Host Control Center &amp; Local Sync Engine</span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white">📋 Parent Hub, Weekly Sign-Off &amp; Local Sync</h2>
+        </div>
+        <button id="closeHubBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold">
+          Close ✕
+        </button>
+      </div>
+
+      <!-- Live Session Telemetry Bar (Vinyl Vault Style) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-amber-400/30">
+          <div class="text-[10px] font-bold uppercase text-amber-300">Weekly Session Metadata</div>
+          <div id="telemetrySessionTitle" class="text-sm font-extrabold text-white mt-0.5">Week of Nov 16 • Long /O/</div>
+          <div id="telemetryLastSync" class="text-[11px] text-slate-400 mt-0.5">Auto-synced to browser &amp; inline form</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-400/30">
+          <div class="text-[10px] font-bold uppercase text-emerald-300">Violet's Live Progress</div>
+          <div id="telemetryScoreText" class="text-sm font-extrabold text-white mt-0.5">0 Coins • 0/5 Arena Stars</div>
+          <div id="telemetryDailySolved" class="text-[11px] text-slate-400 mt-0.5">0 Chopped • 0/10 Sorted • 0/10 Locks</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-sky-400/30">
+          <div class="text-[10px] font-bold uppercase text-sky-300">Parent Hub Sign-Offs</div>
+          <div id="telemetrySignoffText" class="text-sm font-extrabold text-white mt-0.5">0 / 8 Sprints Signed Off</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Mon–Thu Phonics &amp; Math Sprints</div>
+        </div>
+      </div>
+
+      <!-- LOCAL SYNC & SELF-CONTAINED EXPORTER (Discogs Vinyl Vault Architecture) -->
+      <div class="bg-slate-900/95 rounded-2xl p-4 border-2 border-sky-400/40 space-y-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-sky-300">💾 Local Sync &amp; Self-Contained State Manager</span>
+            <p class="text-xs text-slate-300 mt-0.5">
+              Never lose points, stars, or Parent Hub sign-offs on page refresh! Bake your live session state directly into a downloadable <code class="text-amber-300">.html</code> file (just like <code class="text-sky-300">index.html</code> in your Discogs Vinyl Vault) or export/import a portable JSON sync file.
+            </p>
+          </div>
+          <button id="forceResyncBtn" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-extrabold transition">
+            🔄 Resync State Now
+          </button>
+        </div>
+
+        <!-- Primary Sync Action Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <button id="downloadBakedHtmlBtn" type="button" class="p-3 rounded-xl bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-300 hover:to-indigo-400 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow transition">
+            <span>💾</span>
+            <span>Download Updated Game HTML (Bake Progress In)</span>
+          </button>
+          <button id="exportJsonBtn" type="button" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-sky-400/40 text-sky-200 font-extrabold text-xs flex items-center justify-center gap-2 transition">
+            <span>📤</span>
+            <span>Export Sync JSON (violet_quest_sync.json)</span>
+          </button>
+          <label for="importJsonFileInput" class="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-400/40 text-amber-200 font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer transition text-center">
+            <span>📥</span>
+            <span>Import / Resync JSON File</span>
+            <input id="importJsonFileInput" type="file" accept=".json,application/json" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Quick Clipboard Snapshot Sync -->
+        <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <input id="syncJsonSnapshotInput" type="text" readonly placeholder="Live JSON sync snapshot..." class="flex-1 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-[11px] font-mono text-slate-300" />
+          <div class="flex items-center gap-1.5">
+            <button id="copySyncJsonBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-amber-300 border border-slate-700 whitespace-nowrap">
+              📋 Copy Sync Code
+            </button>
+            <button id="applyPastedJsonBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-emerald-300 border border-slate-700 whitespace-nowrap">
+              📥 Paste &amp; Restore
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct Workspace Companion Links -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+        <a href="https://docs.google.com/presentation/d/1oSDU7vfsShmhrNtLXLWaLAwuksxUnW3rqZwtxFD1Wv4/edit" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-amber-400/40 flex items-center gap-2.5 text-amber-200 font-bold">
+          <span class="text-xl">🖥️</span>
+          <span>Open Companion Google Slides Game Show</span>
+        </a>
+        <a href="https://docs.google.com/document/d/1toRghnHExDVKz3tHK-JaKdJVPER23ySkDWJlyjACcxU/edit" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-sky-400/40 flex items-center gap-2.5 text-sky-200 font-bold">
+          <span class="text-xl">📄</span>
+          <span>Open Printable 5-Star Practice Playbook Doc</span>
+        </a>
+        <a href="https://drive.google.com/file/d/1KHnOXW6pZDZkQsprlNDYRCZjY7A2ldst/view?usp=drive_web" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-emerald-400/40 flex items-center gap-2.5 text-emerald-200 font-bold">
+          <span class="text-xl">🎥</span>
+          <span>Watch Mrs. Ulrich's Expanded Form Video</span>
+        </a>
+        <a href="https://keep.google.com/?note=1pT3vI285AZnnQ529d8RAPgM29WqjprsDbAaFt8LoBzERMncLF6JXthT-Yf-gs88" target="_blank" rel="noopener noreferrer" class="p-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-purple-400/40 flex items-center gap-2.5 text-purple-200 font-bold">
+          <span class="text-xl">📌</span>
+          <span>Open Violet's Spelling Words Keep Note</span>
+        </a>
+      </div>
+
+      <!-- Mon-Thu Daily Progress Sign-Off -->
+      <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-700 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-sm font-extrabold uppercase tracking-wider text-amber-300">Monday–Thursday Family Sign-Off Log</h3>
+          <div class="flex items-center gap-3">
+            <button id="modalResetDailyBtn" type="button" class="text-xs text-amber-300 hover:underline font-bold">🔄 Reset Daily Boards Only</button>
+            <button id="resetProgressBtn" type="button" class="text-xs text-rose-300 hover:underline font-bold">Reset All Progress</button>
+          </div>
+        </div>
+        <div id="signOffList" class="space-y-2 text-xs sm:text-sm"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // 1. GROUNDED HOMEWORK DATA (WEEK OF NOV 16, 2026)
+    // =====================================================
+    const SESSION_METADATA = {
+      weekId: '2026-11-16_championship_quest',
+      weekLabel: 'Week of Nov 16, 2026',
+      themeTitle: "Violet's Championship Quest: Long O & Metamorphosis Game Show!",
+      student: 'Violet Goresch (2nd Grade • Mrs. Molly Ulrich)',
+      coaches: 'Dad (Alex) & Marisa',
+      slidesUrl: 'https://docs.google.com/presentation/d/1oSDU7vfsShmhrNtLXLWaLAwuksxUnW3rqZwtxFD1Wv4/edit',
+      playbookUrl: 'https://docs.google.com/document/d/1toRghnHExDVKz3tHK-JaKdJVPER23ySkDWJlyjACcxU/edit'
+    };
+
+    const SPELLING_WORDS = [
+      { word: 'moment', pattern: 'o', vaultName: 'Open o', isCompound: false, syllables: 'mo • ment', sentence: 'Wait just one moment before we start the game show!' },
+      { word: 'frozen', pattern: 'o', vaultName: 'Open o', isCompound: false, syllables: 'fro • zen', sentence: 'The pond water was frozen solid on the chilly morning.' },
+      { word: 'tadpole', pattern: 'o_e', vaultName: 'Magic o_e', isCompound: true, part1: 'tad', part2: 'pole', chopIndex: 3, syllables: 'tad • pole', tip: 'Silent Magic e jumps over the l to make the o say its name!', sentence: 'The tiny tadpole wiggled its tail in the pond.' },
+      { word: 'explode', pattern: 'o_e', vaultName: 'Magic o_e', isCompound: false, syllables: 'ex • plode', sentence: 'We explode double-digit numbers into tens and ones!' },
+      { word: 'oatmeal', pattern: 'oa', vaultName: 'Team oa', isCompound: true, part1: 'oat', part2: 'meal', chopIndex: 3, syllables: 'oat • meal', tip: 'When two vowels go walking (o and a), the first one does the talking!', sentence: 'Violet ate a warm bowl of cinnamon oatmeal for breakfast.' },
+      { word: 'raincoat', pattern: 'oa', vaultName: 'Team oa', isCompound: true, part1: 'rain', part2: 'coat', chopIndex: 4, syllables: 'rain • coat', tip: "Mrs. Ulrich's Rule: The /k/ sound at the start of 'coat' starts with C, not K!", sentence: 'Zip up your yellow raincoat before stepping into the storm.' },
+      { word: 'snowball', pattern: 'ow', vaultName: 'Team ow', isCompound: true, part1: 'snow', part2: 'ball', chopIndex: 4, syllables: 'snow • ball', tip: 'The vowel team ow makes the Long /O/ sound at the end of snow!', sentence: 'We rolled a giant snowball in the backyard.' },
+      { word: 'elbow', pattern: 'ow', vaultName: 'Team ow', isCompound: false, syllables: 'el • bow', sentence: 'Tap your shoulder, elbow, and wrist to sound out tricky words.' },
+      { word: 'toenail', pattern: 'oe', vaultName: 'Team oe', isCompound: true, part1: 'toe', part2: 'nail', chopIndex: 3, syllables: 'toe • nail', tip: 'The vowel team oe is at the end of the base word toe!', sentence: 'She painted her toenail bright sparkly purple.' },
+      { word: 'goes', pattern: 'oe', vaultName: 'Team oe', isCompound: false, syllables: 'goes', sentence: 'A tadpole goes through metamorphosis to become a frog.' }
+    ];
+
+    const VAULT_DEFS = [
+      { id: 'o', title: 'Vault 1: Open o', badge: 'o', color: 'border-amber-400/50 bg-amber-500/10' },
+      { id: 'o_e', title: 'Vault 2: Magic o_e', badge: 'o_e', color: 'border-rose-400/50 bg-rose-500/10' },
+      { id: 'oa', title: 'Vault 3: Team oa', badge: 'oa', color: 'border-sky-400/50 bg-sky-500/10' },
+      { id: 'ow', title: 'Vault 4: Team ow', badge: 'ow', color: 'border-emerald-400/50 bg-emerald-500/10' },
+      { id: 'oe', title: 'Vault 5: Team oe', badge: 'oe', color: 'border-purple-400/50 bg-purple-500/10' }
+    ];
+
+    const MYSTERY_WORDS = [
+      { word: 'moment', masked: 'm _ m e n t', answer: 'o', options: ['o', 'oa', 'ow'] },
+      { word: 'frozen', masked: 'f r _ z e n', answer: 'o', options: ['o', 'oe', 'oa'] },
+      { word: 'tadpole', masked: 't a d p _ l _', answer: 'o_e', options: ['o_e', 'oa', 'ow'] },
+      { word: 'explode', masked: 'e x p l _ d _', answer: 'o_e', options: ['o_e', 'oe', 'oa'] },
+      { word: 'oatmeal', masked: '_ _ t m e a l', answer: 'oa', options: ['oa', 'ow', 'oe'] },
+      { word: 'raincoat', masked: 'r a i n c _ _ t', answer: 'oa', options: ['oa', 'ow', 'o_e'] },
+      { word: 'snowball', masked: 's n _ _ b a l l', answer: 'ow', options: ['ow', 'oa', 'oe'] },
+      { word: 'elbow', masked: 'e l b _ _', answer: 'ow', options: ['ow', 'oe', 'oa'] },
+      { word: 'toenail', masked: 't _ _ n a i l', answer: 'oe', options: ['oe', 'oa', 'ow'] },
+      { word: 'goes', masked: 'g _ _ s', answer: 'oe', options: ['oe', 'ow', 'oa'] }
+    ];
+
+    const LIFE_CYCLES = {
+      frog: [
+        { step: 1, finger: 'Finger 1 (Thumb)', temporal: 'FIRST', title: 'Tiny Egg', icon: '🥚', action: 'Curl up tight into a tiny Frog Egg on the rug!' },
+        { step: 2, finger: 'Finger 2 (Pointer)', temporal: 'THEN', title: 'Swimming Tadpole', icon: '〰️🐸', action: 'Hatch and wiggle around like a hungry Tadpole!' },
+        { step: 3, finger: 'Finger 3 (Middle)', temporal: 'NEXT', title: 'Pollywog (Back Legs)', icon: '🦵🐸', action: 'Grow strong back legs into a Pollywog!' },
+        { step: 4, finger: 'Finger 4 (Ring)', temporal: 'THEN', title: 'Froglet (Metamorphosis!)', icon: '✨🐸', action: 'Metamorphosis! Grow front legs and shrink your tail!' },
+        { step: 5, finger: 'Finger 5 (Pinky)', temporal: 'LAST', title: 'Leaping Adult Frog', icon: '🐸👑', action: 'Leap big across the living room as an adult Frog!' }
+      ],
+      butterfly: [
+        { step: 1, finger: 'Finger 1 (Thumb)', temporal: 'FIRST', title: 'Egg on a Leaf', icon: '🍃🥚', action: 'Curl up still like a tiny Egg on a green leaf!' },
+        { step: 2, finger: 'Finger 2 (Pointer)', temporal: 'THEN', title: 'Hungry Caterpillar', icon: '🐛', action: 'Wriggle and munch leaves like a growing Caterpillar!' },
+        { step: 3, finger: 'Finger 3 (Middle)', temporal: 'NEXT', title: 'Cozy Chrysalis', icon: '🛡️', action: 'Wrap your arms tight around yourself in a Chrysalis!' },
+        { step: 4, finger: 'Finger 4 (Ring)', temporal: 'THEN', title: 'Metamorphosis! Cracking Open', icon: '✨🦋', action: 'Metamorphosis! Stretch your wings out slowly!' },
+        { step: 5, finger: 'Finger 5 (Pinky)', temporal: 'LAST', title: 'Soaring Butterfly', icon: '🦋🌸', action: 'Soar gently around the room as an adult Butterfly!' }
+      ]
+    };
+
+    const SCRIPTS = [
+      {
+        title: 'Script 1: The Snowball Swim Meet (Kids Excel Broadcast)',
+        html: `Welcome back to Kids Excel Sports Desk! Just one <strong class="text-sky-300">moment</strong> ago, Maya zipped up her bright yellow <strong class="text-sky-300">raincoat</strong> by the pool. <span class="quote-segment">"I ate a big bowl of warm <strong class="text-sky-300">oatmeal</strong> this morning, so I am ready to race!"</span> cheered Maya. Even when the wind felt <strong class="text-sky-300">frozen</strong> like a <strong class="text-sky-300">snowball</strong>, she bent her <strong class="text-sky-300">elbow</strong> and dove in like a speedy <strong class="text-sky-300">tadpole</strong>! <span class="quote-segment">"There she <strong class="text-sky-300">goes</strong> to the finish line!"</span> shouted the crowd as the scoreboard lights began to <strong class="text-sky-300">explode</strong>!`,
+        plain: `Welcome back to Kids Excel Sports Desk! Just one moment ago, Maya zipped up her bright yellow raincoat by the pool. "I ate a big bowl of warm oatmeal this morning, so I am ready to race!" cheered Maya. Even when the wind felt frozen like a snowball, she bent her elbow and dove in like a speedy tadpole! "There she goes to the finish line!" shouted the crowd as the scoreboard lights began to explode!`
+      },
+      {
+        title: 'Script 2: The Tadpole Jump Finals (Kids Excel Broadcast)',
+        html: `Live from Paris Ridge Arena, it is time for the Championship Long Jump! Leo tapped his <strong class="text-sky-300">toenail</strong> on the starting line and took a deep breath. <span class="quote-segment">"Watch me leap just like a frog after metamorphosis!"</span> Leo announced into the microphone. At the exact right <strong class="text-sky-300">moment</strong>, he swung his <strong class="text-sky-300">elbow</strong> back and launched across the mat! <span class="quote-segment">"That jump was cooler than a <strong class="text-sky-300">frozen</strong> <strong class="text-sky-300">snowball</strong>!"</span> cheered his coach.`,
+        plain: `Live from Paris Ridge Arena, it is time for the Championship Long Jump! Leo tapped his toenail on the starting line and took a deep breath. "Watch me leap just like a frog after metamorphosis!" Leo announced into the microphone. At the exact right moment, he swung his elbow back and launched across the mat! "That jump was cooler than a frozen snowball!" cheered his coach.`
+      }
+    ];
+
+    const FLASHCARD_DECK = [
+      { a: 6, b: 4, ans: 10, pile: 'plus4', label: '🔥 +4 Challenger', tip: '6 + 4 makes a Friendly 10!' },
+      { a: 7, b: 4, ans: 11, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Think 7 + 3 = 10, plus 1 more is 11!' },
+      { a: 8, b: 4, ans: 12, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Think 8 + 2 = 10, plus 2 more is 12!' },
+      { a: 9, b: 4, ans: 13, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Think 9 + 1 = 10, plus 3 more is 13!' },
+      { a: 5, b: 4, ans: 9, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Near-Double! 4 + 4 is 8, plus 1 more is 9!' },
+      { a: 4, b: 4, ans: 8, pile: 'plus4', label: '🔥 +4 Challenger (Double!)', tip: 'Double 4s make 8!' },
+      { a: 3, b: 4, ans: 7, pile: 'plus4', label: '🔥 +4 Challenger', tip: 'Double 3s is 6, plus 1 more is 7!' },
+      { a: 10, b: 7, ans: 17, pile: 'base', label: '⭐ Confident Base (Teens)', tip: '1 ten and 7 ones is 17!' },
+      { a: 10, b: 4, ans: 14, pile: 'base', label: '⭐ Confident Base (Teens)', tip: '1 ten and 4 ones is 14!' },
+      { a: 8, b: 8, ans: 16, pile: 'base', label: '⭐ Confident Base (Doubles)', tip: 'Double 8s equal 16!' },
+      { a: 7, b: 7, ans: 14, pile: 'base', label: '⭐ Confident Base (Doubles)', tip: 'Double 7s equal 14!' },
+      { a: 8, b: 3, ans: 11, pile: 'base', label: '⭐ Confident Base (+3)', tip: '8 + 2 = 10, plus 1 more is 11!' },
+      { a: 9, b: 3, ans: 12, pile: 'base', label: '⭐ Confident Base (+3)', tip: '9 + 1 = 10, plus 2 more is 12!' },
+      { a: 9, b: 2, ans: 11, pile: 'base', label: '⭐ Confident Base (+2)', tip: 'Count up 2 from 9: 10, 11!' }
+    ];
+
+    const EXPLODE_PROBLEMS = [
+      { a: 58, b: 42, label: 'Classroom Model: 58 + 42' },
+      { a: 36, b: 24, label: 'Playbook Box 1: 36 + 24' },
+      { a: 47, b: 35, label: 'Playbook Box 2: 47 + 35' },
+      { a: 63, b: 28, label: 'Playbook Box 3: 63 + 28' },
+      { a: 45, b: 37, label: 'Slides Challenge B: 45 + 37' }
+    ];
+
+    const HOP_PROBLEMS = [
+      {
+        start: 53,
+        sub: 23,
+        ans: 30,
+        onesHop: 3,
+        tensCount: 2,
+        story: 'Violet made 53 snowballs (or spotted 53 tadpoles in the pond!). She threw 23 snowballs at Dad. How many snowballs are left?',
+        options: [53, 23, 30, 76]
+      },
+      {
+        start: 44,
+        sub: 14,
+        ans: 30,
+        onesHop: 4,
+        tensCount: 1,
+        story: 'Violet packed 44 snowballs for the championship fort. She threw 14 snowballs during Round 1. How many snowballs are left?',
+        options: [44, 14, 30, 58]
+      },
+      {
+        start: 62,
+        sub: 32,
+        ans: 30,
+        onesHop: 2,
+        tensCount: 3,
+        story: 'There were 62 glowing fireflies near the pond. 32 fireflies zoomed up into the oak tree. How many fireflies stayed by the pond?',
+        options: [62, 32, 30, 94]
+      }
+    ];
+
+    // =====================================================
+    // 2. PERSISTENT GAME STATE & VINYL-VAULT LOCAL SYNC ENGINE
+    // =====================================================
+    const STORAGE_KEY = 'violet_quest_nov16_v1';
+
+    const state = {
+      metadata: SESSION_METADATA,
+      lastSavedAt: null,
+      coins: 0,
+      streak: 0,
+      muted: false,
+      activeTab: 'ritual',
+      ritualChecks: { deck: false, body: false, eyes: false, retell: false },
+      stars: { karate: false, vaults: false, metamorphosis: false, sportscaster: false, mathlab: false },
+      // Stage 1: Karate
+      karateIdx: 0,
+      karateChopped: {},
+      karatePatternDone: {},
+      karateFused: {},
+      // Stage 2: Vaults
+      vaultMode: 'sort',
+      selectedSortWord: null,
+      sortedWords: {},
+      crackedLocks: {},
+      spellTestIdx: 0,
+      spellTestCorrect: {},
+      // Stage 3: Metamorphosis
+      creature: 'frog',
+      retellOrder: [],
+      retellShuffled: [],
+      // Stage 4: Sportscaster
+      scriptIdx: 0,
+      quoteGlow: true,
+      pass1Done: false,
+      pass2Done: false,
+      gratitudeText: '',
+      gratitudeClaimed: false,
+      // Stage 5: Math Lab
+      mathMode: 'flashcards',
+      flashFilter: 'mixed',
+      currentFlashIdx: 0,
+      flashSolvedCount: 0,
+      explodeIdx: 1,
+      activeExplode: { a: 36, b: 24 },
+      hopIdx: 0,
+      hopPpwUnlocked: false,
+      hopCurrentVal: 53,
+      hopHistory: [],
+      // Daily Sign-Off
+      signOff: {
+        monPhonics: false, monMath: false,
+        tuePhonics: false, tueMath: false,
+        wedPhonics: false, wedMath: false,
+        thuPhonics: false, thuMath: false
+      }
+    };
+
+    function getSerializablePayload() {
+      return {
+        metadata: SESSION_METADATA,
+        lastSavedAt: state.lastSavedAt || new Date().toLocaleTimeString(),
+        coins: state.coins,
+        streak: state.streak,
+        ritualChecks: state.ritualChecks,
+        stars: state.stars,
+        karateChopped: state.karateChopped,
+        karatePatternDone: state.karatePatternDone,
+        karateFused: state.karateFused,
+        sortedWords: state.sortedWords,
+        crackedLocks: state.crackedLocks,
+        spellTestCorrect: state.spellTestCorrect,
+        pass1Done: state.pass1Done,
+        pass2Done: state.pass2Done,
+        gratitudeText: document.getElementById('gratitudeInput') ? document.getElementById('gratitudeInput').value : state.gratitudeText,
+        flashSolvedCount: state.flashSolvedCount,
+        signOff: state.signOff
+      };
+    }
+
+    function applyPayloadToState(parsed) {
+      if (!parsed || typeof parsed !== 'object') return;
+      if (typeof parsed.coins === 'number') state.coins = parsed.coins;
+      if (typeof parsed.streak === 'number') state.streak = parsed.streak;
+      if (parsed.lastSavedAt) state.lastSavedAt = parsed.lastSavedAt;
+      if (parsed.ritualChecks) Object.assign(state.ritualChecks, parsed.ritualChecks);
+      if (parsed.stars) Object.assign(state.stars, parsed.stars);
+      if (parsed.karateChopped) state.karateChopped = { ...parsed.karateChopped };
+      if (parsed.karatePatternDone) state.karatePatternDone = { ...parsed.karatePatternDone };
+      if (parsed.karateFused) state.karateFused = { ...parsed.karateFused };
+      if (parsed.sortedWords) state.sortedWords = { ...parsed.sortedWords };
+      if (parsed.crackedLocks) state.crackedLocks = { ...parsed.crackedLocks };
+      if (parsed.spellTestCorrect) state.spellTestCorrect = { ...parsed.spellTestCorrect };
+      if (typeof parsed.pass1Done === 'boolean') state.pass1Done = parsed.pass1Done;
+      if (typeof parsed.pass2Done === 'boolean') state.pass2Done = parsed.pass2Done;
+      if (typeof parsed.gratitudeText === 'string') {
+        state.gratitudeText = parsed.gratitudeText;
+        const gEl = document.getElementById('gratitudeInput');
+        if (gEl) gEl.value = parsed.gratitudeText;
+      }
+      if (typeof parsed.flashSolvedCount === 'number') state.flashSolvedCount = parsed.flashSolvedCount;
+      if (parsed.signOff) Object.assign(state.signOff, parsed.signOff);
+    }
+
+    function syncInlineFormAndTelemetry() {
+      const payload = getSerializablePayload();
+      const jsonStr = JSON.stringify(payload);
+      window.__VIOLET_QUEST_STATE__ = payload;
+
+      const hiddenJson = document.getElementById('quest-hidden-state-json');
+      const hiddenCoins = document.getElementById('quest-hidden-coins');
+      const hiddenStars = document.getElementById('quest-hidden-stars');
+      const hiddenSignoffs = document.getElementById('quest-hidden-signoffs');
+      if (hiddenJson) hiddenJson.value = jsonStr;
+      if (hiddenCoins) hiddenCoins.value = String(state.coins);
+      const starCount = Object.values(state.stars).filter(Boolean).length;
+      if (hiddenStars) hiddenStars.value = String(starCount);
+      const signedKeys = Object.keys(state.signOff).filter((k) => state.signOff[k]);
+      if (hiddenSignoffs) hiddenSignoffs.value = signedKeys.join(',');
+
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      if (snapInput) snapInput.value = jsonStr;
+
+      const syncPill = document.getElementById('syncStatusPill');
+      if (syncPill && state.lastSavedAt) {
+        syncPill.textContent = `🟢 Synced ${state.lastSavedAt}`;
+      }
+
+      // Update Parent Hub Telemetry Cards
+      const tScore = document.getElementById('telemetryScoreText');
+      const tDaily = document.getElementById('telemetryDailySolved');
+      const tSign = document.getElementById('telemetrySignoffText');
+      const tSync = document.getElementById('telemetryLastSync');
+      if (tScore) tScore.textContent = `${state.coins} Coins • ${starCount}/5 Arena Stars`;
+      if (tDaily) {
+        const cCount = Object.values(state.karateFused).filter(Boolean).length;
+        const sCount = Object.keys(state.sortedWords).length;
+        const mCount = Object.keys(state.crackedLocks).length;
+        tDaily.textContent = `${cCount}/5 Chopped • ${sCount}/10 Sorted • ${mCount}/10 Locks`;
+      }
+      if (tSign) tSign.textContent = `${signedKeys.length} / 8 Sprints Signed Off`;
+      if (tSync) tSync.textContent = state.lastSavedAt ? `Last local sync: ${state.lastSavedAt}` : 'Auto-synced to browser & inline form';
+    }
+
+    function loadSavedState() {
+      // Priority 1: Check if baked-in state exists inside HTML (from "Download Updated Game HTML")
+      if (window.__VIOLET_QUEST_STATE__ && typeof window.__VIOLET_QUEST_STATE__ === 'object') {
+        applyPayloadToState(window.__VIOLET_QUEST_STATE__);
+      } else {
+        const hiddenJson = document.getElementById('quest-hidden-state-json');
+        if (hiddenJson && hiddenJson.value) {
+          try {
+            applyPayloadToState(JSON.parse(hiddenJson.value));
+          } catch (e) {
+            // Ignore malformed hidden JSON
+          }
+        }
+      }
+      // Priority 2: Reconcile with browser localStorage if newer/present
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          applyPayloadToState(parsed);
+        }
+      } catch (e) {
+        // Ignore storage errors in sandboxed iframes
+      }
+      syncInlineFormAndTelemetry();
+    }
+
+    function saveState() {
+      state.lastSavedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const payload = getSerializablePayload();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch (e) {
+        // Ignore storage errors
+      }
+      syncInlineFormAndTelemetry();
+    }
+
+    // =====================================================
+    // 3. WEB AUDIO SYNTHESIZER & SPEECH SYNTHESIS
+    // =====================================================
+    let audioCtx = null;
+    function ensureAudio() {
+      if (!audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) audioCtx = new Ctx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (state.muted) return;
+      try {
+        ensureAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+
+        if (type === 'coin' || type === 'correct') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(587.33, now);
+          osc.frequency.setValueAtTime(880, now + 0.09);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'chop') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(420, now);
+          osc.frequency.exponentialRampToValueAtTime(95, now + 0.16);
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        } else if (type === 'explode') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(240, now);
+          osc.frequency.exponentialRampToValueAtTime(48, now + 0.32);
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'fanfare' || type === 'cheer') {
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.09);
+            gain.gain.setValueAtTime(0.18, now + i * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.35);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.09);
+            osc.stop(now + i * 0.09 + 0.35);
+          });
+        } else if (type === 'onair') {
+          [440, 659.25, 880].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.11);
+            gain.gain.setValueAtTime(0.15, now + i * 0.11);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.11);
+            osc.stop(now + i * 0.11 + 0.3);
+          });
+        } else if (type === 'drum') {
+          for (let i = 0; i < 6; i++) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(140 + (i % 2) * 20, now + i * 0.06);
+            gain.gain.setValueAtTime(0.16, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.05);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.06);
+            osc.stop(now + i * 0.06 + 0.05);
+          }
+        } else if (type === 'oops') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(280, now);
+          osc.frequency.setValueAtTime(210, now + 0.12);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (e) {
+        // Ignore audio errors
+      }
+    }
+
+    // =====================================================
+    // 3B. AMAZON FIRE KIDS TABLET & CROSS-BROWSER VOICE ENGINE
+    //     - Preserves native Web Speech API (speechSynthesis) on desktop/phones
+    //     - Fixes Android/Fire OS cancel() + speak() race condition (60ms debounce)
+    //     - Normalizes en-US / en_US voice matching without forcing broken voice refs
+    //     - Automatically falls back to standard HTML5 Media Audio (same channel as SFX)
+    //       when Amazon Kids Web Browser / WebView blocks or mutes speechSynthesis
+    // =====================================================
+    const DICTIONARY_WORD_MP3S = {
+      moment: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/moment--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/moment-us.mp3'
+      ],
+      frozen: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/frozen--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/frozen-us.mp3'
+      ],
+      tadpole: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/tadpole--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/tadpole-us.mp3'
+      ],
+      explode: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/explode--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/explode-us.mp3'
+      ],
+      oatmeal: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/oatmeal--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/oatmeal-us.mp3'
+      ],
+      raincoat: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/raincoat--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/raincoat-us.mp3'
+      ],
+      snowball: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/snowball--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/snowball-us.mp3'
+      ],
+      elbow: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/elbow--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/elbow-us.mp3'
+      ],
+      toenail: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/toenail--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/toenail-us.mp3'
+      ],
+      goes: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/goes--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/goes-us.mp3'
+      ],
+      tad: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/tad--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/tad-us.mp3'
+      ],
+      pole: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/pole--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/pole-us.mp3'
+      ],
+      oat: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/oat--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/oat-us.mp3'
+      ],
+      meal: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/meal--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/meal-us.mp3'
+      ],
+      rain: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/rain--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/rain-us.mp3'
+      ],
+      coat: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/coat--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/coat-us.mp3'
+      ],
+      snow: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/snow--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/snow-us.mp3'
+      ],
+      ball: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/ball--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/ball-us.mp3'
+      ],
+      toe: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/toe--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/toe-us.mp3'
+      ],
+      nail: [
+        'https://ssl.gstatic.com/dictionary/static/sounds/20200429/nail--_us_1.mp3',
+        'https://api.dictionaryapi.dev/media/pronunciations/en/nail-us.mp3'
+      ]
+    };
+
+    const uaString = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : '';
+    const isFireOrAndroidTablet = /\b(Silk|KF[A-Z0-9]+|AF[A-Z0-9]+|Amazon|Fire|Android|wv)\b/i.test(uaString);
+    const isFireKidsOrSilk = /\b(Silk|KF[A-Z0-9]+|AF[A-Z0-9]+|Amazon|Fire)\b/i.test(uaString);
+
+    let cachedSpeechVoices = [];
+    let speechSynthVerifiedWorking = false;
+    let tabletMediaFallbackSticky = false;
+    let activeSpeechSeqId = 0;
+    let speechCancelDebounceTimer = null;
+    let speechStartWatchdogTimer = null;
+    let sharedFallbackAudio = null;
+
+    function refreshSpeechVoices() {
+      try {
+        if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
+          const list = window.speechSynthesis.getVoices();
+          if (Array.isArray(list) && list.length > 0) {
+            cachedSpeechVoices = list;
+          }
+        }
+      } catch (e) {
+        // Ignore getVoices errors in restricted WebViews
+      }
+    }
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      refreshSpeechVoices();
+      try {
+        if ('onvoiceschanged' in window.speechSynthesis) {
+          window.speechSynthesis.onvoiceschanged = refreshSpeechVoices;
+        } else if (typeof window.speechSynthesis.addEventListener === 'function') {
+          window.speechSynthesis.addEventListener('voiceschanged', refreshSpeechVoices);
+        }
+      } catch (e) {
+        // Ignore listener errors
+      }
+    }
+
+    function pickBestEnglishVoice() {
+      refreshSpeechVoices();
+      if (!cachedSpeechVoices || cachedSpeechVoices.length === 0) return null;
+      // Normalize en-US and Android/Fire OS en_US locale formats
+      const enUsVoices = cachedSpeechVoices.filter((v) => v && v.lang && /^en[-_]US/i.test(v.lang));
+      const anyEnVoices = cachedSpeechVoices.filter((v) => v && v.lang && /^en([-_]|$)/i.test(v.lang));
+      const pool = enUsVoices.length > 0 ? enUsVoices : anyEnVoices;
+      if (pool.length === 0) return null;
+      const preferred = pool.find((v) => /natural|google|samantha|ava|allison|zira|aria|jenny|female|default/i.test(v.name || ''));
+      return preferred || pool.find((v) => v.default) || pool[0];
+    }
+
+    function ensureFallbackAudioElement() {
+      if (!sharedFallbackAudio && typeof Audio !== 'undefined') {
+        sharedFallbackAudio = new Audio();
+        sharedFallbackAudio.preload = 'auto';
+        try {
+          sharedFallbackAudio.referrerPolicy = 'no-referrer';
+        } catch (e) {
+          // Ignore if unsupported
+        }
+      }
+      return sharedFallbackAudio;
+    }
+
+    function stopFallbackAudioPlayback() {
+      if (speechCancelDebounceTimer) {
+        clearTimeout(speechCancelDebounceTimer);
+        speechCancelDebounceTimer = null;
+      }
+      if (speechStartWatchdogTimer) {
+        clearTimeout(speechStartWatchdogTimer);
+        speechStartWatchdogTimer = null;
+      }
+      if (sharedFallbackAudio) {
+        try {
+          sharedFallbackAudio.onended = null;
+          sharedFallbackAudio.onerror = null;
+          sharedFallbackAudio.pause();
+        } catch (e) {
+          // Ignore pause errors
+        }
+      }
+    }
+
+    function buildStreamTtsUrls(textChunk) {
+      const encoded = encodeURIComponent(textChunk.trim());
+      return [
+        `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en-US&q=${encoded}`,
+        `https://dict.youdao.com/dictvoice?audio=${encoded}&type=2`
+      ];
+    }
+
+    function splitIntoSpeakableSegments(rawText) {
+      const cleaned = String(rawText || '').replace(/\s+/g, ' ').trim();
+      if (!cleaned) return [];
+      const singleClean = cleaned.toLowerCase().replace(/[^a-z]/g, '');
+      if (DICTIONARY_WORD_MP3S[singleClean] && !cleaned.includes(' ')) {
+        return [{ type: 'word', word: singleClean, text: cleaned }];
+      }
+      // Split sentences while keeping short chunks <= 160 chars for media TTS endpoints
+      const roughParts = cleaned.match(/[^.!?]+[.!?]*/g) || [cleaned];
+      const segments = [];
+      roughParts.forEach((part) => {
+        const trimmed = part.trim();
+        if (!trimmed) return;
+        const wordOnly = trimmed.toLowerCase().replace(/[^a-z]/g, '');
+        if (DICTIONARY_WORD_MP3S[wordOnly] && trimmed.split(/\s+/).length === 1) {
+          segments.push({ type: 'word', word: wordOnly, text: trimmed });
+        } else if (trimmed.length <= 165) {
+          segments.push({ type: 'phrase', text: trimmed });
+        } else {
+          const words = trimmed.split(/\s+/);
+          let buf = '';
+          words.forEach((w) => {
+            if ((buf + ' ' + w).trim().length > 155) {
+              if (buf.trim()) segments.push({ type: 'phrase', text: buf.trim() });
+              buf = w;
+            } else {
+              buf = (buf + ' ' + w).trim();
+            }
+          });
+          if (buf.trim()) segments.push({ type: 'phrase', text: buf.trim() });
+        }
+      });
+      return segments;
+    }
+
+    function extractEmbeddedWeeklyWords(text) {
+      const lower = String(text || '').toLowerCase();
+      const matches = [];
+      const words = lower.match(/[a-z]+/g) || [];
+      words.forEach((w) => {
+        if (DICTIONARY_WORD_MP3S[w]) {
+          matches.push(w);
+        }
+      });
+      return matches;
+    }
+
+    function playSyllableChimeCadence(text) {
+      // Offline last-resort cadence through Web Audio API if tablet Wi-Fi is off
+      if (state.muted) return;
+      try {
+        ensureAudio();
+        if (!audioCtx) return;
+        const words = String(text || '').trim().split(/\s+/).slice(0, 6);
+        const baseNotes = [523.25, 659.25, 587.33, 783.99];
+        const now = audioCtx.currentTime;
+        words.forEach((w, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(baseNotes[idx % baseNotes.length], now + idx * 0.14);
+          gain.gain.setValueAtTime(0.14, now + idx * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.12);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.12);
+        });
+      } catch (e) {
+        // Ignore audio errors
+      }
+    }
+
+    function playCandidateUrlsWithAudio(urlCandidates, seqId, onComplete, onAllFailed) {
+      if (state.muted || seqId !== activeSpeechSeqId) return;
+      const player = ensureFallbackAudioElement();
+      if (!player || !urlCandidates || urlCandidates.length === 0) {
+        if (onAllFailed) onAllFailed();
+        return;
+      }
+
+      let candidateIdx = 0;
+      const tryNextUrl = () => {
+        if (state.muted || seqId !== activeSpeechSeqId) return;
+        if (candidateIdx >= urlCandidates.length) {
+          if (onAllFailed) onAllFailed();
+          return;
+        }
+        const currentUrl = urlCandidates[candidateIdx++];
+        let settled = false;
+        const advanceOnFail = () => {
+          if (settled) return;
+          settled = true;
+          tryNextUrl();
+        };
+
+        player.onended = () => {
+          if (settled || seqId !== activeSpeechSeqId) return;
+          settled = true;
+          if (onComplete) onComplete();
+        };
+        player.onerror = advanceOnFail;
+        player.src = currentUrl;
+        try {
+          const playPromise = player.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(advanceOnFail);
+          }
+        } catch (err) {
+          advanceOnFail();
+        }
+      };
+
+      tryNextUrl();
+    }
+
+    function playTabletMediaFallback(text, seqId) {
+      if (state.muted || seqId !== activeSpeechSeqId) return;
+      const segments = splitIntoSpeakableSegments(text);
+      if (segments.length === 0) return;
+
+      let segIdx = 0;
+      const playNextSegment = () => {
+        if (state.muted || seqId !== activeSpeechSeqId || segIdx >= segments.length) return;
+        const seg = segments[segIdx++];
+
+        if (seg.type === 'word' && DICTIONARY_WORD_MP3S[seg.word]) {
+          const urls = [
+            ...DICTIONARY_WORD_MP3S[seg.word],
+            ...buildStreamTtsUrls(seg.word)
+          ];
+          playCandidateUrlsWithAudio(
+            urls,
+            seqId,
+            () => setTimeout(playNextSegment, 90),
+            () => {
+              playSyllableChimeCadence(seg.word);
+              setTimeout(playNextSegment, 180);
+            }
+          );
+        } else {
+          const phraseUrls = buildStreamTtsUrls(seg.text);
+          playCandidateUrlsWithAudio(
+            phraseUrls,
+            seqId,
+            () => setTimeout(playNextSegment, 90),
+            () => {
+              // If full-sentence TTS stream is blocked by Amazon Kids web filter,
+              // play the dictionary MP3s for any spelling words inside the sentence!
+              const embeddedWords = extractEmbeddedWeeklyWords(seg.text);
+              if (embeddedWords.length > 0) {
+                let wIdx = 0;
+                const playEmbeddedWord = () => {
+                  if (state.muted || seqId !== activeSpeechSeqId || wIdx >= embeddedWords.length) {
+                    playNextSegment();
+                    return;
+                  }
+                  const w = embeddedWords[wIdx++];
+                  playCandidateUrlsWithAudio(
+                    DICTIONARY_WORD_MP3S[w],
+                    seqId,
+                    () => setTimeout(playEmbeddedWord, 140),
+                    () => {
+                      playSyllableChimeCadence(w);
+                      setTimeout(playEmbeddedWord, 180);
+                    }
+                  );
+                };
+                playEmbeddedWord();
+              } else {
+                playSyllableChimeCadence(seg.text);
+                setTimeout(playNextSegment, 180);
+              }
+            }
+          );
+        }
+      };
+
+      playNextSegment();
+    }
+
+    function speakText(text) {
+      if (state.muted || !text) return;
+      activeSpeechSeqId += 1;
+      const seqId = activeSpeechSeqId;
+
+      stopFallbackAudioPlayback();
+      ensureFallbackAudioElement();
+
+      // If this device was already verified as blocking speechSynthesis (e.g. Amazon Kids Browser),
+      // go straight to the media audio channel inside the synchronous user tap gesture
+      if (tabletMediaFallbackSticky || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+        playTabletMediaFallback(text, seqId);
+        return;
+      }
+
+      refreshSpeechVoices();
+      // On Amazon Fire / Silk where getVoices() is empty (no OS TTS voice exposed in Kids Profile),
+      // trigger the media audio fallback immediately while still allowing speechSynthesis if it wakes up
+      if (isFireKidsOrSilk && cachedSpeechVoices.length === 0 && !speechSynthVerifiedWorking) {
+        tabletMediaFallbackSticky = true;
+        playTabletMediaFallback(text, seqId);
+        return;
+      }
+
+      try {
+        const synth = window.speechSynthesis;
+        const wasActive = synth.speaking || synth.pending;
+        if (wasActive || isFireOrAndroidTablet) {
+          synth.cancel();
+        }
+
+        // Fix 1: 60ms pause between cancel() and speak() on Fire/Android tablets (or when canceling active speech)
+        // prevents the Chromium/Android cancel() race condition from muting the new utterance
+        const launchDelayMs = (isFireOrAndroidTablet || wasActive) ? 60 : 0;
+
+        const queueUtterance = () => {
+          if (state.muted || seqId !== activeSpeechSeqId) return;
+          try {
+            if (synth.paused) {
+              synth.resume();
+            }
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = 0.92;
+            utter.pitch = 1.08;
+
+            // Fix 2: Only assign a specific voice object if a valid English voice is present;
+            // otherwise let the tablet use its default system voice
+            const matchedVoice = pickBestEnglishVoice();
+            if (matchedVoice && !isFireKidsOrSilk) {
+              utter.voice = matchedVoice;
+            }
+
+            let utterStarted = false;
+            utter.onstart = () => {
+              utterStarted = true;
+              speechSynthVerifiedWorking = true;
+              if (speechStartWatchdogTimer) {
+                clearTimeout(speechStartWatchdogTimer);
+                speechStartWatchdogTimer = null;
+              }
+            };
+
+            utter.onerror = () => {
+              if (speechStartWatchdogTimer) {
+                clearTimeout(speechStartWatchdogTimer);
+                speechStartWatchdogTimer = null;
+              }
+              if (!utterStarted && seqId === activeSpeechSeqId && !state.muted) {
+                if (isFireOrAndroidTablet) tabletMediaFallbackSticky = true;
+                playTabletMediaFallback(text, seqId);
+              }
+            };
+
+            // Fix 3: 300ms watchdog — if Amazon Kids Web Browser silently drops speechSynthesis.speak()
+            // without firing onstart, automatically stream through the media audio channel
+            if (!speechSynthVerifiedWorking || isFireOrAndroidTablet) {
+              speechStartWatchdogTimer = setTimeout(() => {
+                if (!utterStarted && !synth.speaking && seqId === activeSpeechSeqId && !state.muted) {
+                  if (isFireOrAndroidTablet) tabletMediaFallbackSticky = true;
+                  try {
+                    synth.cancel();
+                  } catch (e) {
+                    // Ignore cancel error
+                  }
+                  playTabletMediaFallback(text, seqId);
+                }
+              }, 300);
+            }
+
+            synth.speak(utter);
+          } catch (innerErr) {
+            playTabletMediaFallback(text, seqId);
+          }
+        };
+
+        if (launchDelayMs > 0) {
+          speechCancelDebounceTimer = setTimeout(queueUtterance, launchDelayMs);
+        } else {
+          queueUtterance();
+        }
+      } catch (e) {
+        playTabletMediaFallback(text, seqId);
+      }
+    }
+
+    // =====================================================
+    // 4. CONFETTI FX ENGINE & FEEDBACK BANNER
+    // =====================================================
+    const fxCanvas = document.getElementById('fxCanvas');
+    const fxCtx = fxCanvas.getContext('2d');
+    let particles = [];
+    let fxAnimId = null;
+
+    function resizeFxCanvas() {
+      fxCanvas.width = window.innerWidth;
+      fxCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeFxCanvas);
+    resizeFxCanvas();
+
+    function spawnConfetti(count = 45) {
+      const colors = ['#facc15', '#34d399', '#38bdf8', '#f472b6', '#a78bfa', '#fb923c'];
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: window.innerWidth * (0.25 + Math.random() * 0.5),
+          y: window.innerHeight * 0.35,
+          vx: (Math.random() - 0.5) * 11,
+          vy: -Math.random() * 9 - 3,
+          size: 6 + Math.random() * 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * Math.PI * 2,
+          vrot: (Math.random() - 0.5) * 0.2,
+          life: 1
+        });
+      }
+      if (!fxAnimId) runFxLoop();
+    }
+
+    function runFxLoop() {
+      fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.28;
+        p.rot += p.vrot;
+        p.life -= 0.014;
+        fxCtx.save();
+        fxCtx.translate(p.x, p.y);
+        fxCtx.rotate(p.rot);
+        fxCtx.globalAlpha = Math.max(0, p.life);
+        fxCtx.fillStyle = p.color;
+        fxCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        fxCtx.restore();
+      });
+      particles = particles.filter((p) => p.life > 0 && p.y < fxCanvas.height + 30);
+      if (particles.length > 0) {
+        fxAnimId = requestAnimationFrame(runFxLoop);
+      } else {
+        fxAnimId = null;
+        fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      }
+    }
+
+    function showBanner(emoji, message, tone = 'emerald') {
+      const banner = document.getElementById('feedbackBanner');
+      const emojiEl = document.getElementById('feedbackEmoji');
+      const textEl = document.getElementById('feedbackText');
+      emojiEl.textContent = emoji;
+      textEl.textContent = message;
+      banner.className = 'mb-4 rounded-2xl px-4 py-3 border text-sm sm:text-base font-bold flex items-center justify-between gap-3 animate-pop ';
+      if (tone === 'emerald') {
+        banner.className += 'bg-emerald-500/20 border-emerald-400/50 text-emerald-200';
+      } else if (tone === 'amber') {
+        banner.className += 'bg-amber-500/20 border-amber-400/50 text-amber-200';
+      } else {
+        banner.className += 'bg-rose-500/20 border-rose-400/50 text-rose-200';
+      }
+    }
+
+    document.getElementById('closeFeedbackBtn').addEventListener('click', () => {
+      document.getElementById('feedbackBanner').classList.add('hidden');
+    });
+
+    document.getElementById('celebrateAgainBtn').addEventListener('click', () => {
+      playSound('fanfare');
+      spawnConfetti(90);
+    });
+
+    function addCoins(amount, reasonText) {
+      state.coins += amount;
+      state.streak += 1;
+      updateHeaderReadouts();
+      saveState();
+      playSound('coin');
+      if (reasonText) {
+        showBanner('🪙', `${reasonText} (+${amount} Champion Coins!)`, 'emerald');
+      }
+    }
+
+    function awardStar(stageKey, stageLabel) {
+      if (!state.stars[stageKey]) {
+        state.stars[stageKey] = true;
+        state.coins += 50;
+        saveState();
+        updateHeaderReadouts();
+        playSound('fanfare');
+        spawnConfetti(70);
+        showBanner('🌟', `ARENA STAR UNLOCKED: ${stageLabel}! (+50 Bonus Coins!)`, 'amber');
+      }
+    }
+
+    function updateHeaderReadouts() {
+      document.getElementById('coinDisplay').textContent = state.coins;
+      const starCount = Object.values(state.stars).filter(Boolean).length;
+      document.getElementById('starDisplay').textContent = `${starCount} / 5`;
+      document.getElementById('streakPill').textContent = `🔥 ${state.streak} Streak`;
+      const grandBanner = document.getElementById('grandPrizeBanner');
+      if (starCount === 5) {
+        grandBanner.classList.remove('hidden');
+      } else {
+        grandBanner.classList.add('hidden');
+      }
+    }
+
+    // =====================================================
+    // 5. SPRINT TIMER & NAVIGATION
+    // =====================================================
+    let timerSeconds = 600;
+    let timerInterval = null;
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+      document.getElementById('timerReadout').textContent = formatTime(timerSeconds);
+    }
+
+    document.getElementById('timerPresetSelect').addEventListener('change', (e) => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('timerToggleBtn').textContent = 'Start';
+      }
+      timerSeconds = parseInt(e.target.value, 10) || 600;
+      updateTimerUI();
+    });
+
+    document.getElementById('timerToggleBtn').addEventListener('click', () => {
+      const btn = document.getElementById('timerToggleBtn');
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.textContent = 'Resume';
+      } else {
+        playSound('onair');
+        btn.textContent = 'Pause';
+        timerInterval = setInterval(() => {
+          if (timerSeconds > 0) {
+            timerSeconds--;
+            updateTimerUI();
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            btn.textContent = 'Done!';
+            playSound('fanfare');
+            spawnConfetti(60);
+            showBanner('⏰', 'Sprint Timer Complete! Awesome focus, Violet!', 'amber');
+          }
+        }, 1000);
+      }
+    });
+
+    document.getElementById('muteBtn').addEventListener('click', () => {
+      state.muted = !state.muted;
+      document.getElementById('muteIcon').textContent = state.muted ? '🔇' : '🔊';
+      document.getElementById('muteLabel').textContent = state.muted ? 'Muted' : 'SFX On';
+      if (state.muted) {
+        stopFallbackAudioPlayback();
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+      }
+    });
+
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      document.querySelectorAll('.stage-view').forEach((el) => {
+        el.classList.toggle('hidden', el.id !== `view-${tabId}`);
+      });
+      document.querySelectorAll('.nav-tab').forEach((btn) => {
+        const isCurrent = btn.getAttribute('data-tab') === tabId;
+        btn.className = isCurrent
+          ? 'nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-amber-400 text-slate-950 shadow'
+          : 'nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700';
+      });
+      if (tabId === 'metamorphosis') {
+        setTimeout(resizePondCanvas, 50);
+      } else if (tabId === 'sportscaster') {
+        setTimeout(resizeDrawCanvas, 50);
+      }
+    }
+
+    document.querySelectorAll('.nav-tab').forEach((btn) => {
+      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+    });
+
+    document.getElementById('launchStage1Btn').addEventListener('click', () => {
+      switchTab('karate');
+    });
+
+    document.getElementById('speakAffirmationBtn').addEventListener('click', () => {
+      speakText('I am loved, I am special, I can change the universe, and we really can!');
+      addCoins(15, "Mrs. Ulrich's Daily Affirmation Spoken with Pride!");
+    });
+
+    // =====================================================
+    // 6. STAGE 0: PRE-SPRINT RITUAL & SOUNDBOARD
+    // =====================================================
+    function renderRitual() {
+      let count = 0;
+      document.querySelectorAll('.ritual-card').forEach((card) => {
+        const key = card.getAttribute('data-ritual');
+        const checked = !!state.ritualChecks[key];
+        if (checked) count++;
+        const badge = card.querySelector('.ritual-badge');
+        if (checked) {
+          card.className = 'ritual-card text-left p-4 rounded-2xl bg-emerald-950/60 border-2 border-emerald-400 transition flex flex-col justify-between gap-3 emerald-glow';
+          badge.className = 'ritual-badge text-xs font-extrabold px-2.5 py-1 rounded-full bg-emerald-400 text-slate-950';
+          badge.textContent = '✓ Ready!';
+        } else {
+          card.className = 'ritual-card text-left p-4 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border-2 border-slate-700 transition flex flex-col justify-between gap-3';
+          badge.className = 'ritual-badge text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400';
+          badge.textContent = 'Tap to Check';
+        }
+      });
+      document.getElementById('ritualProgressText').textContent = `${count} / 4 Checked`;
+    }
+
+    document.querySelectorAll('.ritual-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const key = card.getAttribute('data-ritual');
+        const wasChecked = state.ritualChecks[key];
+        state.ritualChecks[key] = !wasChecked;
+        renderRitual();
+        if (!wasChecked) {
+          const allDone = Object.values(state.ritualChecks).every(Boolean);
+          if (allDone) {
+            addCoins(50, '3-Step Champion Check Complete! Body Ready, Eyes on Speaker, Task Repeated!');
+            spawnConfetti(50);
+          } else {
+            addCoins(10, 'Ready Check Step Completed!');
+          }
+        }
+        saveState();
+      });
+    });
+
+    function renderSoundboard() {
+      const grid = document.getElementById('wordSoundboardGrid');
+      grid.innerHTML = '';
+      SPELLING_WORDS.forEach((item) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'p-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-amber-400/60 text-left transition flex flex-col justify-between gap-1 group';
+        btn.innerHTML = `
+          <div class="flex items-center justify-between w-full">
+            <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">${item.vaultName}</span>
+            <span class="text-sm group-hover:scale-125 transition">🔊</span>
+          </div>
+          <div class="text-lg font-extrabold text-white tracking-wide mt-1">${item.word}</div>
+          <div class="text-[11px] text-amber-300 font-semibold">Tap: ${item.syllables}</div>
+        `;
+        btn.addEventListener('click', () => {
+          speakText(`${item.word}. ${item.sentence}`);
+          playSound('coin');
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    document.getElementById('speakAllWordsBtn').addEventListener('click', () => {
+      const listText = SPELLING_WORDS.map((w) => w.word).join(', ');
+      speakText(`Here are Violet's ten Long O spelling words for this week: ${listText}.`);
+    });
+
+    // =====================================================
+    // 7. STAGE 1: COMPOUND WORD KARATE CHOP
+    // =====================================================
+    const COMPOUND_WORDS = SPELLING_WORDS.filter((w) => w.isCompound);
+
+    function renderKarateStage() {
+      const tabsEl = document.getElementById('karateWordTabs');
+      tabsEl.innerHTML = '';
+      const fusedCount = Object.values(state.karateFused).filter(Boolean).length;
+      document.getElementById('karateScoreText').textContent = `${fusedCount} / ${COMPOUND_WORDS.length}`;
+
+      COMPOUND_WORDS.forEach((item, idx) => {
+        const isCurrent = idx === state.karateIdx;
+        const isDone = !!state.karateFused[item.word];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = isCurrent
+          ? 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-rose-500 text-white shadow transition flex items-center gap-1.5'
+          : 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-700 transition flex items-center gap-1.5';
+        btn.innerHTML = `<span>${isDone ? '✅' : '🥋'}</span><span>${item.word}</span>`;
+        btn.addEventListener('click', () => {
+          state.karateIdx = idx;
+          renderKarateStage();
+        });
+        tabsEl.appendChild(btn);
+      });
+
+      const current = COMPOUND_WORDS[state.karateIdx];
+      document.getElementById('karateCoachTip').textContent = `💡 Coach Tip: ${current.tip}`;
+
+      const chopRow = document.getElementById('karateChopContainer');
+      chopRow.innerHTML = '';
+      const isChopped = !!state.karateChopped[current.word];
+
+      for (let i = 0; i < current.word.length; i++) {
+        const ch = current.word[i];
+        const tile = document.createElement('div');
+        const inFirstPart = i < current.chopIndex;
+        tile.className = isChopped
+          ? `w-11 h-14 sm:w-14 sm:h-16 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-extrabold game-font border-2 ${
+              inFirstPart
+                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200 mr-0.5'
+                : 'bg-sky-500/20 border-sky-400 text-sky-200 ml-0.5'
+            }`
+          : 'w-11 h-14 sm:w-14 sm:h-16 rounded-2xl bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-white game-font';
+        tile.textContent = ch;
+        chopRow.appendChild(tile);
+
+        if (i < current.word.length - 1) {
+          if (isChopped && i + 1 === current.chopIndex) {
+            const divider = document.createElement('div');
+            divider.className = 'px-2 text-2xl sm:text-3xl animate-bounce';
+            divider.textContent = '⚡🥋⚡';
+            chopRow.appendChild(divider);
+          } else if (!isChopped) {
+            const chopBtn = document.createElement('button');
+            chopBtn.type = 'button';
+            chopBtn.className = 'w-7 h-12 rounded-xl bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-400/40 flex items-center justify-center text-xs font-bold transition';
+            chopBtn.title = 'Karate Chop Here!';
+            chopBtn.textContent = '🥋';
+            const splitPos = i + 1;
+            chopBtn.addEventListener('click', () => handleKarateChopAttempt(current, splitPos));
+            chopRow.appendChild(chopBtn);
+          }
+        }
+      }
+
+      const postArea = document.getElementById('karatePostChopArea');
+      if (isChopped) {
+        postArea.classList.remove('hidden');
+        document.getElementById('karatePart1Display').textContent = current.part1;
+        document.getElementById('karatePart2Display').textContent = current.part2;
+        document.getElementById('karateWholeDisplay').textContent = current.word;
+
+        const patternContainer = document.getElementById('karatePatternChoices');
+        patternContainer.innerHTML = '';
+        VAULT_DEFS.forEach((v) => {
+          const pBtn = document.createElement('button');
+          pBtn.type = 'button';
+          const selected = state.karatePatternDone[current.word] === v.id;
+          pBtn.className = selected
+            ? 'px-3 py-2 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950 shadow'
+            : 'px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700';
+          pBtn.textContent = v.title.replace('Vault ', '');
+          pBtn.addEventListener('click', () => {
+            if (v.id === current.pattern) {
+              state.karatePatternDone[current.word] = v.id;
+              addCoins(15, `Spot on! "${current.word}" uses the ${v.title} pattern!`);
+              renderKarateStage();
+            } else {
+              playSound('oops');
+              showBanner('🕵️‍♀️', `Look closely at the letters making the Long /O/ sound in "${current.word}" and try again!`, 'amber');
+            }
+          });
+          patternContainer.appendChild(pBtn);
+        });
+
+        const spellInput = document.getElementById('karateSpellInput');
+        spellInput.value = state.karateFused[current.word] ? current.word : '';
+      } else {
+        postArea.classList.add('hidden');
+      }
+    }
+
+    function handleKarateChopAttempt(item, splitPos) {
+      if (splitPos === item.chopIndex) {
+        playSound('chop');
+        state.karateChopped[item.word] = true;
+        speakText(`HI-YAH! ${item.part1}, plus ${item.part2}, equals ${item.word}!`);
+        addCoins(15, `HI-YAH! You chopped "${item.word}" into "${item.part1}" + "${item.part2}"!`);
+        renderKarateStage();
+      } else {
+        playSound('oops');
+        showBanner('🥋', `Almost! Read the two smaller base words inside "${item.word}" and chop right between them!`, 'amber');
+      }
+    }
+
+    document.getElementById('karateSpeakBtn').addEventListener('click', () => {
+      const current = COMPOUND_WORDS[state.karateIdx];
+      speakText(`${current.word}. ${current.part1}, ${current.part2}. ${current.sentence}`);
+    });
+
+    ['armTap1Btn', 'armTap2Btn', 'armTap3Btn'].forEach((id, idx) => {
+      document.getElementById(id).addEventListener('click', () => {
+        const current = COMPOUND_WORDS[state.karateIdx];
+        playSound('coin');
+        if (idx === 0) speakText(current.part1);
+        if (idx === 1) speakText(current.part2);
+        if (idx === 2) speakText(current.word);
+      });
+    });
+
+    document.getElementById('karateVerifyBtn').addEventListener('click', () => {
+      const current = COMPOUND_WORDS[state.karateIdx];
+      const val = document.getElementById('karateSpellInput').value.trim().toLowerCase();
+      if (val === current.word) {
+        state.karateFused[current.word] = true;
+        addCoins(25, `BOOM! You fused "${current.part1} + ${current.part2} = ${current.word}"!`);
+        spawnConfetti(35);
+        renderKarateStage();
+        const allFused = COMPOUND_WORDS.every((w) => state.karateFused[w.word]);
+        if (allFused) {
+          awardStar('karate', 'Compound Word Karate Master');
+        }
+      } else {
+        playSound('oops');
+        if (current.word === 'raincoat' && val.includes('k')) {
+          showBanner('💡', `Remember Mrs. Ulrich's C vs. K rule! In "raincoat", the /k/ sound in "coat" starts with a C!`, 'amber');
+        } else {
+          showBanner('💪', `Tap the sounds on your arm for "${current.part1}" + "${current.part2}" and check each letter!`, 'amber');
+        }
+      }
+    });
+
+    // =====================================================
+    // 8. STAGE 2: THE 5 SECRET LONG /O/ VAULTS
+    // =====================================================
+    function switchVaultMode(mode) {
+      state.vaultMode = mode;
+      ['sort', 'mystery', 'test'].forEach((m) => {
+        document.getElementById(`vaultMode-${m}`).classList.toggle('hidden', m !== mode);
+      });
+      document.querySelectorAll('.vault-mode-btn').forEach((btn) => {
+        const isCurrent = btn.getAttribute('data-vault-mode') === mode;
+        btn.className = isCurrent
+          ? 'vault-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-sky-400 text-slate-950 transition'
+          : 'vault-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition';
+      });
+      renderVaultStage();
+    }
+
+    document.querySelectorAll('.vault-mode-btn').forEach((btn) => {
+      btn.addEventListener('click', () => switchVaultMode(btn.getAttribute('data-vault-mode')));
+    });
+
+    function renderVaultStage() {
+      const sortedCount = Object.keys(state.sortedWords).length;
+      const crackedCount = Object.keys(state.crackedLocks).length;
+      document.getElementById('vaultSortCount').textContent = `${sortedCount}/10`;
+      document.getElementById('mysteryCrackCount').textContent = `${crackedCount}/10`;
+
+      if (sortedCount === 10 && crackedCount === 10) {
+        awardStar('vaults', '5 Secret Long /O/ Vaults Detective');
+      }
+
+      const bankEl = document.getElementById('unsortedWordBank');
+      bankEl.innerHTML = '';
+      const remaining = SPELLING_WORDS.filter((w) => !state.sortedWords[w.word]);
+      if (remaining.length === 0) {
+        bankEl.innerHTML = `<div class="text-sm font-extrabold text-emerald-300">🎉 All 10 Spelling Words Sorted into Their Secret Vaults! Now try "2. Mystery Letters"!</div>`;
+      } else {
+        if (!state.selectedSortWord || state.sortedWords[state.selectedSortWord]) {
+          state.selectedSortWord = remaining[0].word;
+        }
+        remaining.forEach((item) => {
+          const isSel = state.selectedSortWord === item.word;
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = isSel
+            ? 'px-4 py-2 rounded-xl text-sm font-extrabold bg-amber-400 text-slate-950 shadow-lg ring-2 ring-white transition flex items-center gap-1.5'
+            : 'px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition flex items-center gap-1.5';
+          chip.innerHTML = `<span>${item.word}</span><span class="text-xs">🔊</span>`;
+          chip.addEventListener('click', () => {
+            state.selectedSortWord = item.word;
+            speakText(item.word);
+            renderVaultStage();
+          });
+          bankEl.appendChild(chip);
+        });
+      }
+
+      const colsEl = document.getElementById('vaultColumnsContainer');
+      colsEl.innerHTML = '';
+      VAULT_DEFS.forEach((vault) => {
+        const col = document.createElement('div');
+        col.className = `rounded-2xl p-3.5 border-2 ${vault.color} flex flex-col justify-between min-h-[190px]`;
+        const wordsInVault = SPELLING_WORDS.filter((w) => state.sortedWords[w.word] === vault.id);
+        const cardsHtml = wordsInVault
+          .map(
+            (w) =>
+              `<div class="px-3 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-400/50 text-emerald-200 font-extrabold text-sm flex items-center justify-between">
+                <span>${w.word}</span><span>✓</span>
+              </div>`
+          )
+          .join('');
+
+        col.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-white">${vault.title}</span>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-900 text-amber-300">${vault.badge}</span>
+            </div>
+            <div class="space-y-1.5 my-2">${cardsHtml || '<div class="text-xs text-slate-400 italic py-4 text-center">2 words hide here</div>'}</div>
+          </div>
+          <button type="button" class="vault-drop-btn w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-600 text-xs font-extrabold text-amber-300 transition">
+            📥 Place Selected Word Here
+          </button>
+        `;
+        col.querySelector('.vault-drop-btn').addEventListener('click', () => {
+          if (!state.selectedSortWord) return;
+          const wordObj = SPELLING_WORDS.find((w) => w.word === state.selectedSortWord);
+          if (!wordObj) return;
+          if (wordObj.pattern === vault.id) {
+            state.sortedWords[wordObj.word] = vault.id;
+            addCoins(15, `Unlocked! "${wordObj.word}" belongs in ${vault.title}!`);
+            renderVaultStage();
+          } else {
+            playSound('oops');
+            showBanner('🔐', `Look closely at the Long /O/ spelling inside "${wordObj.word}" — which letters make the /o/ sound?`, 'amber');
+          }
+        });
+        colsEl.appendChild(col);
+      });
+
+      const mystGrid = document.getElementById('mysteryGrid');
+      mystGrid.innerHTML = '';
+      MYSTERY_WORDS.forEach((m, idx) => {
+        const solved = !!state.crackedLocks[m.word];
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-2xl border ${
+          solved ? 'bg-emerald-950/40 border-emerald-400/60' : 'bg-slate-900/90 border-slate-700'
+        } flex flex-wrap items-center justify-between gap-3`;
+        const btnsHtml = m.options
+          .map(
+            (opt) =>
+              `<button type="button" data-opt="${opt}" class="myst-opt-btn px-3 py-1.5 rounded-xl text-xs font-extrabold ${
+                solved && opt === m.answer
+                  ? 'bg-emerald-400 text-slate-950'
+                  : 'bg-slate-800 hover:bg-amber-400 hover:text-slate-950 text-slate-200 border border-slate-600'
+              } transition">${opt}</button>`
+          )
+          .join('');
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-800 text-xs font-bold flex items-center justify-center text-slate-300">${idx + 1}</span>
+            <div>
+              <div class="text-lg font-mono font-extrabold tracking-widest ${solved ? 'text-emerald-300' : 'text-white'}">
+                ${solved ? m.word : m.masked}
+              </div>
+              <div class="text-[11px] text-slate-400">${solved ? '🔓 Vault Unlocked!' : 'Pick the missing Long /O/ letters:'}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">${btnsHtml}</div>
+        `;
+        card.querySelectorAll('.myst-opt-btn').forEach((b) => {
+          b.addEventListener('click', () => {
+            const chosen = b.getAttribute('data-opt');
+            if (chosen === m.answer) {
+              state.crackedLocks[m.word] = true;
+              speakText(m.word);
+              addCoins(15, `Cracked Lock #${idx + 1}: "${m.word}" uses "${m.answer}"!`);
+              renderVaultStage();
+            } else {
+              playSound('oops');
+              showBanner('🕵️‍♀️', `Try again on "${m.masked}" — spot which vowel team fits!`, 'amber');
+            }
+          });
+        });
+        mystGrid.appendChild(card);
+      });
+
+      const testWord = SPELLING_WORDS[state.spellTestIdx];
+      const testSolvedCount = Object.keys(state.spellTestCorrect).length;
+      document.getElementById('spellTestProgress').textContent = `Word ${state.spellTestIdx + 1} of ${SPELLING_WORDS.length}`;
+      document.getElementById('spellTestScore').textContent = `Mastered: ${testSolvedCount} / ${SPELLING_WORDS.length}`;
+      document.getElementById('spellTestSentence').textContent = `"${testWord.sentence.replace(new RegExp(testWord.word, 'gi'), '_____')}"`;
+    }
+
+    document.getElementById('resetVaultSortBtn').addEventListener('click', () => {
+      state.sortedWords = {};
+      saveState();
+      renderVaultStage();
+    });
+
+    document.getElementById('resetMysteryBtn').addEventListener('click', () => {
+      state.crackedLocks = {};
+      saveState();
+      renderVaultStage();
+    });
+
+    document.getElementById('spellTestSpeakBtn').addEventListener('click', () => {
+      const item = SPELLING_WORDS[state.spellTestIdx];
+      speakText(`Spell the word: ${item.word}. ${item.sentence}. The word is: ${item.word}.`);
+    });
+
+    document.getElementById('spellTestHintBtn').addEventListener('click', () => {
+      const item = SPELLING_WORDS[state.spellTestIdx];
+      const box = document.getElementById('spellTestHintBox');
+      box.classList.remove('hidden');
+      box.textContent = `💪 Arm-Tap: ${item.syllables} • Vault Pattern: ${item.vaultName} (${item.word.length} letters)${
+        item.word === 'raincoat' ? " • Remember: 'coat' starts with C, not K!" : ''
+      }`;
+    });
+
+    document.getElementById('spellTestSubmitBtn').addEventListener('click', () => {
+      const item = SPELLING_WORDS[state.spellTestIdx];
+      const typed = document.getElementById('spellTestInput').value.trim().toLowerCase();
+      if (typed === item.word) {
+        state.spellTestCorrect[item.word] = true;
+        addCoins(25, `Spelling Champion! You spelled "${item.word}" accurately!`);
+        spawnConfetti(35);
+        document.getElementById('spellTestInput').value = '';
+        document.getElementById('spellTestHintBox').classList.add('hidden');
+        state.spellTestIdx = (state.spellTestIdx + 1) % SPELLING_WORDS.length;
+        renderVaultStage();
+      } else {
+        playSound('oops');
+        showBanner('💪', `Slow down and arm-tap "${item.syllables}"! Spot the ${item.vaultName} vowel team and try again!`, 'amber');
+      }
+    });
+
+    document.getElementById('spellTestNextBtn').addEventListener('click', () => {
+      state.spellTestIdx = (state.spellTestIdx + 1) % SPELLING_WORDS.length;
+      document.getElementById('spellTestInput').value = '';
+      document.getElementById('spellTestHintBox').classList.add('hidden');
+      renderVaultStage();
+    });
+
+    // =====================================================
+    // 9. STAGE 3: METAMORPHOSIS 5-FINGER RETELL & POND HOPPER
+    // =====================================================
+    function initRetellPuzzle() {
+      const stages = LIFE_CYCLES[state.creature];
+      state.retellOrder = [];
+      state.retellShuffled = [...stages].sort(() => Math.random() - 0.5);
+      renderRetellStage();
+    }
+
+    function renderRetellStage() {
+      const stages = LIFE_CYCLES[state.creature];
+      const poolEl = document.getElementById('retellPool');
+      const slotsEl = document.getElementById('retellSlots');
+      poolEl.innerHTML = '';
+      slotsEl.innerHTML = '';
+
+      state.retellShuffled.forEach((item) => {
+        const alreadyPlaced = state.retellOrder.some((o) => o.step === item.step);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.disabled = alreadyPlaced;
+        btn.className = alreadyPlaced
+          ? 'p-3 rounded-2xl bg-slate-950/50 border border-slate-800 text-slate-600 text-left opacity-40 cursor-not-allowed'
+          : 'p-3 rounded-2xl bg-slate-800 hover:bg-emerald-600/30 border-2 border-slate-600 hover:border-emerald-400 text-left transition';
+        btn.innerHTML = `
+          <div class="text-2xl mb-1">${item.icon}</div>
+          <div class="text-sm font-extrabold text-white">${item.title}</div>
+          <div class="text-[11px] text-slate-300 mt-1">${item.action}</div>
+        `;
+        btn.addEventListener('click', () => {
+          const expectedStep = state.retellOrder.length + 1;
+          if (item.step === expectedStep) {
+            state.retellOrder.push(item);
+            speakText(`${item.temporal}: ${item.title}. ${item.action}`);
+            addCoins(15, `${item.finger} — ${item.temporal}: ${item.title}! Act it out now!`);
+            renderRetellStage();
+            if (state.retellOrder.length === 5) {
+              awardStar('metamorphosis', 'Metamorphosis 5-Finger Retell Boss');
+            }
+          } else {
+            playSound('oops');
+            const needed = stages[expectedStep - 1];
+            showBanner('🖐️', `Hold up ${needed.finger} (${needed.temporal}) — which stage comes next in the life cycle?`, 'amber');
+          }
+        });
+        poolEl.appendChild(btn);
+      });
+
+      stages.forEach((slotDef, idx) => {
+        const placed = state.retellOrder[idx];
+        const slot = document.createElement('div');
+        slot.className = placed
+          ? 'p-3.5 rounded-2xl bg-emerald-950/60 border-2 border-emerald-400 text-left animate-pop'
+          : 'p-3.5 rounded-2xl bg-slate-950/80 border-2 border-dashed border-slate-700 text-left';
+        slot.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-extrabold text-amber-300 uppercase">
+            <span>🖐️ ${slotDef.finger}</span>
+            <span class="px-2 py-0.5 rounded bg-amber-400/20">${slotDef.temporal}</span>
+          </div>
+          ${
+            placed
+              ? `<div class="text-2xl mt-2">${placed.icon}</div>
+                 <div class="text-sm font-extrabold text-white mt-1">${placed.title}</div>
+                 <div class="text-[11px] text-emerald-200 mt-0.5">${placed.action}</div>`
+              : `<div class="text-xs text-slate-500 py-5 text-center">Tap Stage #${idx + 1} above</div>`
+          }
+        `;
+        slotsEl.appendChild(slot);
+      });
+    }
+
+    document.querySelectorAll('.creature-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.creature = btn.getAttribute('data-creature');
+        document.querySelectorAll('.creature-btn').forEach((b) => {
+          const active = b.getAttribute('data-creature') === state.creature;
+          b.className = active
+            ? 'creature-btn px-4 py-2 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950 transition'
+            : 'creature-btn px-4 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition';
+        });
+        initRetellPuzzle();
+      });
+    });
+
+    document.getElementById('resetRetellBtn').addEventListener('click', initRetellPuzzle);
+
+    // POND HOPPER CANVAS MINI-GAME
+    const pondCanvas = document.getElementById('pondCanvas');
+    const pondCtx = pondCanvas.getContext('2d');
+    const pondGame = {
+      cols: 5,
+      rows: 3,
+      playerCol: 2,
+      playerRow: 1,
+      bubblesCaught: 0,
+      targetBubble: { col: 0, row: 0, word: 'tadpole' }
+    };
+
+    function spawnPondBubble() {
+      let c = Math.floor(Math.random() * pondGame.cols);
+      let r = Math.floor(Math.random() * pondGame.rows);
+      if (c === pondGame.playerCol && r === pondGame.playerRow) {
+        c = (c + 1) % pondGame.cols;
+      }
+      const wordObj = SPELLING_WORDS[Math.floor(Math.random() * SPELLING_WORDS.length)];
+      pondGame.targetBubble = { col: c, row: r, word: wordObj.word };
+    }
+
+    function getPondEvolutionStage() {
+      const b = pondGame.bubblesCaught;
+      if (b < 2) return { name: 'Stage 1: 🥚 Tiny Egg', emoji: '🥚' };
+      if (b < 4) return { name: 'Stage 2: 〰️ Swimming Tadpole', emoji: '🐟' };
+      if (b < 6) return { name: 'Stage 3: 🦵 Pollywog (Back Legs)', emoji: '🦎' };
+      if (b < 8) return { name: 'Stage 4: ✨ Froglet (Metamorphosis!)', emoji: '🐸' };
+      return { name: 'Stage 5: 🐸👑 Champion Adult Frog!', emoji: '🐸' };
+    }
+
+    function resizePondCanvas() {
+      const rect = pondCanvas.parentElement.getBoundingClientRect();
+      pondCanvas.width = Math.max(320, rect.width);
+      pondCanvas.height = Math.max(220, rect.height);
+      drawPondGame();
+    }
+    window.addEventListener('resize', resizePondCanvas);
+
+    function drawPondGame() {
+      const w = pondCanvas.width;
+      const h = pondCanvas.height;
+      pondCtx.clearRect(0, 0, w, h);
+
+      const grad = pondCtx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#022c22');
+      grad.addColorStop(1, '#0f172a');
+      pondCtx.fillStyle = grad;
+      pondCtx.fillRect(0, 0, w, h);
+
+      const cellW = w / pondGame.cols;
+      const cellH = h / pondGame.rows;
+
+      for (let r = 0; r < pondGame.rows; r++) {
+        for (let c = 0; c < pondGame.cols; c++) {
+          const cx = c * cellW + cellW / 2;
+          const cy = r * cellH + cellH / 2;
+          const radius = Math.min(cellW, cellH) * 0.34;
+
+          pondCtx.beginPath();
+          pondCtx.arc(cx, cy, radius, 0.2, Math.PI * 1.9);
+          pondCtx.lineTo(cx, cy);
+          pondCtx.closePath();
+          pondCtx.fillStyle = 'rgba(16, 185, 129, 0.28)';
+          pondCtx.fill();
+          pondCtx.lineWidth = 2;
+          pondCtx.strokeStyle = 'rgba(52, 211, 153, 0.55)';
+          pondCtx.stroke();
+        }
+      }
+
+      const bx = pondGame.targetBubble.col * cellW + cellW / 2;
+      const by = pondGame.targetBubble.row * cellH + cellH / 2;
+      pondCtx.beginPath();
+      pondCtx.arc(bx, by, Math.min(cellW, cellH) * 0.36, 0, Math.PI * 2);
+      pondCtx.fillStyle = 'rgba(250, 204, 21, 0.25)';
+      pondCtx.fill();
+      pondCtx.lineWidth = 2.5;
+      pondCtx.strokeStyle = '#facc15';
+      pondCtx.stroke();
+
+      pondCtx.fillStyle = '#fef08a';
+      pondCtx.font = 'bold 14px Inter, sans-serif';
+      pondCtx.textAlign = 'center';
+      pondCtx.textBaseline = 'middle';
+      pondCtx.fillText(pondGame.targetBubble.word, bx, by);
+
+      const px = pondGame.playerCol * cellW + cellW / 2;
+      const py = pondGame.playerRow * cellH + cellH / 2;
+      const evo = getPondEvolutionStage();
+      pondCtx.font = '32px sans-serif';
+      pondCtx.fillText(evo.emoji, px, py);
+
+      document.getElementById('pondStageBadge').textContent = `${evo.name} (${pondGame.bubblesCaught}/8 Bubbles)`;
+    }
+
+    function movePondPlayer(dir) {
+      if (dir === 'left' && pondGame.playerCol > 0) pondGame.playerCol--;
+      if (dir === 'right' && pondGame.playerCol < pondGame.cols - 1) pondGame.playerCol++;
+      if (dir === 'up' && pondGame.playerRow > 0) pondGame.playerRow--;
+      if (dir === 'down' && pondGame.playerRow < pondGame.rows - 1) pondGame.playerRow++;
+
+      playSound('chop');
+      if (
+        pondGame.playerCol === pondGame.targetBubble.col &&
+        pondGame.playerRow === pondGame.targetBubble.row
+      ) {
+        const caughtWord = pondGame.targetBubble.word;
+        pondGame.bubblesCaught++;
+        speakText(caughtWord);
+        addCoins(10, `Pond Leap! Caught "${caughtWord}"!`);
+        if (pondGame.bubblesCaught === 8) {
+          spawnConfetti(60);
+          awardStar('metamorphosis', 'Metamorphosis Pond Champion');
+        }
+        spawnPondBubble();
+      }
+      drawPondGame();
+    }
+
+    document.querySelectorAll('.pond-move-btn').forEach((btn) => {
+      btn.addEventListener('click', () => movePondPlayer(btn.getAttribute('data-move')));
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (state.activeTab !== 'metamorphosis') return;
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+        e.preventDefault();
+        if (e.key === 'ArrowLeft') movePondPlayer('left');
+        if (e.key === 'ArrowRight') movePondPlayer('right');
+        if (e.key === 'ArrowUp') movePondPlayer('up');
+        if (e.key === 'ArrowDown') movePondPlayer('down');
+      }
+    });
+
+    document.getElementById('resetPondGameBtn').addEventListener('click', () => {
+      pondGame.bubblesCaught = 0;
+      pondGame.playerCol = 2;
+      pondGame.playerRow = 1;
+      spawnPondBubble();
+      drawPondGame();
+    });
+
+    // =====================================================
+    // 10. STAGE 4: KIDS EXCEL SPORTSCASTER & GRATITUDE STUDIO
+    // =====================================================
+    function renderSportscasterStage() {
+      const script = SCRIPTS[state.scriptIdx];
+      const box = document.getElementById('teleprompterBox');
+      box.innerHTML = script.html;
+      box.querySelectorAll('.quote-segment').forEach((seg) => {
+        seg.className = state.quoteGlow
+          ? 'quote-segment px-2 py-0.5 rounded-lg bg-amber-400/25 text-amber-200 border border-amber-400/50 font-extrabold'
+          : 'quote-segment';
+      });
+      document.getElementById('pass1DoneBtn').textContent = state.pass1Done
+        ? '✅ Pass 1: Warm-Up Lap Completed!'
+        : '⬜ Pass 1: Warm-Up Lap (Accuracy & Arm-Tapping)';
+      document.getElementById('pass2DoneBtn').textContent = state.pass2Done
+        ? '✅ Pass 2: Sportscaster Broadcast Voice Completed!'
+        : '⬜ Pass 2: Live TV Sportscaster Voice (" " Expression!)';
+    }
+
+    document.querySelectorAll('.script-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.scriptIdx = parseInt(btn.getAttribute('data-script'), 10) || 0;
+        document.querySelectorAll('.script-tab').forEach((b) => {
+          const active = parseInt(b.getAttribute('data-script'), 10) === state.scriptIdx;
+          b.className = active
+            ? 'script-tab px-3 py-1 rounded-xl text-xs font-bold bg-amber-400 text-slate-950'
+            : 'script-tab px-3 py-1 rounded-xl text-xs font-bold bg-slate-800 text-slate-300';
+        });
+        renderSportscasterStage();
+      });
+    });
+
+    document.getElementById('toggleQuoteGlowBtn').addEventListener('click', () => {
+      state.quoteGlow = !state.quoteGlow;
+      renderSportscasterStage();
+    });
+
+    document.getElementById('readScriptAloudBtn').addEventListener('click', () => {
+      speakText(SCRIPTS[state.scriptIdx].plain);
+    });
+
+    document.querySelectorAll('.sfx-btn').forEach((btn) => {
+      btn.addEventListener('click', () => playSound(btn.getAttribute('data-sfx')));
+    });
+
+    document.getElementById('pass1DoneBtn').addEventListener('click', () => {
+      state.pass1Done = !state.pass1Done;
+      renderSportscasterStage();
+      saveState();
+      if (state.pass1Done) addCoins(20, 'Pass 1 Warm-Up Reading Lap Complete!');
+    });
+
+    document.getElementById('pass2DoneBtn').addEventListener('click', () => {
+      state.pass2Done = !state.pass2Done;
+      renderSportscasterStage();
+      saveState();
+      if (state.pass2Done) {
+        playSound('cheer');
+        addCoins(20, 'Pass 2 Live TV Sportscaster Broadcast Complete!');
+      }
+    });
+
+    const gratInput = document.getElementById('gratitudeInput');
+    function evaluateGratitudeSentence() {
+      const val = gratInput.value.trim();
+      state.gratitudeText = val;
+      const hasCap = /^[A-Z"]/.test(val) && /[A-Z]/.test(val.slice(0, 2));
+      const hasSpellWord = SPELLING_WORDS.some((w) => new RegExp(`\\b${w.word}\\b`, 'i').test(val));
+      const hasQuotes = val.includes('"');
+      const hasPunct = /[.!?]["']?$/.test(val);
+
+      const setCheck = (id, ok, text) => {
+        const el = document.getElementById(id);
+        el.className = ok
+          ? 'text-xs sm:text-sm font-extrabold text-emerald-300 flex items-center gap-2'
+          : 'text-xs sm:text-sm font-bold text-slate-400 flex items-center gap-2';
+        el.innerHTML = `<span>${ok ? '✅' : '⬜'}</span><span>${text}</span>`;
+      };
+
+      setCheck('checkCap', hasCap, 'Starts with a Capital Letter');
+      setCheck('checkWordOrQuote', hasSpellWord || hasQuotes, 'Uses a Long /O/ Spelling Word or Quotation Marks (" ")');
+      setCheck('checkPunct', hasPunct, 'Ends with proper punctuation ( . ! or ? )');
+
+      return hasCap && (hasSpellWord || hasQuotes) && hasPunct;
+    }
+
+    gratInput.addEventListener('input', () => {
+      evaluateGratitudeSentence();
+      saveState();
+    });
+
+    document.querySelectorAll('.insert-word-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const word = btn.getAttribute('data-insert');
+        const start = gratInput.selectionStart || gratInput.value.length;
+        const before = gratInput.value.slice(0, start);
+        const after = gratInput.value.slice(start);
+        const spacer = before.length > 0 && !before.endsWith(' ') && word !== '"' ? ' ' : '';
+        gratInput.value = `${before}${spacer}${word}${after}`;
+        gratInput.focus();
+        evaluateGratitudeSentence();
+        saveState();
+      });
+    });
+
+    document.getElementById('claimGratitudeBtn').addEventListener('click', () => {
+      const ok = evaluateGratitudeSentence();
+      if (ok) {
+        speakText(gratInput.value.trim());
+        awardStar('sportscaster', 'Kids Excel Sportscaster & Gratitude Mic Drop');
+      } else {
+        playSound('oops');
+        showBanner('🎙️', 'Check your 3-Star Self-Check list below the box: make sure you have a Capital Letter, a Long /O/ word or " ", and ending punctuation!', 'amber');
+      }
+    });
+
+    // Drawing Canvas
+    const drawCanvas = document.getElementById('drawCanvas');
+    const drawCtx = drawCanvas.getContext('2d');
+    let isDrawing = false;
+    let brushColor = '#facc15';
+
+    function resizeDrawCanvas() {
+      const rect = drawCanvas.parentElement.getBoundingClientRect();
+      if (rect.width > 0 && drawCanvas.width !== rect.width) {
+        drawCanvas.width = rect.width;
+        drawCanvas.height = rect.height;
+      }
+    }
+
+    function getDrawPos(e) {
+      const rect = drawCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    drawCanvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      const pos = getDrawPos(e);
+      drawCtx.beginPath();
+      drawCtx.moveTo(pos.x, pos.y);
+    });
+    drawCanvas.addEventListener('mousemove', (e) => {
+      if (!isDrawing) return;
+      const pos = getDrawPos(e);
+      drawCtx.lineTo(pos.x, pos.y);
+      drawCtx.strokeStyle = brushColor;
+      drawCtx.lineWidth = 4;
+      drawCtx.lineCap = 'round';
+      drawCtx.stroke();
+    });
+    window.addEventListener('mouseup', () => { isDrawing = false; });
+
+    drawCanvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      isDrawing = true;
+      const pos = getDrawPos(e);
+      drawCtx.beginPath();
+      drawCtx.moveTo(pos.x, pos.y);
+    }, { passive: false });
+    drawCanvas.addEventListener('touchmove', (e) => {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const pos = getDrawPos(e);
+      drawCtx.lineTo(pos.x, pos.y);
+      drawCtx.strokeStyle = brushColor;
+      drawCtx.lineWidth = 4;
+      drawCtx.lineCap = 'round';
+      drawCtx.stroke();
+    }, { passive: false });
+    drawCanvas.addEventListener('touchend', () => { isDrawing = false; });
+
+    document.querySelectorAll('.draw-color-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        brushColor = btn.getAttribute('data-color');
+        document.querySelectorAll('.draw-color-btn').forEach((b) => b.classList.remove('ring-2', 'ring-white'));
+        btn.classList.add('ring-2', 'ring-white');
+      });
+    });
+
+    document.getElementById('clearDrawBtn').addEventListener('click', () => {
+      drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    });
+
+    // =====================================================
+    // 11. STAGE 5: EXPLODE MATH LAB & TADPOLE HOP NUMBER LINES
+    // =====================================================
+    function switchMathMode(mode) {
+      state.mathMode = mode;
+      ['flashcards', 'explode', 'numberline'].forEach((m) => {
+        document.getElementById(`mathMode-${m}`).classList.toggle('hidden', m !== mode);
+      });
+      document.querySelectorAll('.math-mode-btn').forEach((btn) => {
+        const active = btn.getAttribute('data-math-mode') === mode;
+        btn.className = active
+          ? 'math-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-purple-400 text-slate-950 transition'
+          : 'math-mode-btn px-3.5 py-2 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200 hover:bg-slate-700 transition';
+      });
+      if (mode === 'flashcards') renderFlashcard();
+      if (mode === 'explode') renderExplodeProblem();
+      if (mode === 'numberline') renderHopProblem();
+    }
+
+    document.querySelectorAll('.math-mode-btn').forEach((btn) => {
+      btn.addEventListener('click', () => switchMathMode(btn.getAttribute('data-math-mode')));
+    });
+
+    function getFilteredFlashcards() {
+      if (state.flashFilter === 'plus4') return FLASHCARD_DECK.filter((c) => c.pile === 'plus4');
+      if (state.flashFilter === 'base') return FLASHCARD_DECK.filter((c) => c.pile === 'base');
+      return FLASHCARD_DECK;
+    }
+
+    function renderFlashcard() {
+      const deck = getFilteredFlashcards();
+      const card = deck[state.currentFlashIdx % deck.length];
+      document.getElementById('flashPileTag').textContent = card.label;
+      document.getElementById('flashEquation').textContent = `${card.a} + ${card.b} = ?`;
+      document.getElementById('flashSolvedBadge').textContent = `Solved: ${state.flashSolvedCount}`;
+      document.getElementById('flashVisualDots').classList.add('hidden');
+
+      const opts = new Set([card.ans]);
+      while (opts.size < 4) {
+        const delta = Math.floor(Math.random() * 5) - 2;
+        const candidate = Math.max(2, card.ans + (delta === 0 ? 3 : delta));
+        opts.add(candidate);
+      }
+      const shuffled = Array.from(opts).sort((a, b) => a - b);
+      const grid = document.getElementById('flashChoicesGrid');
+      grid.innerHTML = '';
+      shuffled.forEach((num) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'py-3.5 rounded-2xl bg-slate-800 hover:bg-purple-500 hover:text-slate-950 border-2 border-slate-600 text-2xl font-extrabold text-white game-font transition';
+        btn.textContent = num;
+        btn.addEventListener('click', () => {
+          if (num === card.ans) {
+            state.flashSolvedCount++;
+            addCoins(10, `${card.a} + ${card.b} = ${card.ans}!`);
+            state.currentFlashIdx++;
+            renderFlashcard();
+          } else {
+            playSound('oops');
+            const dotBox = document.getElementById('flashVisualDots');
+            dotBox.classList.remove('hidden');
+            dotBox.textContent = `💡 Strategy Hint: ${card.tip}`;
+          }
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    document.getElementById('flashDeckFilter').addEventListener('change', (e) => {
+      state.flashFilter = e.target.value;
+      state.currentFlashIdx = 0;
+      renderFlashcard();
+    });
+
+    document.getElementById('flashShowDotsBtn').addEventListener('click', () => {
+      const deck = getFilteredFlashcards();
+      const card = deck[state.currentFlashIdx % deck.length];
+      const dotBox = document.getElementById('flashVisualDots');
+      dotBox.classList.remove('hidden');
+      const dotsA = '🟢'.repeat(card.a);
+      const dotsB = '🟡'.repeat(card.b);
+      dotBox.innerHTML = `<div>${dotsA} + ${dotsB}</div><div class="mt-1 font-bold text-emerald-300">${card.tip}</div>`;
+    });
+
+    document.getElementById('flashNextBtn').addEventListener('click', () => {
+      state.currentFlashIdx++;
+      renderFlashcard();
+    });
+
+    function setExplodeProblem(a, b) {
+      state.activeExplode = { a, b };
+      document.getElementById('explodeMainEq').textContent = `${a} + ${b}`;
+      ['expTen1', 'expTen2', 'expTenSum', 'expOne1', 'expOne2', 'expOneSum', 'expFinalTotal'].forEach((id) => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('combineHintLabel').textContent = 'Tens + Ones =';
+    }
+
+    function renderExplodeProblem() {
+      const p = EXPLODE_PROBLEMS[state.explodeIdx];
+      setExplodeProblem(p.a, p.b);
+    }
+
+    document.querySelectorAll('.exp-prob-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.explodeIdx = parseInt(btn.getAttribute('data-exp-idx'), 10) || 0;
+        document.querySelectorAll('.exp-prob-btn').forEach((b) => {
+          const active = parseInt(b.getAttribute('data-exp-idx'), 10) === state.explodeIdx;
+          b.className = active
+            ? 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500 text-white'
+            : 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200';
+        });
+        renderExplodeProblem();
+      });
+    });
+
+    document.getElementById('randomExplodeBtn').addEventListener('click', () => {
+      const a = (Math.floor(Math.random() * 5) + 2) * 10 + Math.floor(Math.random() * 6) + 4;
+      const b = (Math.floor(Math.random() * 3) + 1) * 10 + Math.floor(Math.random() * 6) + 4;
+      setExplodeProblem(a, b);
+    });
+
+    document.getElementById('triggerExplodeBtn').addEventListener('click', () => {
+      const { a, b } = state.activeExplode;
+      const ten1 = Math.floor(a / 10) * 10;
+      const one1 = a % 10;
+      const ten2 = Math.floor(b / 10) * 10;
+      const one2 = b % 10;
+      playSound('explode');
+      spawnConfetti(30);
+      document.getElementById('expTen1').value = ten1;
+      document.getElementById('expTen2').value = ten2;
+      document.getElementById('expOne1').value = one1;
+      document.getElementById('expOne2').value = one2;
+      speakText(`BOOM! ${a} explodes into ${ten1} plus ${one1}! And ${b} explodes into ${ten2} plus ${one2}!`);
+      showBanner('💥', `EXPLODED! Now add the Tens (${ten1} + ${ten2}), add the Ones (${one1} + ${one2}), and combine them!`, 'amber');
+    });
+
+    document.getElementById('verifyExplodeBtn').addEventListener('click', () => {
+      const { a, b } = state.activeExplode;
+      const ten1 = Math.floor(a / 10) * 10;
+      const one1 = a % 10;
+      const ten2 = Math.floor(b / 10) * 10;
+      const one2 = b % 10;
+      const expectedTenSum = ten1 + ten2;
+      const expectedOneSum = one1 + one2;
+      const expectedTotal = a + b;
+
+      const userTenSum = parseInt(document.getElementById('expTenSum').value, 10);
+      const userOneSum = parseInt(document.getElementById('expOneSum').value, 10);
+      const userTotal = parseInt(document.getElementById('expFinalTotal').value, 10);
+
+      document.getElementById('combineHintLabel').textContent = `${expectedTenSum} + ${expectedOneSum} =`;
+
+      if (userTenSum === expectedTenSum && userOneSum === expectedOneSum && userTotal === expectedTotal) {
+        addCoins(35, `Expanded Form Master! (${ten1}+${ten2}=${expectedTenSum}) + (${one1}+${one2}=${expectedOneSum}) = ${expectedTotal}!`);
+        awardStar('mathlab', 'Explode the Number & Tadpole Hop Champion');
+      } else {
+        playSound('oops');
+        showBanner('🔢', `Check each step: Tens (${ten1} + ${ten2} = ${expectedTenSum}), Ones (${one1} + ${one2} = ${expectedOneSum}), then combine ${expectedTenSum} + ${expectedOneSum}!`, 'amber');
+      }
+    });
+
+    function renderHopProblem() {
+      const prob = HOP_PROBLEMS[state.hopIdx];
+      state.hopPpwUnlocked = false;
+      state.hopCurrentVal = prob.start;
+      state.hopHistory = [];
+
+      document.getElementById('hopStoryText').textContent = prob.story;
+      document.getElementById('hopFinalEqLabel').textContent = `${prob.start} - ${prob.sub} =`;
+      document.getElementById('hopFinalInput').value = '';
+
+      const wholeSel = document.getElementById('ppwWholeSelect');
+      const partSel = document.getElementById('ppwPartSelect');
+      wholeSel.innerHTML = `<option value="">Pick Whole...</option>` + prob.options.map((n) => `<option value="${n}">${n}</option>`).join('');
+      partSel.innerHTML = `<option value="">Pick Part...</option>` + prob.options.map((n) => `<option value="${n}">${n}</option>`).join('');
+
+      document.getElementById('hopOnesBtn').textContent = `🐸 Small Hop to Friendly 10 (-${prob.onesHop})`;
+      drawHopSvg();
+    }
+
+    document.querySelectorAll('.hop-prob-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.hopIdx = parseInt(btn.getAttribute('data-hop-idx'), 10) || 0;
+        document.querySelectorAll('.hop-prob-btn').forEach((b) => {
+          const active = parseInt(b.getAttribute('data-hop-idx'), 10) === state.hopIdx;
+          b.className = active
+            ? 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950'
+            : 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200';
+        });
+        renderHopProblem();
+      });
+    });
+
+    document.getElementById('checkPpwBtn').addEventListener('click', () => {
+      const prob = HOP_PROBLEMS[state.hopIdx];
+      const w = parseInt(document.getElementById('ppwWholeSelect').value, 10);
+      const p = parseInt(document.getElementById('ppwPartSelect').value, 10);
+      if (w === prob.start && p === prob.sub) {
+        state.hopPpwUnlocked = true;
+        addCoins(15, `Task Retell Spot On! ${prob.start} is the WHOLE and ${prob.sub} is the PART hopping back!`);
+      } else {
+        playSound('oops');
+        showBanner('🕵️‍♀️', `Read the story again: which big number do we start with (the WHOLE), and how many hop away (the PART)?`, 'amber');
+      }
+    });
+
+    function drawHopSvg() {
+      const prob = HOP_PROBLEMS[state.hopIdx];
+      const svg = document.getElementById('hopSvg');
+      const leftToSub = prob.sub - (prob.start - state.hopCurrentVal);
+      document.getElementById('hopRemainingLabel').textContent = `Current Spot: ${state.hopCurrentVal} • Left to Subtract: ${leftToSub}`;
+
+      const minVal = prob.ans - 10;
+      const maxVal = prob.start + 5;
+      const mapX = (val) => 60 + ((val - minVal) / (maxVal - minVal)) * 580;
+
+      let html = `
+        <line x1="40" y1="105" x2="660" y2="105" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+      `;
+
+      const ticks = new Set([prob.start, prob.start - prob.onesHop, prob.ans, prob.ans + 10, prob.ans + 20]);
+      ticks.forEach((t) => {
+        if (t >= minVal && t <= maxVal) {
+          const x = mapX(t);
+          html += `
+            <line x1="${x}" y1="97" x2="${x}" y2="113" stroke="#94a3b8" stroke-width="3" />
+            <text x="${x}" y="134" fill="#e2e8f0" font-size="14" font-weight="bold" text-anchor="middle">${t}</text>
+          `;
+        }
+      });
+
+      state.hopHistory.forEach((hop) => {
+        const x1 = mapX(hop.from);
+        const x2 = mapX(hop.to);
+        const midX = (x1 + x2) / 2;
+        const arcY = hop.delta === 10 ? 35 : 55;
+        const strokeColor = hop.delta === 10 ? '#34d399' : '#facc15';
+        html += `
+          <path d="M ${x1} 100 Q ${midX} ${arcY} ${x2} 100" fill="none" stroke="${strokeColor}" stroke-width="3.5" stroke-dasharray="5,3" />
+          <text x="${midX}" y="${arcY + 12}" fill="${strokeColor}" font-size="13" font-weight="bold" text-anchor="middle">-${hop.delta}</text>
+        `;
+      });
+
+      const curX = mapX(state.hopCurrentVal);
+      html += `<text x="${curX}" y="90" font-size="24" text-anchor="middle">🐸</text>`;
+
+      svg.innerHTML = html;
+    }
+
+    document.getElementById('hopOnesBtn').addEventListener('click', () => {
+      const prob = HOP_PROBLEMS[state.hopIdx];
+      if (state.hopCurrentVal === prob.start) {
+        const nextVal = state.hopCurrentVal - prob.onesHop;
+        state.hopHistory.push({ from: state.hopCurrentVal, to: nextVal, delta: prob.onesHop });
+        state.hopCurrentVal = nextVal;
+        playSound('chop');
+        showBanner('🐸', `Nice! Hopped back -${prob.onesHop} to reach Friendly Ten (${nextVal})! Now jump back by 10s!`, 'emerald');
+        drawHopSvg();
+      } else {
+        playSound('oops');
+        showBanner('🐸', `You already hopped to a Friendly Ten (${state.hopCurrentVal})! Now use the Big Jump Back (-10) button!`, 'amber');
+      }
+    });
+
+    document.getElementById('hopTenBtn').addEventListener('click', () => {
+      const prob = HOP_PROBLEMS[state.hopIdx];
+      if (state.hopCurrentVal === prob.start) {
+        playSound('oops');
+        showBanner('🐸', `Rule 2: Hop back -${prob.onesHop} to the closest Friendly Ten (${prob.start - prob.onesHop}) FIRST before jumping back tens!`, 'amber');
+        return;
+      }
+      if (state.hopCurrentVal - 10 >= prob.ans) {
+        const nextVal = state.hopCurrentVal - 10;
+        state.hopHistory.push({ from: state.hopCurrentVal, to: nextVal, delta: 10 });
+        state.hopCurrentVal = nextVal;
+        playSound('chop');
+        drawHopSvg();
+        if (state.hopCurrentVal === prob.ans) {
+          document.getElementById('hopFinalInput').value = prob.ans;
+          showBanner('🎉', `Your Tadpole landed right on ${prob.ans}! Click "Check Answer" to claim your coins!`, 'emerald');
+        }
+      } else {
+        playSound('oops');
+        showBanner('🛑', `Careful! You already subtracted all ${prob.sub} and landed on ${prob.ans}!`, 'amber');
+      }
+    });
+
+    document.getElementById('resetHopLineBtn').addEventListener('click', renderHopProblem);
+
+    document.getElementById('verifyHopFinalBtn').addEventListener('click', () => {
+      const prob = HOP_PROBLEMS[state.hopIdx];
+      const userAns = parseInt(document.getElementById('hopFinalInput').value, 10);
+      if (userAns === prob.ans) {
+        addCoins(30, `Tadpole Hop Champion! ${prob.start} - ${prob.sub} = ${prob.ans}!`);
+        awardStar('mathlab', 'Explode the Number & Tadpole Hop Champion');
+      } else {
+        playSound('oops');
+        showBanner('🐸', `Hop your Tadpole on the number line: start at ${prob.start}, hop -${prob.onesHop} to ${prob.start - prob.onesHop}, then jump back by 10s!`, 'amber');
+      }
+    });
+
+    // =====================================================
+    // 12. RESET DAILY PROGRESS VS. FULL WEEKLY RESET
+    //     & VINYL-VAULT LOCAL SYNC / HTML BAKER
+    // =====================================================
+    const SIGN_OFF_ITEMS = [
+      { key: 'monPhonics', label: 'Monday: Phonics Karate Chop' },
+      { key: 'monMath', label: 'Monday: +4 Flashcard Sprint' },
+      { key: 'tuePhonics', label: 'Tuesday: 5 Secret Long /O/ Vaults Sort' },
+      { key: 'tueMath', label: 'Tuesday: Explode Double-Digit Addition Lab' },
+      { key: 'wedPhonics', label: 'Wednesday: Metamorphosis 5-Finger Retell' },
+      { key: 'wedMath', label: 'Wednesday: Tadpole Hop Number Lines' },
+      { key: 'thuPhonics', label: 'Thursday: Kids Excel Sportscaster & Gratitude' },
+      { key: 'thuMath', label: 'Thursday: Full Championship Review' }
+    ];
+
+    function refreshAllViews() {
+      updateHeaderReadouts();
+      renderRitual();
+      renderKarateStage();
+      renderVaultStage();
+      initRetellPuzzle();
+      renderSportscasterStage();
+      evaluateGratitudeSentence();
+      renderFlashcard();
+      renderExplodeProblem();
+      renderHopProblem();
+      renderSignOffList();
+      syncInlineFormAndTelemetry();
+    }
+
+    // RESET DAILY PROGRESS: Clears today's interactive exercise boards for a fresh daily run
+    // while keeping Weekly Coins, 5 Arena Stars, and Mon-Thu Parent Hub Sign-Offs intact!
+    function resetDailyProgressOnly() {
+      state.streak = 0;
+      state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
+      state.karateChopped = {};
+      state.karatePatternDone = {};
+      state.karateFused = {};
+      state.sortedWords = {};
+      state.crackedLocks = {};
+      state.spellTestCorrect = {};
+      state.pass1Done = false;
+      state.pass2Done = false;
+      pondGame.bubblesCaught = 0;
+      pondGame.playerCol = 2;
+      pondGame.playerRow = 1;
+      spawnPondBubble();
+      drawPondGame();
+      saveState();
+      refreshAllViews();
+      playSound('onair');
+      showBanner('🔄', 'Daily Practice Boards Reset for Today! (Your Weekly Coins, Arena Stars & Parent Hub Sign-Offs are safely kept!)', 'emerald');
+    }
+
+    document.getElementById('topResetDailyBtn').addEventListener('click', resetDailyProgressOnly);
+    document.getElementById('modalResetDailyBtn').addEventListener('click', resetDailyProgressOnly);
+
+    function renderSignOffList() {
+      const list = document.getElementById('signOffList');
+      list.innerHTML = '';
+      SIGN_OFF_ITEMS.forEach((item) => {
+        const done = !!state.signOff[item.key];
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = `w-full p-2.5 rounded-xl border text-left font-bold flex items-center justify-between transition ${
+          done ? 'bg-emerald-950/60 border-emerald-400/50 text-emerald-200' : 'bg-slate-950 border-slate-800 text-slate-300'
+        }`;
+        row.innerHTML = `<span>${done ? '✅' : '⬜'} ${item.label}</span><span class="text-xs">${done ? 'Signed Off' : 'Tap to Sign'}</span>`;
+        row.addEventListener('click', () => {
+          state.signOff[item.key] = !done;
+          saveState();
+          renderSignOffList();
+        });
+        list.appendChild(row);
+      });
+    }
+
+    function openParentAndSyncModal() {
+      saveState();
+      renderSignOffList();
+      document.getElementById('parentModal').classList.remove('hidden');
+    }
+
+    document.getElementById('openHubBtn').addEventListener('click', openParentAndSyncModal);
+    document.getElementById('topSyncBtn').addEventListener('click', openParentAndSyncModal);
+
+    document.getElementById('closeHubBtn').addEventListener('click', () => {
+      document.getElementById('parentModal').classList.add('hidden');
+    });
+
+    // Force Resync button
+    document.getElementById('forceResyncBtn').addEventListener('click', () => {
+      loadSavedState();
+      saveState();
+      refreshAllViews();
+      playSound('coin');
+      showBanner('💾', `Local Sync Verified at ${state.lastSavedAt}! Coins, Stars & Parent Hub Sign-Offs are locked in.`, 'emerald');
+    });
+
+    // Download Self-Contained Updated HTML (Vinyl Vault index.html Baker Pattern)
+    document.getElementById('downloadBakedHtmlBtn').addEventListener('click', () => {
+      saveState();
+      const payload = getSerializablePayload();
+      const serialized = JSON.stringify(payload);
+      let htmlSource = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      htmlSource = htmlSource.replace(
+        /<script id="baked-state-script">[\s\S]*?<\/script>/,
+        `<script id="baked-state-script">\n    window.__VIOLET_QUEST_STATE__ = ${serialized};\n  <\/script>`
+      );
+      const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      playSound('fanfare');
+      showBanner('💾', 'Downloaded self-contained index.html with all points & Parent Hub progress baked in!', 'emerald');
+    });
+
+    // Export Portable JSON Sync File
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      saveState();
+      const payload = getSerializablePayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'violet_quest_sync.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      playSound('coin');
+      showBanner('📤', 'Exported violet_quest_sync.json snapshot!', 'emerald');
+    });
+
+    // Import / Resync JSON File
+    document.getElementById('importJsonFileInput').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          applyPayloadToState(parsed);
+          saveState();
+          refreshAllViews();
+          playSound('fanfare');
+          spawnConfetti(45);
+          showBanner('📥', 'Resynced session metadata, points, stars, and Parent Hub sign-offs from JSON file!', 'emerald');
+        } catch (err) {
+          playSound('oops');
+          showBanner('⚠️', 'Could not parse that JSON sync file. Please check the file and try again.', 'amber');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Copy & Paste Snapshot JSON Controls
+    document.getElementById('copySyncJsonBtn').addEventListener('click', () => {
+      saveState();
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      snapInput.select();
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(snapInput.value);
+        } else {
+          document.execCommand('copy');
+        }
+      } catch (e) {
+        document.execCommand('copy');
+      }
+      playSound('coin');
+      showBanner('📋', 'Copied live Local Sync JSON code to clipboard!', 'emerald');
+    });
+
+    document.getElementById('applyPastedJsonBtn').addEventListener('click', () => {
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      if (snapInput.hasAttribute('readonly')) {
+        snapInput.removeAttribute('readonly');
+        snapInput.value = '';
+        snapInput.placeholder = 'Paste your saved Sync JSON code here, then click Paste & Restore again...';
+        snapInput.focus();
+        return;
+      }
+      try {
+        const parsed = JSON.parse(snapInput.value.trim());
+        snapInput.setAttribute('readonly', 'readonly');
+        applyPayloadToState(parsed);
+        saveState();
+        refreshAllViews();
+        playSound('fanfare');
+        showBanner('📥', 'Restored session progress from pasted Sync Code!', 'emerald');
+      } catch (e) {
+        playSound('oops');
+        showBanner('⚠️', 'Invalid Sync JSON code — paste the full JSON string copied from Copy Sync Code.', 'amber');
+      }
+    });
+
+    // Full Weekly Reset
+    document.getElementById('resetProgressBtn').addEventListener('click', () => {
+      state.coins = 0;
+      state.streak = 0;
+      state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
+      state.stars = { karate: false, vaults: false, metamorphosis: false, sportscaster: false, mathlab: false };
+      state.karateChopped = {};
+      state.karatePatternDone = {};
+      state.karateFused = {};
+      state.sortedWords = {};
+      state.crackedLocks = {};
+      state.spellTestCorrect = {};
+      state.pass1Done = false;
+      state.pass2Done = false;
+      state.gratitudeText = '';
+      if (document.getElementById('gratitudeInput')) document.getElementById('gratitudeInput').value = '';
+      state.flashSolvedCount = 0;
+      Object.keys(state.signOff).forEach((k) => { state.signOff[k] = false; });
+      saveState();
+      refreshAllViews();
+      showBanner('🔄', 'Full Weekly Progress Reset for a brand-new week!', 'amber');
+    });
+
+    // =====================================================
+    // 13. INITIALIZATION ON LOAD
+    // =====================================================
+    window.addEventListener('load', () => {
+      loadSavedState();
+      updateHeaderReadouts();
+      updateTimerUI();
+      renderRitual();
+      renderSoundboard();
+      renderKarateStage();
+      renderVaultStage();
+      initRetellPuzzle();
+      spawnPondBubble();
+      resizePondCanvas();
+      renderSportscasterStage();
+      evaluateGratitudeSentence();
+      renderFlashcard();
+      renderExplodeProblem();
+      renderHopProblem();
+      syncInlineFormAndTelemetry();
+    });
+  </script>
+</body>
+</html>
