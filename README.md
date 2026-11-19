@@ -1,66 +1,81 @@
-# 🐸👑 Violet's Championship Quest: Long /O/ & Metamorphosis Game Show!
+# 🥧✨ Violet's Great Thanksgiving Bakery & Secret Recipe Escape Room!
 
-**[🎮 PLAY VIOLET'S CHAMPIONSHIP QUEST LIVE (krunked-fpv.github.io/violets_homework) 🚀](https://krunked-fpv.github.io/violets_homework/)** • **[📦 GitHub Repository](https://github.com/krunked-fpv/violets_homework)** • **[🖥️ Companion Google Slides Game Show](https://docs.google.com/presentation/d/1oSDU7vfsShmhrNtLXLWaLAwuksxUnW3rqZwtxFD1Wv4/edit)** • **[📄 Printable 5-Star Practice Playbook Doc](https://docs.google.com/document/d/1toRghnHExDVKz3tHK-JaKdJVPER23ySkDWJlyjACcxU/edit)**
+![Week of Nov 23, 2026](https://img.shields.io/badge/Week%20of-Nov%2023%2C%202026-f472b6?style=for-the-badge)
+![2nd Grade Paris Ridge](https://img.shields.io/badge/Paris%20Ridge-2nd%20Grade%20Scots-a855f7?style=for-the-badge)
+![Math Focus](https://img.shields.io/badge/Math%20Ladder-%2B5%20Challengers%20%7C%20Expanded%20Form-f59e0b?style=for-the-badge)
+![Fire Kids Audio](https://img.shields.io/badge/Fire%20Kids%20Tablet-3--Part%20Audio%20%2B%20Cookie%20Vault-10b981?style=for-the-badge)
 
-## 🌟 What Is This Project?
+**[🎮 PLAY VIOLET'S THANKSGIVING BAKERY ESCAPE LIVE (krunked-fpv.github.io/violets_homework) 🚀](https://krunked-fpv.github.io/violets_homework/)** • **[📦 GitHub Repository](https://github.com/krunked-fpv/violets_homework)** • **[🖥️ Companion Google Slides Deck](https://docs.google.com/presentation/d/1EJVlOGLxgJFhPcpdsYEOvQGqPEAn-G4rNNBu-TOKMvg/edit)** • **[🖨️ Printable 5-Star Bakery Playbook Doc](https://docs.google.com/document/d/1bGbr5BOHYqS2s1MwyprEYjTKS8WyR-cTQvkYkKimAEE/edit)**
 
-**Violet's Championship Quest** is the interactive HTML5 homework game show in **Violet's Weekly 3-Part Homework Suite** (paired with her [Google Slides Game Show](https://docs.google.com/presentation/d/1oSDU7vfsShmhrNtLXLWaLAwuksxUnW3rqZwtxFD1Wv4/edit) and [Printable 5-Star Practice Playbook](https://docs.google.com/document/d/1toRghnHExDVKz3tHK-JaKdJVPER23ySkDWJlyjACcxU/edit)). Built for **Violet** (2nd Grade at Paris Ridge Elementary, **Mrs. Molly Ulrich's** class) and coached by **Dad (Alex)** and **Marisa**, the app turns her structured 1-hour evening homework routine—two focused 10–15 minute sprints separated by a 5-minute movement break—into a broadcast television game show where earning all **5 Arena Stars** unlocks **30+ minutes of free creative time**!
+---
 
-## 🛡️ 3-Tier Persistence & Daily Reset Architecture (`Reset Daily` + `Local Sync` + `Shadow-Cookie Auto-Healer`)
+## 🌟 What Is This Week's Adventure?
 
-So Violet never loses her weekly **Champion Coins**, **5 Arena Stars**, or **Monday–Thursday Parent Hub sign-offs** when refreshing the page or playing on her **Amazon Fire Kids Tablet**, `index.html` runs a 3-tier self-healing persistence stack:
+**Violet's Great Thanksgiving Bakery & Secret Recipe Escape Room!** is the interactive HTML5 homework quest in **Violet's Weekly 3-Part Homework Suite** (paired with her [10-Slide Google Slides Escape Deck](https://docs.google.com/presentation/d/1EJVlOGLxgJFhPcpdsYEOvQGqPEAn-G4rNNBu-TOKMvg/edit) and [Printable 5-Star Bakery Playbook & Game Kit](https://docs.google.com/document/d/1bGbr5BOHYqS2s1MwyprEYjTKS8WyR-cTQvkYkKimAEE/edit)).
 
-| Persistence & Reset Layer | Header Control / Engine | How It Protects Violet's Weekly Progress |
+Designed for **Violet** (2nd Grade at Paris Ridge Elementary, **Mrs. Molly Ulrich's** class — *Go Scots!*) and coached at home by **Dad (Alex)** and **Marisa**, this week transforms the structured 1-hour evening homework routine—two focused 10–15 minute sprints split by a 5-minute movement break—into a glittery purple, berry-pink, and pumpkin-gold Thanksgiving Bakery Escape Room! Unlocking all **5 Bakery Stars** cracks the Secret Recipe Vault and earns **30+ minutes of free creative time**!
+
+> 🌟 **Daily Classroom Affirmation:** *"I am loved, I am special, I can change the universe, and we really can!"*
+
+---
+
+## 🕹️ Inside the 6 Bakery Escape Stages (1-Hour Homework Blueprint)
+
+| Stage / Sprint Window | Bakery Escape Arena | 2nd Grade Academic Targets & Playable Mechanics |
 | :--- | :--- | :--- |
-| **1. Top-Bar `🔄 Reset Daily` Button** | `🔄 Reset Daily` (2-tap guarded) in top navigation bar | Clears today's practice boards (Ready Check, Karate Chop words, Long `/o/` Vault sorts, 5-Finger Retell cards, Teleprompter passes, and Math Lab inputs) for a fresh daily rep while **preserving** cumulative weekly Champion Coins, Arena Stars (`0/5`), Streak, Gratitude drawing/sentence, and Mon–Thu Parent Hub sign-offs. |
-| **2. Self-Contained `💾 Local Sync` & HTML Baker** | `💾 Local Sync` modal + `<form id="quest-inline-state-form">` + `window.__VIOLET_QUEST_STATE__` | Modeled after the [Discogs Vinyl Vault](https://github.com/krunked-fpv/discogs_collection). Click **💾 Download Updated Game HTML (Bake Progress In)** to save a clean, self-contained `index.html` with all current points, stars, drawing, and sign-offs baked directly inside the HTML file, or export/import `violet_quest_sync.json` and clipboard sync strings. |
-| **3. Shadow-Cookie Auto-Healer (`kv1_*`)** | `<script id="krunked-cookie-vault-v1">` in `<head>` (400-day `SameSite=Lax` cookies) | Defends against tablet OS and mobile browser `localStorage` eviction. Hooks `Storage.prototype.setItem`, `removeItem`, and `clear`, automatically strips heavy base64 `<canvas>` Gratitude Scene drawings (`data:image/...`) to stay under the 4 KB per-cookie limit, chunks `violet_quest_nov16_v1` into 3.2 KB cookies (`Max-Age=34560000`), restores `localStorage` at boot before the game initializes, and updates the shared `krunked_family_pulse` (`Path=/`) root cookie across `krunked-fpv.github.io`. |
+| **Stage 0 • Kickoff (5 Mins)** | **✨ 0. Chef Check-In & 10-Word Soundboard** | Speak Mrs. Ulrich's Daily Affirmation (`+5 🪙`), complete **Chef's 4-Step Ready Check** (*Clear Counter, Body Ready, Eyes on Head Chef, Recipe Retell*), and tap all **10 Thanksgiving Bakery Words** on the audio soundboard. |
+| **Arena 1 • Sprint 1 Phonics (5 Mins)** | **🥧 1. Pumpkin Pie Slicer: Compound Recipe Split** | Slice 5 Thanksgiving compound words (`cupcake`, `pancake`, `daytime`, `cornbread`, `popcorn`), arm-tap **Shoulder → Elbow → Wrist**, solve the **C vs. K / Vowel Team** phonics secret, and fuse the recipe back together! |
+| **Arena 2 • Sprint 1 Spelling (5 Mins)** | **🧁 2. The 5 Secret Spice Jars Escape Lock** | **3 Modes in 1:** (1) **5-Jar Sorter** (`a_e`, `a/ay`, `oa/o_e`, `ar/er`, `or + C-rule`), (2) **10-Word Recipe Padlocks**, and (3) **Head Chef Audio Bake-Off** typing challenge with non-spoiler arm-tap & C-rule clues. |
+| **Arena 3 • Movement Break (5 Mins)** | **🎃 3. Harvest-to-Table 5-Finger Retell & Turkey Pie-Tray Dash!** | Sequence two *Cycles of Nature* tracks (**Pumpkin Plant Life Cycle** & **Earth's 4 Seasons Cycle**) with temporal words (**First → Next → Then → After That → Finally**), then catch 10 falling bakery treats while dodging Burnt Toast in the `<canvas>` **Turkey Pie-Tray Dash!** arcade. |
+| **Arena 4 • Sprint 2 Reading (15 Mins)** | **📖 4. Golden Spoon Storybook & Thankful Menu Card** | Read 2 original dialogue scripts packed with all 10 words and highlighted `"quotation marks"` (Pass 1 Smooth & Steady, Pass 2 Character Voices!), stamp a **Thankful Menu Card** sentence (Capital + Spaces + `. ! ?`), and decorate treats on the **Glitter Frosting Sketchpad** `<canvas>`. |
+| **Arena 5 • Sprint 2 Math Lab (15 Mins)** | **🧮 5. Bakery Math Lab** | **4 Modes:** (A) **New `+5` Challenger Flashcards** layered over mastered facts (`3+5` to `9+5`), (B) **Mix-the-Bowl Expanded Notation** (`34+26`, `48+35`, `56+29`, `29+44`, `67+25`), (C) **Part-Part-Whole Detective & Open Number Line Hops** (`64-24`, `75-35`, `56-26`), and (D) **Slow-Down Bakery Coin Checkout** (`41¢`, `66¢`, `58¢` — biggest coins first!). |
 
-### Patching, Rollback & Console Diagnostics
+---
 
-* **One-Command Ad-Hoc Patcher (`bolt_on_cookie_persistence.py`):**
-  ```bash
-  # Patch violets_homework index.html with automatic .cookie_bak backup
-  python bolt_on_cookie_persistence.py C:\path\to\violets_homework
+## 🧁 Week of Nov 23: 10-Word Bakery Phonics & C-Rule Matrix
 
-  # Roll back to .cookie_bak if needed
-  python bolt_on_cookie_persistence.py --rollback C:\path\to\violets_homework
-  ```
-* **Browser Console Check:** Run `window.__KRUNKED_COOKIE_VAULT__.status()` in the browser console to inspect mirrored `kv1_*` cookie chunks and the shared `krunked_family_pulse` summary across [violets_homework](https://krunked-fpv.github.io/violets_homework/), [ozias_laboratory](https://krunked-fpv.github.io/ozias_laboratory/), and [discogs_collection](https://krunked-fpv.github.io/discogs_collection/).
-
-## 🔊 Amazon Fire Kids Tablet 3-Part Spoken-Word Audio Engine
-
-Because the **Amazon Kids (FreeTime) Web Browser** runs inside a restricted child profile that frequently blocks `window.speechSynthesis` or drops audio when `cancel()` and `speak()` fire together, `index.html` includes a dedicated 3-part spoken-word fallback (plus a live **Voice Engine & Fire Tablet Audio Diagnostic** panel inside **📋 Parent Hub**) while leaving native desktop and phone TTS untouched:
-
-1. **60ms Chromium/Fire OS `cancel()` Debounce:** Prevents the Android WebView race condition where `speechSynthesis.cancel()` silences the immediately following `speak()` utterance.
-2. **Flexible `en-US` / `en_US` Locale Matching:** Normalizes underscore and hyphen locale tags on Fire OS without assigning broken voice objects when `getVoices()` returns empty.
-3. **300ms Watchdog, 2.5s Endpoint Timeout & HTML5 `<audio>` Dictionary MP3 / Streamed TTS Fallback:** If `speechSynthesis.onstart` does not fire within `300ms` (or immediately when Fire/Silk Kids browser is detected or **Tablet Media Audio: Forced ON** is enabled in Parent Hub), the game streams real dictionary pronunciation MP3s and TTS audio through a shared HTML5 `<audio>` media element—with a `2.5s` per-URL timeout so filtered endpoints never hang—using the exact same unrestricted media channel as the game show's **On-Air Chime**, **Crowd Fanfare**, and **Drumroll**.
-
-## 🕹️ Inside the 6 Game Show Stages (1-Hour MTSS Routine)
-
-| Stage / Sprint Window | Game Show Arena | Core 2nd Grade Skills & Interactive Mechanics |
-| :--- | :--- | :--- |
-| **Stage 0 • Pre-Sprint Ritual (5 Mins)** | **🚦 0. Ready Check & Soundboard** | Complete Mrs. Ulrich's **3-Step Champion Check** (*Clear the Deck, Body Ready, Eyes on Speaker, Repeat the Task*), speak the daily affirmation (*"I am loved, I am special, I can change the universe, and we really can!"*) for `+15 Coins`, and tap the **10 Long `/O/` Spelling Words Soundboard**. |
-| **Arena 1 • Sprint 1 Phonics (5 Mins)** | **🥋 1. Tadpole-to-Frog Compound Word Karate Chop** | Chop the 5 compound spelling words (`tadpole`, `oatmeal`, `raincoat`, `snowball`, `toenail`) right between their two base words (`tad + pole`), arm-tap Shoulder–Elbow–Wrist, identify the hidden Long `/o/` pattern, and fuse the word back together. |
-| **Arena 2 • Sprint 1 Spelling (5 Mins)** | **🔐 2. The 5 Secret Long `/O/` Vaults** | **3 Modes in 1:** (1) **Vault Sorter** into the 5 Long `/o/` patterns (`o`, `o_e`, `oa`, `ow`, `oe`), (2) **Mystery Letters** vowel-lock cracker, and (3) **Live Audio Spelling Test** with contextual sentences and non-spoiler Arm-Tap hints. |
-| **Arena 3 • Movement Break (5 Mins)** | **🦋 3. Metamorphosis 5-Finger Retell & Pond Leap** | Sequence the **Frog** and **Butterfly** life cycles using Mrs. Ulrich's 5-Finger Retell words (**First, Then, Next, Then, Last**), act out each stage across the living room, and play the **Tadpole-to-Frog Pond Leap** arcade mini-game! |
-| **Arena 4 • Sprint 2 Reading (15 Mins)** | **🎙️ 4. *Kids Excel* Sportscaster Desk & Gratitude Mic Drop** | Read two live teleprompter scripts packed with all 10 spelling words (Pass 1 Accuracy, Pass 2 Big TV Sportscaster Expression on `" "` quotation marks), then type a **Gratitude Mic Drop Sentence** with live 3-Star Self-Check and draw a Gratitude Scene on the digital `<canvas>`. |
-| **Arena 5 • Sprint 2 Math Lab (15 Mins)** | **💥 5. "Explode" the Number Lab & Tadpole Hop Lines** | **Part A:** `+4` Challenger Flashcard Sprint (layered onto Teens, `+0`, `+1`, `+2`, `+3`, and Doubles). **Part B:** Click **💥 EXPLODE** to break 2-digit addition into Tens and Ones (`58 + 42 = 50 + 40` and `8 + 2`). **Part C:** Spot **Whole vs. Part** first, then hop the Tadpole back to a friendly 10 on the interactive number line (`53 - 23`: hop `-3` to `50`, jump `-10` to `40`, jump `-10` to `30`). |
-
-## 🔐 Weekly Long `/O/` Spelling Vault Matrix
-
-| Vault Pattern | Phonics Rule & Coach Tip | Target Spelling Words | Syllable Arm-Tap |
+| Secret Spice Jar | Phonics Focus & Slow-Down Cue | Target Words | Arm-Tap Breakdown |
 | :--- | :--- | :--- | :--- |
-| **Vault 1: Open `o`** | Open syllable—the `o` at the end of the first syllable says its long name! | **moment**, **frozen** | `mo • ment`, `fro • zen` |
-| **Vault 2: Magic `o_e`** | Silent Magic `e` jumps over one consonant to make `o` say `/ō/`! | **tadpole**, **explode** | `tad • pole`, `ex • plode` |
-| **Vault 3: Team `oa`** | *"When two vowels go walking, the first one does the talking!"* (Usually in the middle) | **oatmeal**, **raincoat** | `oat • meal`, `rain • coat` |
-| **Vault 4: Team `ow`** | `ow` says Long `/ō/` at the end of a base word or before `l`/`n`! | **snowball**, **elbow** | `snow • ball`, `el • bow` |
-| **Vault 5: Team `oe`** | `oe` teams up right at the end of root words (`toe`, `goes`)! | **toenail**, **goes** | `toe • nail`, `goes` |
+| **Jar 1: Magic `a_e` + C-Rule** | Silent `e` makes `a` say `/ā/`; `/k/` before `a` or `u` starts with **`c`**, not `k`! | **cupcake**, **pancake** | `cup • cake`, `pan • cake` |
+| **Jar 2: Open `a` & Team `ay`** | Open syllable `a` says its name; `ay` closes a Long `/ā/` word part! | **apron**, **daytime** | `a • pron`, `day • time` |
+| **Jar 3: Long `/o/` Carryover** | Team `oa` in the middle & Magic `o_e` silent `e` review! | **toast**, **stove** | `toast`, `stove` |
+| **Jar 4: Bossy-R `ar` & `er`** | Bossy `r` takes charge of `a` (`ar`) and `e` (`er`)! | **harvest**, **butter** | `har • vest`, `but • ter` |
+| **Jar 5: Bossy-R `or` + C-Rule** | Root word **`corn`** starts with **`c`** (not `k`) + Bossy-R `or`! | **cornbread**, **popcorn** | `corn • bread`, `pop • corn` |
 
-## 🚀 Quick Start & GitHub Pages Deployment
+---
 
-1. **Play Online (Laptop, Phone, or Amazon Fire Kids Tablet):** Open **[krunked-fpv.github.io/violets_homework](https://krunked-fpv.github.io/violets_homework/)**.
-2. **Daily Replay vs. Weekly Save:**
-   * Click **`🔄 Reset Daily`** in the top bar each school night (Monday–Thursday) to clear the activity boards for a fresh practice run while keeping all coins, stars, and Parent Hub checkmarks.
-   * Open **`📋 Parent Hub`** to sign off Monday–Thursday coaching sessions, test the Fire Tablet voice engine, or open the companion Google Slides and Printable Playbook Doc.
-   * Click **`💾 Local Sync`** anytime to export a JSON backup or click **`💾 Download Updated Game HTML (Bake Progress In)`** to download a self-contained `index.html` with Violet's latest progress permanently baked in.
+## 🛡️ 3-Tier Persistence, Daily Reset & Fire Kids Audio Engineering
+
+`index.html` preserves all 5 mandatory engineering pillars so Violet's progress and voice playback work seamlessly on laptops, phones, and **Amazon Fire Kids Tablets**:
+
+| Pillar | Control / Component | How It Protects Every Session |
+| :--- | :--- | :--- |
+| **1. Top-Bar `🔄 Reset Daily`** | `#topResetDailyBtn` (2-tap guarded) | Clears daily practice boards for a fresh evening rep while **preserving** Weekly Coins, Streak, 5 Bakery Stars, Thankful Menu Card/Drawing, and Parent Hub Sign-Offs. |
+| **2. `💾 Local Sync` & HTML Baker** | `#topSyncBtn` + `<form id="quest-inline-state-form">` + `window.__VIOLET_QUEST_STATE__` | Download a clean, XSS-safe, self-contained `index.html` with all points, stars, drawing, and sign-offs baked directly in, or export/import `violet_bakery_sync.json`. |
+| **3. Shadow-Cookie Auto-Healer** | `<script id="krunked-cookie-vault-v1">` in `<head>` (400-day `kv1_*` cookies) | Automatically mirrors `violet_quest_nov23_v1` into chunked cookies (stripping heavy base64 canvas strings), auto-heals `localStorage` on boot if evicted by tablet OS, and updates shared `krunked_family_pulse`. |
+| **4. 3-Part Fire Kids Spoken Audio** | `60ms` cancel debounce + `en-US`/`en_US` matching + `300ms` watchdog → HTML5 `<audio>` | Streams dictionary MP3s (all 10 bakery words + compound roots) and TTS audio over the unrestricted media channel with a `2.5s` timeout, offline chime cadence, and **Parent Hub Audio Diagnostic** toggle. |
+| **5. Automated Browser Verification** | Headless Chromium pre-release test suite | Verified for zero runtime console errors, intact `Reset Daily` retention, Shadow-Cookie `localStorage.clear()` auto-heal, Fire Kids audio fallback, and touch tablet responsiveness (`1024×600`, `600×1024`). |
+
+---
+
+## 📅 Upcoming Paris Ridge Dates (Nov–Dec 2026)
+
+* 🦃 **Wed–Fri, Nov 25–27:** Thanksgiving Break — No School!
+* 📚 **Tue, Dec 1:** Holiday Scholastic Book Order Due (`www.scholastic.com/bookclubs`, Class Code: **`HKJBR`** — spend \$5, earn a free \$5 book!)
+* 🍿 **Fri, Dec 4:** PTO Popcorn Friday
+* 🩺 **Mon–Tue, Dec 7–8:** 2nd Grade Hearing & Vision Screening
+* 🎶 **Wed, Dec 9:** 3rd & 4th Grade Music Concert
+* 🎉 **Thu, Dec 17 (2:00–3:00 PM):** 2nd Grade Holiday Classroom Party (Gym Game, Snacks/Bingo, Craft & Cookie Decorating)
+* ❄️ **Fri, Dec 18:** Half Day before Winter Break (**Dec 21 – Jan 1**)
+* 📖 **Every Wednesday Morning:** Library Books Due!
+
+---
+
+## 🕹️ Past Weeks Archive (`/past_games/`)
+
+Every previous week's standalone interactive game is preserved in [`/past_games/`](./past_games/) so Violet can replay favorites anytime without repeating weekly curriculum:
+
+| Week | Archived Theme | File |
+| :--- | :--- | :--- |
+| **Week of Nov 16, 2026** | 🏆 *Violet's Championship Quest: Long /O/ & Metamorphosis Game Show!* | [`past_games/2026-11-16_championship_quest.html`](./past_games/2026-11-16_championship_quest.html) |
+| **Week 1 (Baseline Test)** | 🧪 *Week 1 Phonics & Math Testing Arena* | [`past_games/week1testing.html`](./past_games/week1testing.html) |
