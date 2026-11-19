@@ -448,7 +448,7 @@
   <title>Violet's Championship Quest: Long O &amp; Metamorphosis Game Show!</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
-  <style>
+  <style id="app-custom-styles">
     body {
       font-family: 'Inter', sans-serif;
       background: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 60%, #020617 100%);
@@ -1225,8 +1225,8 @@
           <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700">
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-xs font-bold text-rose-300 uppercase">Playbook &amp; Slides Problems:</span>
-              <button type="button" data-exp-idx="0" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500 text-white">Model: 58 + 42</button>
-              <button type="button" data-exp-idx="1" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Box 1: 36 + 24</button>
+              <button type="button" data-exp-idx="0" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Model: 58 + 42</button>
+              <button type="button" data-exp-idx="1" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500 text-white">Box 1: 36 + 24</button>
               <button type="button" data-exp-idx="2" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Box 2: 47 + 35</button>
               <button type="button" data-exp-idx="3" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Box 3: 63 + 28</button>
               <button type="button" data-exp-idx="4" class="exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200">Slides B: 45 + 37</button>
@@ -1311,9 +1311,14 @@
 
           <div class="bg-slate-900/90 border border-slate-700 rounded-3xl p-5 space-y-5">
             <!-- Story Problem & Rule 1: Part-Part-Whole Task Retell -->
-            <div class="p-4 rounded-2xl bg-slate-950 border border-indigo-500/40 space-y-3">
-              <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-300">
-                Rule 1 (Task Retell First): Spot the WHOLE and the PART before touching the number line!
+            <div id="hopPpwCard" class="p-4 rounded-2xl bg-slate-950 border border-indigo-500/40 space-y-3 transition">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-300">
+                  Rule 1 (Task Retell First): Spot the WHOLE and the PART before touching the number line!
+                </div>
+                <span id="hopLockStatusBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                  🔒 Step 1: Unlock Line Below
+                </span>
               </div>
               <p id="hopStoryText" class="text-base sm:text-lg font-bold text-white"></p>
               <div class="flex flex-wrap items-center gap-3 pt-1">
@@ -1332,7 +1337,7 @@
             </div>
 
             <!-- Rule 2: Interactive SVG Open Number Line -->
-            <div class="space-y-3">
+            <div id="hopLineSection" class="space-y-3 transition">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div class="text-xs sm:text-sm font-bold text-emerald-300">
                   Rule 2 (Hop Back to Friendly 10 First!): Click each hop button in order to jump your Tadpole back!
@@ -1452,6 +1457,24 @@
             </button>
             <button id="applyPastedJsonBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-emerald-300 border border-slate-700 whitespace-nowrap">
               📥 Paste &amp; Restore
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice Engine & Fire Tablet Audio Diagnostic Panel -->
+      <div class="bg-slate-900/90 rounded-2xl p-4 border border-indigo-400/35 space-y-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-300">🔊 Voice Engine &amp; Fire Tablet Audio Diagnostic</span>
+            <div id="voiceEngineStatusText" class="text-xs text-slate-300 mt-0.5">Checking speech engine &amp; Shadow-Cookie Vault...</div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="testVoiceEngineBtn" type="button" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold transition">
+              🔊 Test Voice ("tadpole")
+            </button>
+            <button id="toggleMediaAudioBtn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-indigo-400/40 text-indigo-200 text-xs font-extrabold transition">
+              📱 Tablet Media Audio: Auto
             </button>
           </div>
         </div>
@@ -1632,11 +1655,16 @@
     const state = {
       metadata: SESSION_METADATA,
       lastSavedAt: null,
+      lastSavedTs: 0,
       coins: 0,
       streak: 0,
       muted: false,
+      forceMediaAudio: false,
       activeTab: 'ritual',
+      affirmationClaimed: false,
       ritualChecks: { deck: false, body: false, eyes: false, retell: false },
+      ritualStepRewarded: { deck: false, body: false, eyes: false, retell: false },
+      ritualAllBonusClaimed: false,
       stars: { karate: false, vaults: false, metamorphosis: false, sportscaster: false, mathlab: false },
       // Stage 1: Karate
       karateIdx: 0,
@@ -1647,20 +1675,27 @@
       vaultMode: 'sort',
       selectedSortWord: null,
       sortedWords: {},
+      sortedWordsRewarded: {},
       crackedLocks: {},
+      crackedLocksRewarded: {},
       spellTestIdx: 0,
       spellTestCorrect: {},
       // Stage 3: Metamorphosis
       creature: 'frog',
       retellOrder: [],
       retellShuffled: [],
+      retellRewarded: {},
+      pondCoinsEarned: 0,
       // Stage 4: Sportscaster
       scriptIdx: 0,
       quoteGlow: true,
       pass1Done: false,
+      pass1Rewarded: false,
       pass2Done: false,
+      pass2Rewarded: false,
       gratitudeText: '',
       gratitudeClaimed: false,
+      drawingDataUrl: '',
       // Stage 5: Math Lab
       mathMode: 'flashcards',
       flashFilter: 'mixed',
@@ -1668,8 +1703,11 @@
       flashSolvedCount: 0,
       explodeIdx: 1,
       activeExplode: { a: 36, b: 24 },
+      explodeSolved: {},
       hopIdx: 0,
       hopPpwUnlocked: false,
+      hopPpwClaimed: {},
+      hopSolved: {},
       hopCurrentVal: 53,
       hopHistory: [],
       // Daily Sign-Off
@@ -1681,26 +1719,46 @@
       }
     };
 
-    function getSerializablePayload() {
-      return {
+    function getSerializablePayload(options = {}) {
+      const includeDrawing = options.includeDrawing !== false;
+      const payload = {
         metadata: SESSION_METADATA,
         lastSavedAt: state.lastSavedAt || new Date().toLocaleTimeString(),
+        lastSavedTs: state.lastSavedTs || Date.now(),
         coins: state.coins,
         streak: state.streak,
-        ritualChecks: state.ritualChecks,
-        stars: state.stars,
-        karateChopped: state.karateChopped,
-        karatePatternDone: state.karatePatternDone,
-        karateFused: state.karateFused,
-        sortedWords: state.sortedWords,
-        crackedLocks: state.crackedLocks,
-        spellTestCorrect: state.spellTestCorrect,
-        pass1Done: state.pass1Done,
-        pass2Done: state.pass2Done,
+        forceMediaAudio: !!state.forceMediaAudio,
+        affirmationClaimed: !!state.affirmationClaimed,
+        ritualChecks: { ...state.ritualChecks },
+        ritualStepRewarded: { ...state.ritualStepRewarded },
+        ritualAllBonusClaimed: !!state.ritualAllBonusClaimed,
+        stars: { ...state.stars },
+        karateChopped: { ...state.karateChopped },
+        karatePatternDone: { ...state.karatePatternDone },
+        karateFused: { ...state.karateFused },
+        sortedWords: { ...state.sortedWords },
+        sortedWordsRewarded: { ...state.sortedWordsRewarded },
+        crackedLocks: { ...state.crackedLocks },
+        crackedLocksRewarded: { ...state.crackedLocksRewarded },
+        spellTestCorrect: { ...state.spellTestCorrect },
+        retellRewarded: { ...state.retellRewarded },
+        pondCoinsEarned: state.pondCoinsEarned,
+        pass1Done: !!state.pass1Done,
+        pass1Rewarded: !!state.pass1Rewarded,
+        pass2Done: !!state.pass2Done,
+        pass2Rewarded: !!state.pass2Rewarded,
         gratitudeText: document.getElementById('gratitudeInput') ? document.getElementById('gratitudeInput').value : state.gratitudeText,
+        gratitudeClaimed: !!state.gratitudeClaimed,
         flashSolvedCount: state.flashSolvedCount,
-        signOff: state.signOff
+        explodeSolved: { ...state.explodeSolved },
+        hopPpwClaimed: { ...state.hopPpwClaimed },
+        hopSolved: { ...state.hopSolved },
+        signOff: { ...state.signOff }
       };
+      if (includeDrawing && state.drawingDataUrl) {
+        payload.drawingDataUrl = state.drawingDataUrl;
+      }
+      return payload;
     }
 
     function applyPayloadToState(parsed) {
@@ -1708,43 +1766,121 @@
       if (typeof parsed.coins === 'number') state.coins = parsed.coins;
       if (typeof parsed.streak === 'number') state.streak = parsed.streak;
       if (parsed.lastSavedAt) state.lastSavedAt = parsed.lastSavedAt;
-      if (parsed.ritualChecks) Object.assign(state.ritualChecks, parsed.ritualChecks);
-      if (parsed.stars) Object.assign(state.stars, parsed.stars);
+      if (typeof parsed.lastSavedTs === 'number') state.lastSavedTs = parsed.lastSavedTs;
+      if (typeof parsed.forceMediaAudio === 'boolean') {
+        state.forceMediaAudio = parsed.forceMediaAudio;
+      }
+      if (typeof parsed.affirmationClaimed === 'boolean') state.affirmationClaimed = parsed.affirmationClaimed;
+      if (parsed.ritualChecks) {
+        state.ritualChecks = { deck: false, body: false, eyes: false, retell: false, ...parsed.ritualChecks };
+      }
+      if (parsed.ritualStepRewarded) {
+        state.ritualStepRewarded = { deck: false, body: false, eyes: false, retell: false, ...parsed.ritualStepRewarded };
+      } else if (parsed.ritualChecks) {
+        state.ritualStepRewarded = { ...state.ritualChecks };
+      }
+      if (typeof parsed.ritualAllBonusClaimed === 'boolean') {
+        state.ritualAllBonusClaimed = parsed.ritualAllBonusClaimed;
+      } else {
+        state.ritualAllBonusClaimed = Object.values(state.ritualChecks).every(Boolean);
+      }
+      if (parsed.stars) {
+        state.stars = { karate: false, vaults: false, metamorphosis: false, sportscaster: false, mathlab: false, ...parsed.stars };
+      }
       if (parsed.karateChopped) state.karateChopped = { ...parsed.karateChopped };
       if (parsed.karatePatternDone) state.karatePatternDone = { ...parsed.karatePatternDone };
       if (parsed.karateFused) state.karateFused = { ...parsed.karateFused };
       if (parsed.sortedWords) state.sortedWords = { ...parsed.sortedWords };
+      if (parsed.sortedWordsRewarded) {
+        state.sortedWordsRewarded = { ...parsed.sortedWordsRewarded };
+      } else if (parsed.sortedWords) {
+        state.sortedWordsRewarded = {};
+        Object.keys(parsed.sortedWords).forEach((k) => { state.sortedWordsRewarded[k] = true; });
+      }
       if (parsed.crackedLocks) state.crackedLocks = { ...parsed.crackedLocks };
+      if (parsed.crackedLocksRewarded) {
+        state.crackedLocksRewarded = { ...parsed.crackedLocksRewarded };
+      } else if (parsed.crackedLocks) {
+        state.crackedLocksRewarded = { ...parsed.crackedLocks };
+      }
       if (parsed.spellTestCorrect) state.spellTestCorrect = { ...parsed.spellTestCorrect };
+      if (parsed.retellRewarded) state.retellRewarded = { ...parsed.retellRewarded };
+      if (typeof parsed.pondCoinsEarned === 'number') state.pondCoinsEarned = parsed.pondCoinsEarned;
       if (typeof parsed.pass1Done === 'boolean') state.pass1Done = parsed.pass1Done;
+      if (typeof parsed.pass1Rewarded === 'boolean') {
+        state.pass1Rewarded = parsed.pass1Rewarded;
+      } else {
+        state.pass1Rewarded = !!state.pass1Done;
+      }
       if (typeof parsed.pass2Done === 'boolean') state.pass2Done = parsed.pass2Done;
+      if (typeof parsed.pass2Rewarded === 'boolean') {
+        state.pass2Rewarded = parsed.pass2Rewarded;
+      } else {
+        state.pass2Rewarded = !!state.pass2Done;
+      }
       if (typeof parsed.gratitudeText === 'string') {
         state.gratitudeText = parsed.gratitudeText;
         const gEl = document.getElementById('gratitudeInput');
         if (gEl) gEl.value = parsed.gratitudeText;
       }
+      if (typeof parsed.gratitudeClaimed === 'boolean') {
+        state.gratitudeClaimed = parsed.gratitudeClaimed;
+      } else {
+        state.gratitudeClaimed = Boolean(state.stars.sportscaster && state.gratitudeText.trim());
+      }
+      if (typeof parsed.drawingDataUrl === 'string') {
+        state.drawingDataUrl = parsed.drawingDataUrl;
+      }
       if (typeof parsed.flashSolvedCount === 'number') state.flashSolvedCount = parsed.flashSolvedCount;
-      if (parsed.signOff) Object.assign(state.signOff, parsed.signOff);
+      if (parsed.explodeSolved) state.explodeSolved = { ...parsed.explodeSolved };
+      if (parsed.hopPpwClaimed) state.hopPpwClaimed = { ...parsed.hopPpwClaimed };
+      if (parsed.hopSolved) state.hopSolved = { ...parsed.hopSolved };
+      if (parsed.signOff) {
+        state.signOff = {
+          monPhonics: false, monMath: false,
+          tuePhonics: false, tueMath: false,
+          wedPhonics: false, wedMath: false,
+          thuPhonics: false, thuMath: false,
+          ...parsed.signOff
+        };
+      }
     }
 
     function syncInlineFormAndTelemetry() {
-      const payload = getSerializablePayload();
-      const jsonStr = JSON.stringify(payload);
-      window.__VIOLET_QUEST_STATE__ = payload;
+      const fullPayload = getSerializablePayload({ includeDrawing: true });
+      const compactPayload = getSerializablePayload({ includeDrawing: false });
+      const compactJsonStr = JSON.stringify(compactPayload);
+      window.__VIOLET_QUEST_STATE__ = fullPayload;
 
       const hiddenJson = document.getElementById('quest-hidden-state-json');
       const hiddenCoins = document.getElementById('quest-hidden-coins');
       const hiddenStars = document.getElementById('quest-hidden-stars');
       const hiddenSignoffs = document.getElementById('quest-hidden-signoffs');
-      if (hiddenJson) hiddenJson.value = jsonStr;
-      if (hiddenCoins) hiddenCoins.value = String(state.coins);
       const starCount = Object.values(state.stars).filter(Boolean).length;
-      if (hiddenStars) hiddenStars.value = String(starCount);
       const signedKeys = Object.keys(state.signOff).filter((k) => state.signOff[k]);
-      if (hiddenSignoffs) hiddenSignoffs.value = signedKeys.join(',');
+
+      if (hiddenJson) {
+        hiddenJson.value = compactJsonStr;
+        hiddenJson.setAttribute('value', compactJsonStr);
+      }
+      if (hiddenCoins) {
+        hiddenCoins.value = String(state.coins);
+        hiddenCoins.setAttribute('value', String(state.coins));
+      }
+      if (hiddenStars) {
+        hiddenStars.value = String(starCount);
+        hiddenStars.setAttribute('value', String(starCount));
+      }
+      if (hiddenSignoffs) {
+        const joinedSignoffs = signedKeys.join(',');
+        hiddenSignoffs.value = joinedSignoffs;
+        hiddenSignoffs.setAttribute('value', joinedSignoffs);
+      }
 
       const snapInput = document.getElementById('syncJsonSnapshotInput');
-      if (snapInput) snapInput.value = jsonStr;
+      if (snapInput && snapInput.hasAttribute('readonly')) {
+        snapInput.value = compactJsonStr;
+      }
 
       const syncPill = document.getElementById('syncStatusPill');
       if (syncPill && state.lastSavedAt) {
@@ -1765,42 +1901,97 @@
       }
       if (tSign) tSign.textContent = `${signedKeys.length} / 8 Sprints Signed Off`;
       if (tSync) tSync.textContent = state.lastSavedAt ? `Last local sync: ${state.lastSavedAt}` : 'Auto-synced to browser & inline form';
+
+      if (typeof updateVoiceDiagnosticUI === 'function') {
+        updateVoiceDiagnosticUI();
+      }
+    }
+
+    function payloadProgressScore(p) {
+      if (!p || typeof p !== 'object') return 0;
+      const starCount = p.stars ? Object.values(p.stars).filter(Boolean).length : 0;
+      const signCount = p.signOff ? Object.values(p.signOff).filter(Boolean).length : 0;
+      return (Number(p.coins) || 0) + starCount * 100 + signCount * 50;
     }
 
     function loadSavedState() {
-      // Priority 1: Check if baked-in state exists inside HTML (from "Download Updated Game HTML")
+      let bakedPayload = null;
+      let localPayload = null;
+
+      // Priority Source A: Baked-in state inside HTML (from "Download Updated Game HTML")
       if (window.__VIOLET_QUEST_STATE__ && typeof window.__VIOLET_QUEST_STATE__ === 'object') {
-        applyPayloadToState(window.__VIOLET_QUEST_STATE__);
+        bakedPayload = window.__VIOLET_QUEST_STATE__;
       } else {
         const hiddenJson = document.getElementById('quest-hidden-state-json');
         if (hiddenJson && hiddenJson.value) {
           try {
-            applyPayloadToState(JSON.parse(hiddenJson.value));
+            bakedPayload = JSON.parse(hiddenJson.value);
           } catch (e) {
             // Ignore malformed hidden JSON
           }
         }
       }
-      // Priority 2: Reconcile with browser localStorage if newer/present
+
+      // Priority Source B: Browser localStorage (auto-healed by Shadow-Cookie Vault if needed)
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
-          const parsed = JSON.parse(raw);
-          applyPayloadToState(parsed);
+          localPayload = JSON.parse(raw);
         }
       } catch (e) {
         // Ignore storage errors in sandboxed iframes
+      }
+
+      // Reconcile by epoch timestamp so newer baked snapshots are never overwritten by stale localStorage
+      if (bakedPayload && localPayload) {
+        const bakedTs = typeof bakedPayload.lastSavedTs === 'number' ? bakedPayload.lastSavedTs : 0;
+        const localTs = typeof localPayload.lastSavedTs === 'number' ? localPayload.lastSavedTs : 0;
+        if (bakedTs > localTs) {
+          applyPayloadToState(bakedPayload);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(getSerializablePayload({ includeDrawing: true })));
+          } catch (e) {
+            // Ignore quota/storage errors
+          }
+        } else if (localTs > bakedTs) {
+          applyPayloadToState(localPayload);
+        } else if (payloadProgressScore(bakedPayload) > payloadProgressScore(localPayload)) {
+          applyPayloadToState(bakedPayload);
+        } else {
+          applyPayloadToState(bakedPayload);
+          applyPayloadToState(localPayload);
+        }
+      } else if (bakedPayload) {
+        applyPayloadToState(bakedPayload);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(getSerializablePayload({ includeDrawing: true })));
+        } catch (e) {
+          // Ignore quota/storage errors
+        }
+      } else if (localPayload) {
+        applyPayloadToState(localPayload);
+      }
+
+      if (typeof applyMediaAudioPreference === 'function') {
+        applyMediaAudioPreference();
       }
       syncInlineFormAndTelemetry();
     }
 
     function saveState() {
-      state.lastSavedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      const payload = getSerializablePayload();
+      state.lastSavedTs = Date.now();
+      state.lastSavedAt = new Date(state.lastSavedTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const payload = getSerializablePayload({ includeDrawing: true });
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       } catch (e) {
-        // Ignore storage errors
+        // If canvas drawing exceeds storage quota, persist core progress without drawingDataUrl
+        try {
+          const compactPayload = getSerializablePayload({ includeDrawing: false });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(compactPayload));
+        } catch (e2) {
+          // Ignore storage errors in sandboxed iframes
+        }
       }
       syncInlineFormAndTelemetry();
     }
@@ -2021,7 +2212,58 @@
     let activeSpeechSeqId = 0;
     let speechCancelDebounceTimer = null;
     let speechStartWatchdogTimer = null;
+    let audioCandidateTimeoutTimer = null;
     let sharedFallbackAudio = null;
+
+    function updateVoiceDiagnosticUI() {
+      const statusEl = document.getElementById('voiceEngineStatusText');
+      const toggleBtn = document.getElementById('toggleMediaAudioBtn');
+      if (toggleBtn) {
+        toggleBtn.textContent = state.forceMediaAudio
+          ? '📱 Tablet Media Audio: Forced ON'
+          : '📱 Tablet Media Audio: Auto';
+        toggleBtn.className = state.forceMediaAudio
+          ? 'px-3 py-1.5 rounded-xl bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/60 text-emerald-200 text-xs font-extrabold transition'
+          : 'px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-indigo-400/40 text-indigo-200 text-xs font-extrabold transition';
+      }
+      if (statusEl) {
+        const hasSynth = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+        const voiceCount = cachedSpeechVoices.length;
+        let voiceModeLabel;
+        if (state.muted) {
+          voiceModeLabel = 'Muted (Tap 🔇 in top bar to unmute)';
+        } else if (state.forceMediaAudio) {
+          voiceModeLabel = 'Media Audio Channel (Forced ON — Dictionary MP3 / Streamed TTS)';
+        } else if (tabletMediaFallbackSticky || !hasSynth) {
+          voiceModeLabel = 'Media Audio Fallback Active (Fire/Kids WebView Mode)';
+        } else if (speechSynthVerifiedWorking) {
+          voiceModeLabel = `Native SpeechSynthesis Verified (${voiceCount} voice${voiceCount === 1 ? '' : 's'})`;
+        } else {
+          voiceModeLabel = `Auto (${hasSynth ? `${voiceCount} OS voice${voiceCount === 1 ? '' : 's'} detected` : 'No OS TTS'} • 300ms Media Fallback Ready)`;
+        }
+
+        let vaultLabel = 'Shadow-Cookie Vault: Standby';
+        try {
+          if (window.__KRUNKED_COOKIE_VAULT__) {
+            const cookiesOk = navigator.cookieEnabled && window.location.protocol !== 'file:';
+            if (cookiesOk) {
+              const kvChunks = (document.cookie || '').split(';').filter((c) => c.trim().startsWith('kv1_')).length;
+              vaultLabel = `Shadow-Cookie Vault: Active (${kvChunks} cookie chunk${kvChunks === 1 ? '' : 's'})`;
+            } else {
+              vaultLabel = 'Shadow-Cookie Vault: Local file:// Mode (Use Baked HTML / JSON Sync)';
+            }
+          }
+        } catch (e) {
+          // Ignore diagnostic errors
+        }
+        statusEl.textContent = `${voiceModeLabel} • ${vaultLabel}`;
+      }
+    }
+
+    function applyMediaAudioPreference() {
+      tabletMediaFallbackSticky = !!state.forceMediaAudio;
+      updateVoiceDiagnosticUI();
+    }
 
     function refreshSpeechVoices() {
       try {
@@ -2034,6 +2276,7 @@
       } catch (e) {
         // Ignore getVoices errors in restricted WebViews
       }
+      updateVoiceDiagnosticUI();
     }
 
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -2083,8 +2326,13 @@
         clearTimeout(speechStartWatchdogTimer);
         speechStartWatchdogTimer = null;
       }
+      if (audioCandidateTimeoutTimer) {
+        clearTimeout(audioCandidateTimeoutTimer);
+        audioCandidateTimeoutTimer = null;
+      }
       if (sharedFallbackAudio) {
         try {
+          sharedFallbackAudio.onplaying = null;
           sharedFallbackAudio.onended = null;
           sharedFallbackAudio.onerror = null;
           sharedFallbackAudio.pause();
@@ -2186,24 +2434,46 @@
       let candidateIdx = 0;
       const tryNextUrl = () => {
         if (state.muted || seqId !== activeSpeechSeqId) return;
+        if (audioCandidateTimeoutTimer) {
+          clearTimeout(audioCandidateTimeoutTimer);
+          audioCandidateTimeoutTimer = null;
+        }
         if (candidateIdx >= urlCandidates.length) {
           if (onAllFailed) onAllFailed();
           return;
         }
         const currentUrl = urlCandidates[candidateIdx++];
         let settled = false;
+        const clearCandidateTimer = () => {
+          if (audioCandidateTimeoutTimer) {
+            clearTimeout(audioCandidateTimeoutTimer);
+            audioCandidateTimeoutTimer = null;
+          }
+        };
         const advanceOnFail = () => {
-          if (settled) return;
+          if (settled || seqId !== activeSpeechSeqId) return;
           settled = true;
+          clearCandidateTimer();
+          try {
+            player.pause();
+          } catch (e) {
+            // Ignore pause errors
+          }
           tryNextUrl();
         };
 
+        player.onplaying = () => {
+          clearCandidateTimer();
+        };
         player.onended = () => {
           if (settled || seqId !== activeSpeechSeqId) return;
           settled = true;
+          clearCandidateTimer();
           if (onComplete) onComplete();
         };
         player.onerror = advanceOnFail;
+        // Guard against Amazon Kids Web Filter blackholing an endpoint without firing onerror
+        audioCandidateTimeoutTimer = setTimeout(advanceOnFail, 2500);
         player.src = currentUrl;
         try {
           const playPromise = player.play();
@@ -2291,9 +2561,9 @@
       stopFallbackAudioPlayback();
       ensureFallbackAudioElement();
 
-      // If this device was already verified as blocking speechSynthesis (e.g. Amazon Kids Browser),
-      // go straight to the media audio channel inside the synchronous user tap gesture
-      if (tabletMediaFallbackSticky || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+      // If user forced Media Audio or this device was already verified as blocking speechSynthesis
+      // (e.g. Amazon Kids Browser), go straight to the media audio channel inside the synchronous user tap gesture
+      if (state.forceMediaAudio || tabletMediaFallbackSticky || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
         playTabletMediaFallback(text, seqId);
         return;
       }
@@ -2303,6 +2573,7 @@
       // trigger the media audio fallback immediately while still allowing speechSynthesis if it wakes up
       if (isFireKidsOrSilk && cachedSpeechVoices.length === 0 && !speechSynthVerifiedWorking) {
         tabletMediaFallbackSticky = true;
+        updateVoiceDiagnosticUI();
         playTabletMediaFallback(text, seqId);
         return;
       }
@@ -2344,6 +2615,7 @@
                 clearTimeout(speechStartWatchdogTimer);
                 speechStartWatchdogTimer = null;
               }
+              updateVoiceDiagnosticUI();
             };
 
             utter.onerror = () => {
@@ -2353,6 +2625,7 @@
               }
               if (!utterStarted && seqId === activeSpeechSeqId && !state.muted) {
                 if (isFireOrAndroidTablet) tabletMediaFallbackSticky = true;
+                updateVoiceDiagnosticUI();
                 playTabletMediaFallback(text, seqId);
               }
             };
@@ -2363,6 +2636,7 @@
               speechStartWatchdogTimer = setTimeout(() => {
                 if (!utterStarted && !synth.speaking && seqId === activeSpeechSeqId && !state.muted) {
                   if (isFireOrAndroidTablet) tabletMediaFallbackSticky = true;
+                  updateVoiceDiagnosticUI();
                   try {
                     synth.cancel();
                   } catch (e) {
@@ -2528,8 +2802,8 @@
       if (timerInterval) {
         clearInterval(timerInterval);
         timerInterval = null;
-        document.getElementById('timerToggleBtn').textContent = 'Start';
       }
+      document.getElementById('timerToggleBtn').textContent = 'Start';
       timerSeconds = parseInt(e.target.value, 10) || 600;
       updateTimerUI();
     });
@@ -2541,6 +2815,10 @@
         timerInterval = null;
         btn.textContent = 'Resume';
       } else {
+        if (timerSeconds <= 0) {
+          timerSeconds = parseInt(document.getElementById('timerPresetSelect').value, 10) || 600;
+          updateTimerUI();
+        }
         playSound('onair');
         btn.textContent = 'Pause';
         timerInterval = setInterval(() => {
@@ -2569,6 +2847,7 @@
           window.speechSynthesis.cancel();
         }
       }
+      updateVoiceDiagnosticUI();
     });
 
     function switchTab(tabId) {
@@ -2599,7 +2878,14 @@
 
     document.getElementById('speakAffirmationBtn').addEventListener('click', () => {
       speakText('I am loved, I am special, I can change the universe, and we really can!');
-      addCoins(15, "Mrs. Ulrich's Daily Affirmation Spoken with Pride!");
+      if (!state.affirmationClaimed) {
+        state.affirmationClaimed = true;
+        addCoins(15, "Mrs. Ulrich's Daily Affirmation Spoken with Pride!");
+        renderRitual();
+      } else {
+        playSound('coin');
+        showBanner('✨', "Mrs. Ulrich's Affirmation! You ARE loved, special, and can change the universe!", 'emerald');
+      }
     });
 
     // =====================================================
@@ -2623,6 +2909,16 @@
         }
       });
       document.getElementById('ritualProgressText').textContent = `${count} / 4 Checked`;
+
+      const affBtn = document.getElementById('speakAffirmationBtn');
+      if (affBtn) {
+        affBtn.textContent = state.affirmationClaimed
+          ? '✅ Spoken Today! Tap to Say Again'
+          : '🔊 Say It Together! (+15 Coins)';
+        affBtn.className = state.affirmationClaimed
+          ? 'px-3.5 py-1.5 rounded-xl bg-emerald-500/25 hover:bg-emerald-500/35 border border-emerald-400/60 text-emerald-200 font-bold text-xs transition'
+          : 'px-3.5 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold text-xs transition';
+      }
     }
 
     document.querySelectorAll('.ritual-card').forEach((card) => {
@@ -2633,11 +2929,16 @@
         renderRitual();
         if (!wasChecked) {
           const allDone = Object.values(state.ritualChecks).every(Boolean);
-          if (allDone) {
+          if (allDone && !state.ritualAllBonusClaimed) {
+            state.ritualStepRewarded[key] = true;
+            state.ritualAllBonusClaimed = true;
             addCoins(50, '3-Step Champion Check Complete! Body Ready, Eyes on Speaker, Task Repeated!');
             spawnConfetti(50);
-          } else {
+          } else if (!state.ritualStepRewarded[key]) {
+            state.ritualStepRewarded[key] = true;
             addCoins(10, 'Ready Check Step Completed!');
+          } else {
+            playSound('coin');
           }
         }
         saveState();
@@ -2740,6 +3041,7 @@
       }
 
       const postArea = document.getElementById('karatePostChopArea');
+      const spellInput = document.getElementById('karateSpellInput');
       if (isChopped) {
         postArea.classList.remove('hidden');
         document.getElementById('karatePart1Display').textContent = current.part1;
@@ -2758,8 +3060,14 @@
           pBtn.textContent = v.title.replace('Vault ', '');
           pBtn.addEventListener('click', () => {
             if (v.id === current.pattern) {
+              const firstTime = state.karatePatternDone[current.word] !== v.id;
               state.karatePatternDone[current.word] = v.id;
-              addCoins(15, `Spot on! "${current.word}" uses the ${v.title} pattern!`);
+              if (firstTime) {
+                addCoins(15, `Spot on! "${current.word}" uses the ${v.title} pattern!`);
+              } else {
+                playSound('coin');
+                showBanner('✅', `"${current.word}" uses the ${v.title} pattern!`, 'emerald');
+              }
               renderKarateStage();
             } else {
               playSound('oops');
@@ -2769,10 +3077,16 @@
           patternContainer.appendChild(pBtn);
         });
 
-        const spellInput = document.getElementById('karateSpellInput');
-        spellInput.value = state.karateFused[current.word] ? current.word : '';
+        if (state.karateFused[current.word]) {
+          spellInput.value = current.word;
+        } else if (spellInput.dataset.word !== current.word) {
+          spellInput.value = '';
+        }
+        spellInput.dataset.word = current.word;
       } else {
         postArea.classList.add('hidden');
+        spellInput.value = '';
+        spellInput.dataset.word = '';
       }
     }
 
@@ -2808,8 +3122,14 @@
       const current = COMPOUND_WORDS[state.karateIdx];
       const val = document.getElementById('karateSpellInput').value.trim().toLowerCase();
       if (val === current.word) {
+        const firstTime = !state.karateFused[current.word];
         state.karateFused[current.word] = true;
-        addCoins(25, `BOOM! You fused "${current.part1} + ${current.part2} = ${current.word}"!`);
+        if (firstTime) {
+          addCoins(25, `BOOM! You fused "${current.part1} + ${current.part2} = ${current.word}"!`);
+        } else {
+          playSound('coin');
+          showBanner('🥋', `Awesome practice! "${current.part1} + ${current.part2} = ${current.word}" is already fused!`, 'emerald');
+        }
         spawnConfetti(35);
         renderKarateStage();
         const allFused = COMPOUND_WORDS.every((w) => state.karateFused[w.word]);
@@ -2823,6 +3143,13 @@
         } else {
           showBanner('💪', `Tap the sounds on your arm for "${current.part1}" + "${current.part2}" and check each letter!`, 'amber');
         }
+      }
+    });
+
+    document.getElementById('karateSpellInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('karateVerifyBtn').click();
       }
     });
 
@@ -2916,7 +3243,14 @@
           if (!wordObj) return;
           if (wordObj.pattern === vault.id) {
             state.sortedWords[wordObj.word] = vault.id;
-            addCoins(15, `Unlocked! "${wordObj.word}" belongs in ${vault.title}!`);
+            if (!state.sortedWordsRewarded[wordObj.word]) {
+              state.sortedWordsRewarded[wordObj.word] = true;
+              addCoins(15, `Unlocked! "${wordObj.word}" belongs in ${vault.title}!`);
+            } else {
+              saveState();
+              playSound('coin');
+              showBanner('🔓', `Great replay! "${wordObj.word}" belongs in ${vault.title}!`, 'emerald');
+            }
             renderVaultStage();
           } else {
             playSound('oops');
@@ -2961,9 +3295,20 @@
           b.addEventListener('click', () => {
             const chosen = b.getAttribute('data-opt');
             if (chosen === m.answer) {
+              const alreadyCrackedNow = !!state.crackedLocks[m.word];
               state.crackedLocks[m.word] = true;
               speakText(m.word);
-              addCoins(15, `Cracked Lock #${idx + 1}: "${m.word}" uses "${m.answer}"!`);
+              if (!state.crackedLocksRewarded[m.word]) {
+                state.crackedLocksRewarded[m.word] = true;
+                addCoins(15, `Cracked Lock #${idx + 1}: "${m.word}" uses "${m.answer}"!`);
+              } else if (!alreadyCrackedNow) {
+                saveState();
+                playSound('coin');
+                showBanner('🔓', `Cracked Lock #${idx + 1} again: "${m.word}" uses "${m.answer}"!`, 'emerald');
+              } else {
+                playSound('coin');
+                showBanner('🔓', `Lock #${idx + 1} is already unlocked: "${m.word}"!`, 'emerald');
+              }
               renderVaultStage();
             } else {
               playSound('oops');
@@ -2976,13 +3321,15 @@
 
       const testWord = SPELLING_WORDS[state.spellTestIdx];
       const testSolvedCount = Object.keys(state.spellTestCorrect).length;
+      const escapedWord = testWord.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       document.getElementById('spellTestProgress').textContent = `Word ${state.spellTestIdx + 1} of ${SPELLING_WORDS.length}`;
       document.getElementById('spellTestScore').textContent = `Mastered: ${testSolvedCount} / ${SPELLING_WORDS.length}`;
-      document.getElementById('spellTestSentence').textContent = `"${testWord.sentence.replace(new RegExp(testWord.word, 'gi'), '_____')}"`;
+      document.getElementById('spellTestSentence').textContent = `"${testWord.sentence.replace(new RegExp(escapedWord, 'gi'), '_____')}"`;
     }
 
     document.getElementById('resetVaultSortBtn').addEventListener('click', () => {
       state.sortedWords = {};
+      state.selectedSortWord = null;
       saveState();
       renderVaultStage();
     });
@@ -3011,16 +3358,46 @@
       const item = SPELLING_WORDS[state.spellTestIdx];
       const typed = document.getElementById('spellTestInput').value.trim().toLowerCase();
       if (typed === item.word) {
+        const firstTime = !state.spellTestCorrect[item.word];
         state.spellTestCorrect[item.word] = true;
-        addCoins(25, `Spelling Champion! You spelled "${item.word}" accurately!`);
+        if (firstTime) {
+          addCoins(25, `Spelling Champion! You spelled "${item.word}" accurately!`);
+        } else {
+          saveState();
+          playSound('coin');
+          showBanner('🌟', `Bonus review mastered! You spelled "${item.word}" accurately!`, 'emerald');
+        }
         spawnConfetti(35);
         document.getElementById('spellTestInput').value = '';
         document.getElementById('spellTestHintBox').classList.add('hidden');
-        state.spellTestIdx = (state.spellTestIdx + 1) % SPELLING_WORDS.length;
+        const allMastered = SPELLING_WORDS.every((w) => state.spellTestCorrect[w.word]);
+        if (allMastered && firstTime) {
+          spawnConfetti(60);
+          playSound('fanfare');
+          showBanner('🏆', '10 / 10 Spelling Test Mastered! Violet is a Long /O/ Spelling Superstar!', 'amber');
+        }
+        let nextIdx = (state.spellTestIdx + 1) % SPELLING_WORDS.length;
+        if (!allMastered) {
+          for (let offset = 1; offset <= SPELLING_WORDS.length; offset++) {
+            const candidateIdx = (state.spellTestIdx + offset) % SPELLING_WORDS.length;
+            if (!state.spellTestCorrect[SPELLING_WORDS[candidateIdx].word]) {
+              nextIdx = candidateIdx;
+              break;
+            }
+          }
+        }
+        state.spellTestIdx = nextIdx;
         renderVaultStage();
       } else {
         playSound('oops');
         showBanner('💪', `Slow down and arm-tap "${item.syllables}"! Spot the ${item.vaultName} vowel team and try again!`, 'amber');
+      }
+    });
+
+    document.getElementById('spellTestInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('spellTestSubmitBtn').click();
       }
     });
 
@@ -3037,7 +3414,18 @@
     function initRetellPuzzle() {
       const stages = LIFE_CYCLES[state.creature];
       state.retellOrder = [];
-      state.retellShuffled = [...stages].sort(() => Math.random() - 0.5);
+      const arr = [...stages];
+      let attempts = 0;
+      do {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = tmp;
+        }
+        attempts++;
+      } while (attempts < 10 && arr.every((s, idx) => s.step === idx + 1));
+      state.retellShuffled = arr;
       renderRetellStage();
     }
 
@@ -3066,7 +3454,15 @@
           if (item.step === expectedStep) {
             state.retellOrder.push(item);
             speakText(`${item.temporal}: ${item.title}. ${item.action}`);
-            addCoins(15, `${item.finger} — ${item.temporal}: ${item.title}! Act it out now!`);
+            const rewardKey = `${state.creature}_${item.step}`;
+            if (!state.retellRewarded[rewardKey]) {
+              state.retellRewarded[rewardKey] = true;
+              addCoins(15, `${item.finger} — ${item.temporal}: ${item.title}! Act it out now!`);
+            } else {
+              saveState();
+              playSound('coin');
+              showBanner('🦋', `${item.finger} — ${item.temporal}: ${item.title}! Great retell practice!`, 'emerald');
+            }
             renderRetellStage();
             if (state.retellOrder.length === 5) {
               awardStar('metamorphosis', 'Metamorphosis 5-Finger Retell Boss');
@@ -3228,7 +3624,13 @@
         const caughtWord = pondGame.targetBubble.word;
         pondGame.bubblesCaught++;
         speakText(caughtWord);
-        addCoins(10, `Pond Leap! Caught "${caughtWord}"!`);
+        if (state.pondCoinsEarned < 8) {
+          state.pondCoinsEarned++;
+          addCoins(10, `Pond Leap! Caught "${caughtWord}"!`);
+        } else {
+          playSound('coin');
+          showBanner('🐸', `Pond Leap! Caught "${caughtWord}"! (Bonus Practice!)`, 'emerald');
+        }
         if (pondGame.bubblesCaught === 8) {
           spawnConfetti(60);
           awardStar('metamorphosis', 'Metamorphosis Pond Champion');
@@ -3244,6 +3646,10 @@
 
     window.addEventListener('keydown', (e) => {
       if (state.activeTab !== 'metamorphosis') return;
+      const parentModal = document.getElementById('parentModal');
+      if (parentModal && !parentModal.classList.contains('hidden')) return;
+      const activeEl = document.activeElement;
+      if (activeEl && (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName) || activeEl.isContentEditable)) return;
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
         e.preventDefault();
         if (e.key === 'ArrowLeft') movePondPlayer('left');
@@ -3310,28 +3716,42 @@
     document.getElementById('pass1DoneBtn').addEventListener('click', () => {
       state.pass1Done = !state.pass1Done;
       renderSportscasterStage();
+      if (state.pass1Done) {
+        if (!state.pass1Rewarded) {
+          state.pass1Rewarded = true;
+          addCoins(20, 'Pass 1 Warm-Up Reading Lap Complete!');
+        } else {
+          playSound('coin');
+          showBanner('✅', 'Pass 1 Warm-Up Reading Lap Checked!', 'emerald');
+        }
+      }
       saveState();
-      if (state.pass1Done) addCoins(20, 'Pass 1 Warm-Up Reading Lap Complete!');
     });
 
     document.getElementById('pass2DoneBtn').addEventListener('click', () => {
       state.pass2Done = !state.pass2Done;
       renderSportscasterStage();
-      saveState();
       if (state.pass2Done) {
         playSound('cheer');
-        addCoins(20, 'Pass 2 Live TV Sportscaster Broadcast Complete!');
+        if (!state.pass2Rewarded) {
+          state.pass2Rewarded = true;
+          addCoins(20, 'Pass 2 Live TV Sportscaster Broadcast Complete!');
+        } else {
+          showBanner('🎙️', 'Pass 2 Live TV Sportscaster Broadcast Checked!', 'emerald');
+        }
       }
+      saveState();
     });
 
     const gratInput = document.getElementById('gratitudeInput');
     function evaluateGratitudeSentence() {
       const val = gratInput.value.trim();
       state.gratitudeText = val;
-      const hasCap = /^[A-Z"]/.test(val) && /[A-Z]/.test(val.slice(0, 2));
+      // Support both straight ASCII quotes and smart/curly quotes typed on Fire Tablets & iPads
+      const hasCap = /^["“'‘]?[A-Z]/.test(val);
       const hasSpellWord = SPELLING_WORDS.some((w) => new RegExp(`\\b${w.word}\\b`, 'i').test(val));
-      const hasQuotes = val.includes('"');
-      const hasPunct = /[.!?]["']?$/.test(val);
+      const hasQuotes = /["“”]/.test(val);
+      const hasPunct = /[.!?]["”'’]?$/.test(val);
 
       const setCheck = (id, ok, text) => {
         const el = document.getElementById(id);
@@ -3345,6 +3765,13 @@
       setCheck('checkWordOrQuote', hasSpellWord || hasQuotes, 'Uses a Long /O/ Spelling Word or Quotation Marks (" ")');
       setCheck('checkPunct', hasPunct, 'Ends with proper punctuation ( . ! or ? )');
 
+      const claimBtn = document.getElementById('claimGratitudeBtn');
+      if (claimBtn) {
+        claimBtn.textContent = state.gratitudeClaimed
+          ? '🎙️ Encore Broadcast My Gratitude Mic Drop!'
+          : '🎙️ Broadcast My Gratitude Mic Drop! (+50 Coins)';
+      }
+
       return hasCap && (hasSpellWord || hasQuotes) && hasPunct;
     }
 
@@ -3356,12 +3783,17 @@
     document.querySelectorAll('.insert-word-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const word = btn.getAttribute('data-insert');
-        const start = gratInput.selectionStart || gratInput.value.length;
+        const start = typeof gratInput.selectionStart === 'number' ? gratInput.selectionStart : gratInput.value.length;
+        const end = typeof gratInput.selectionEnd === 'number' ? gratInput.selectionEnd : start;
         const before = gratInput.value.slice(0, start);
-        const after = gratInput.value.slice(start);
+        const after = gratInput.value.slice(end);
         const spacer = before.length > 0 && !before.endsWith(' ') && word !== '"' ? ' ' : '';
         gratInput.value = `${before}${spacer}${word}${after}`;
+        const nextCaret = before.length + spacer.length + word.length;
         gratInput.focus();
+        if (typeof gratInput.setSelectionRange === 'function') {
+          gratInput.setSelectionRange(nextCaret, nextCaret);
+        }
         evaluateGratitudeSentence();
         saveState();
       });
@@ -3371,7 +3803,20 @@
       const ok = evaluateGratitudeSentence();
       if (ok) {
         speakText(gratInput.value.trim());
-        awardStar('sportscaster', 'Kids Excel Sportscaster & Gratitude Mic Drop');
+        if (!state.gratitudeClaimed) {
+          state.gratitudeClaimed = true;
+          addCoins(50, 'Gratitude Mic Drop Broadcasted Live On Air!');
+          spawnConfetti(50);
+          if (!state.stars.sportscaster) {
+            awardStar('sportscaster', 'Kids Excel Sportscaster & Gratitude Mic Drop');
+          }
+          evaluateGratitudeSentence();
+          saveState();
+        } else {
+          playSound('cheer');
+          spawnConfetti(40);
+          showBanner('🎙️', 'Encore Broadcast! Awesome Gratitude Mic Drop, Violet!', 'emerald');
+        }
       } else {
         playSound('oops');
         showBanner('🎙️', 'Check your 3-Star Self-Check list below the box: make sure you have a Capital Letter, a Long /O/ word or " ", and ending punctuation!', 'amber');
@@ -3384,13 +3829,60 @@
     let isDrawing = false;
     let brushColor = '#facc15';
 
+    function restoreDrawingToCanvas() {
+      if (!drawCanvas || !drawCtx || drawCanvas.width === 0 || drawCanvas.height === 0) return;
+      if (!state.drawingDataUrl) {
+        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        drawCanvas.dataset.hasStrokes = '';
+        drawCanvas.dataset.hydrated = '';
+        return;
+      }
+      const img = new Image();
+      img.onload = () => {
+        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        drawCtx.drawImage(img, 0, 0, drawCanvas.width, drawCanvas.height);
+        drawCanvas.dataset.hasStrokes = '1';
+        drawCanvas.dataset.hydrated = '1';
+      };
+      img.src = state.drawingDataUrl;
+    }
+
     function resizeDrawCanvas() {
       const rect = drawCanvas.parentElement.getBoundingClientRect();
-      if (rect.width > 0 && drawCanvas.width !== rect.width) {
-        drawCanvas.width = rect.width;
-        drawCanvas.height = rect.height;
+      const targetW = Math.round(rect.width);
+      const targetH = Math.round(rect.height);
+      if (targetW <= 0 || targetH <= 0) return;
+
+      const needsResize = drawCanvas.width !== targetW || drawCanvas.height !== targetH;
+      if (!needsResize) {
+        if (state.drawingDataUrl && !drawCanvas.dataset.hydrated) {
+          restoreDrawingToCanvas();
+        }
+        return;
+      }
+
+      let snapshotUrl = state.drawingDataUrl;
+      if (!snapshotUrl && drawCanvas.width > 0 && drawCanvas.height > 0 && drawCanvas.dataset.hasStrokes === '1') {
+        try {
+          snapshotUrl = drawCanvas.toDataURL('image/png');
+        } catch (e) {
+          snapshotUrl = '';
+        }
+      }
+      drawCanvas.width = targetW;
+      drawCanvas.height = targetH;
+      if (snapshotUrl) {
+        const img = new Image();
+        img.onload = () => {
+          drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+          drawCtx.drawImage(img, 0, 0, drawCanvas.width, drawCanvas.height);
+          drawCanvas.dataset.hasStrokes = '1';
+          drawCanvas.dataset.hydrated = '1';
+        };
+        img.src = snapshotUrl;
       }
     }
+    window.addEventListener('resize', resizeDrawCanvas);
 
     function getDrawPos(e) {
       const rect = drawCanvas.getBoundingClientRect();
@@ -3399,11 +3891,32 @@
       return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
+    function drawSingleDot(pos) {
+      drawCtx.beginPath();
+      drawCtx.arc(pos.x, pos.y, 2, 0, Math.PI * 2);
+      drawCtx.fillStyle = brushColor;
+      drawCtx.fill();
+      drawCtx.beginPath();
+      drawCtx.moveTo(pos.x, pos.y);
+    }
+
+    function finishDrawingStroke() {
+      if (!isDrawing) return;
+      isDrawing = false;
+      drawCanvas.dataset.hasStrokes = '1';
+      drawCanvas.dataset.hydrated = '1';
+      try {
+        state.drawingDataUrl = drawCanvas.toDataURL('image/png');
+      } catch (e) {
+        // Ignore serialization errors
+      }
+      saveState();
+    }
+
     drawCanvas.addEventListener('mousedown', (e) => {
       isDrawing = true;
       const pos = getDrawPos(e);
-      drawCtx.beginPath();
-      drawCtx.moveTo(pos.x, pos.y);
+      drawSingleDot(pos);
     });
     drawCanvas.addEventListener('mousemove', (e) => {
       if (!isDrawing) return;
@@ -3414,14 +3927,13 @@
       drawCtx.lineCap = 'round';
       drawCtx.stroke();
     });
-    window.addEventListener('mouseup', () => { isDrawing = false; });
+    window.addEventListener('mouseup', finishDrawingStroke);
 
     drawCanvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       isDrawing = true;
       const pos = getDrawPos(e);
-      drawCtx.beginPath();
-      drawCtx.moveTo(pos.x, pos.y);
+      drawSingleDot(pos);
     }, { passive: false });
     drawCanvas.addEventListener('touchmove', (e) => {
       if (!isDrawing) return;
@@ -3433,7 +3945,8 @@
       drawCtx.lineCap = 'round';
       drawCtx.stroke();
     }, { passive: false });
-    drawCanvas.addEventListener('touchend', () => { isDrawing = false; });
+    drawCanvas.addEventListener('touchend', finishDrawingStroke);
+    drawCanvas.addEventListener('touchcancel', finishDrawingStroke);
 
     document.querySelectorAll('.draw-color-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -3445,6 +3958,10 @@
 
     document.getElementById('clearDrawBtn').addEventListener('click', () => {
       drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      state.drawingDataUrl = '';
+      drawCanvas.dataset.hasStrokes = '';
+      drawCanvas.dataset.hydrated = '';
+      saveState();
     });
 
     // =====================================================
@@ -3536,6 +4053,24 @@
       renderFlashcard();
     });
 
+    function updateExplodeButtonsUI(isRandom = false) {
+      document.querySelectorAll('.exp-prob-btn').forEach((b) => {
+        const idx = parseInt(b.getAttribute('data-exp-idx'), 10);
+        const p = EXPLODE_PROBLEMS[idx];
+        const probKey = p ? `${p.a}+${p.b}` : '';
+        const solved = !!(probKey && state.explodeSolved[probKey]);
+        const active = !isRandom && idx === state.explodeIdx;
+        const baseLabel = b.dataset.baseLabel || b.textContent.replace(/^✅\s*/, '').trim();
+        b.dataset.baseLabel = baseLabel;
+        b.textContent = solved ? `✅ ${baseLabel}` : baseLabel;
+        b.className = active
+          ? 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500 text-white'
+          : solved
+            ? 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-950/60 border border-emerald-400/50 text-emerald-200'
+            : 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200';
+      });
+    }
+
     function setExplodeProblem(a, b) {
       state.activeExplode = { a, b };
       document.getElementById('explodeMainEq').textContent = `${a} + ${b}`;
@@ -3548,17 +4083,12 @@
     function renderExplodeProblem() {
       const p = EXPLODE_PROBLEMS[state.explodeIdx];
       setExplodeProblem(p.a, p.b);
+      updateExplodeButtonsUI(false);
     }
 
     document.querySelectorAll('.exp-prob-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         state.explodeIdx = parseInt(btn.getAttribute('data-exp-idx'), 10) || 0;
-        document.querySelectorAll('.exp-prob-btn').forEach((b) => {
-          const active = parseInt(b.getAttribute('data-exp-idx'), 10) === state.explodeIdx;
-          b.className = active
-            ? 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-rose-500 text-white'
-            : 'exp-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200';
-        });
         renderExplodeProblem();
       });
     });
@@ -3567,6 +4097,7 @@
       const a = (Math.floor(Math.random() * 5) + 2) * 10 + Math.floor(Math.random() * 6) + 4;
       const b = (Math.floor(Math.random() * 3) + 1) * 10 + Math.floor(Math.random() * 6) + 4;
       setExplodeProblem(a, b);
+      updateExplodeButtonsUI(true);
     });
 
     document.getElementById('triggerExplodeBtn').addEventListener('click', () => {
@@ -3595,20 +4126,101 @@
       const expectedOneSum = one1 + one2;
       const expectedTotal = a + b;
 
+      const rawTen1 = document.getElementById('expTen1').value.trim();
+      const rawTen2 = document.getElementById('expTen2').value.trim();
+      const rawOne1 = document.getElementById('expOne1').value.trim();
+      const rawOne2 = document.getElementById('expOne2').value.trim();
+      const tensPartsEntered = rawTen1 !== '' || rawTen2 !== '';
+      const onesPartsEntered = rawOne1 !== '' || rawOne2 !== '';
+      const uTen1 = parseInt(rawTen1, 10);
+      const uTen2 = parseInt(rawTen2, 10);
+      const uOne1 = parseInt(rawOne1, 10);
+      const uOne2 = parseInt(rawOne2, 10);
+      const tensPartsOk = !tensPartsEntered ||
+        (uTen1 === ten1 && uTen2 === ten2) || (uTen1 === ten2 && uTen2 === ten1);
+      const onesPartsOk = !onesPartsEntered ||
+        (uOne1 === one1 && uOne2 === one2) || (uOne1 === one2 && uOne2 === one1);
+
       const userTenSum = parseInt(document.getElementById('expTenSum').value, 10);
       const userOneSum = parseInt(document.getElementById('expOneSum').value, 10);
       const userTotal = parseInt(document.getElementById('expFinalTotal').value, 10);
 
       document.getElementById('combineHintLabel').textContent = `${expectedTenSum} + ${expectedOneSum} =`;
 
+      if (!tensPartsOk || !onesPartsOk) {
+        playSound('oops');
+        showBanner('💥', `Check your exploded parts! ${a} breaks into ${ten1} + ${one1} and ${b} breaks into ${ten2} + ${one2} (or tap "CLICK TO EXPLODE")!`, 'amber');
+        return;
+      }
+
       if (userTenSum === expectedTenSum && userOneSum === expectedOneSum && userTotal === expectedTotal) {
-        addCoins(35, `Expanded Form Master! (${ten1}+${ten2}=${expectedTenSum}) + (${one1}+${one2}=${expectedOneSum}) = ${expectedTotal}!`);
+        const probKey = `${a}+${b}`;
+        const firstTime = !state.explodeSolved[probKey];
+        state.explodeSolved[probKey] = true;
+        if (firstTime) {
+          addCoins(35, `Expanded Form Master! (${ten1}+${ten2}=${expectedTenSum}) + (${one1}+${one2}=${expectedOneSum}) = ${expectedTotal}!`);
+        } else {
+          saveState();
+          playSound('coin');
+          showBanner('💥', `Awesome bonus practice! (${ten1}+${ten2}=${expectedTenSum}) + (${one1}+${one2}=${expectedOneSum}) = ${expectedTotal}!`, 'emerald');
+        }
         awardStar('mathlab', 'Explode the Number & Tadpole Hop Champion');
+        const activePreset = EXPLODE_PROBLEMS[state.explodeIdx];
+        const isRandom = !activePreset || activePreset.a !== a || activePreset.b !== b;
+        updateExplodeButtonsUI(isRandom);
       } else {
         playSound('oops');
         showBanner('🔢', `Check each step: Tens (${ten1} + ${ten2} = ${expectedTenSum}), Ones (${one1} + ${one2} = ${expectedOneSum}), then combine ${expectedTenSum} + ${expectedOneSum}!`, 'amber');
       }
     });
+
+    ['expTenSum', 'expOneSum', 'expFinalTotal'].forEach((id) => {
+      document.getElementById(id).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('verifyExplodeBtn').click();
+        }
+      });
+    });
+
+    function updateHopButtonsUI() {
+      document.querySelectorAll('.hop-prob-btn').forEach((b) => {
+        const idx = parseInt(b.getAttribute('data-hop-idx'), 10);
+        const p = HOP_PROBLEMS[idx];
+        const probKey = p ? `${p.start}-${p.sub}` : '';
+        const solved = !!(probKey && state.hopSolved[probKey]);
+        const active = idx === state.hopIdx;
+        const baseLabel = b.dataset.baseLabel || b.textContent.replace(/^✅\s*/, '').trim();
+        b.dataset.baseLabel = baseLabel;
+        b.textContent = solved ? `✅ ${baseLabel}` : baseLabel;
+        b.className = active
+          ? 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950'
+          : solved
+            ? 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-950/60 border border-emerald-400/50 text-emerald-200'
+            : 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200';
+      });
+    }
+
+    function updateHopLockUI() {
+      const ppwCard = document.getElementById('hopPpwCard');
+      const badge = document.getElementById('hopLockStatusBadge');
+      const lineSection = document.getElementById('hopLineSection');
+      if (state.hopPpwUnlocked) {
+        if (ppwCard) ppwCard.className = 'p-4 rounded-2xl bg-emerald-950/40 border border-emerald-400/60 space-y-3 transition';
+        if (badge) {
+          badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 border border-emerald-400/50';
+          badge.textContent = '🔓 Tadpole Line Unlocked!';
+        }
+        if (lineSection) lineSection.classList.remove('opacity-60');
+      } else {
+        if (ppwCard) ppwCard.className = 'p-4 rounded-2xl bg-slate-950 border border-indigo-500/40 space-y-3 transition';
+        if (badge) {
+          badge.className = 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40';
+          badge.textContent = '🔒 Step 1: Unlock Line Below';
+        }
+        if (lineSection) lineSection.classList.add('opacity-60');
+      }
+    }
 
     function renderHopProblem() {
       const prob = HOP_PROBLEMS[state.hopIdx];
@@ -3626,18 +4238,14 @@
       partSel.innerHTML = `<option value="">Pick Part...</option>` + prob.options.map((n) => `<option value="${n}">${n}</option>`).join('');
 
       document.getElementById('hopOnesBtn').textContent = `🐸 Small Hop to Friendly 10 (-${prob.onesHop})`;
+      updateHopButtonsUI();
+      updateHopLockUI();
       drawHopSvg();
     }
 
     document.querySelectorAll('.hop-prob-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         state.hopIdx = parseInt(btn.getAttribute('data-hop-idx'), 10) || 0;
-        document.querySelectorAll('.hop-prob-btn').forEach((b) => {
-          const active = parseInt(b.getAttribute('data-hop-idx'), 10) === state.hopIdx;
-          b.className = active
-            ? 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-400 text-slate-950'
-            : 'hop-prob-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-800 text-slate-200';
-        });
         renderHopProblem();
       });
     });
@@ -3647,8 +4255,17 @@
       const w = parseInt(document.getElementById('ppwWholeSelect').value, 10);
       const p = parseInt(document.getElementById('ppwPartSelect').value, 10);
       if (w === prob.start && p === prob.sub) {
+        const probKey = `${prob.start}-${prob.sub}`;
         state.hopPpwUnlocked = true;
-        addCoins(15, `Task Retell Spot On! ${prob.start} is the WHOLE and ${prob.sub} is the PART hopping back!`);
+        updateHopLockUI();
+        if (!state.hopPpwClaimed[probKey]) {
+          state.hopPpwClaimed[probKey] = true;
+          addCoins(15, `Task Retell Spot On! ${prob.start} is the WHOLE and ${prob.sub} is the PART hopping back! Tadpole Line Unlocked!`);
+        } else {
+          saveState();
+          playSound('coin');
+          showBanner('🔓', `Tadpole Line Unlocked! ${prob.start} is the WHOLE and ${prob.sub} is the PART hopping back!`, 'emerald');
+        }
       } else {
         playSound('oops');
         showBanner('🕵️‍♀️', `Read the story again: which big number do we start with (the WHOLE), and how many hop away (the PART)?`, 'amber');
@@ -3669,7 +4286,10 @@
         <line x1="40" y1="105" x2="660" y2="105" stroke="#475569" stroke-width="4" stroke-linecap="round" />
       `;
 
-      const ticks = new Set([prob.start, prob.start - prob.onesHop, prob.ans, prob.ans + 10, prob.ans + 20]);
+      const ticks = new Set([prob.start, prob.start - prob.onesHop, prob.ans]);
+      for (let t = prob.ans; t <= prob.start - prob.onesHop; t += 10) {
+        ticks.add(t);
+      }
       ticks.forEach((t) => {
         if (t >= minVal && t <= maxVal) {
           const x = mapX(t);
@@ -3699,6 +4319,11 @@
     }
 
     document.getElementById('hopOnesBtn').addEventListener('click', () => {
+      if (!state.hopPpwUnlocked) {
+        playSound('oops');
+        showBanner('🔒', 'Rule 1 First! Pick the WHOLE and PART above and click "Unlock Tadpole Line" before hopping!', 'amber');
+        return;
+      }
       const prob = HOP_PROBLEMS[state.hopIdx];
       if (state.hopCurrentVal === prob.start) {
         const nextVal = state.hopCurrentVal - prob.onesHop;
@@ -3714,6 +4339,11 @@
     });
 
     document.getElementById('hopTenBtn').addEventListener('click', () => {
+      if (!state.hopPpwUnlocked) {
+        playSound('oops');
+        showBanner('🔒', 'Rule 1 First! Pick the WHOLE and PART above and click "Unlock Tadpole Line" before hopping!', 'amber');
+        return;
+      }
       const prob = HOP_PROBLEMS[state.hopIdx];
       if (state.hopCurrentVal === prob.start) {
         playSound('oops');
@@ -3739,14 +4369,36 @@
     document.getElementById('resetHopLineBtn').addEventListener('click', renderHopProblem);
 
     document.getElementById('verifyHopFinalBtn').addEventListener('click', () => {
+      if (!state.hopPpwUnlocked) {
+        playSound('oops');
+        showBanner('🔒', 'Rule 1 First! Pick the WHOLE and PART above and click "Unlock Tadpole Line" before checking your answer!', 'amber');
+        return;
+      }
       const prob = HOP_PROBLEMS[state.hopIdx];
       const userAns = parseInt(document.getElementById('hopFinalInput').value, 10);
       if (userAns === prob.ans) {
-        addCoins(30, `Tadpole Hop Champion! ${prob.start} - ${prob.sub} = ${prob.ans}!`);
+        const probKey = `${prob.start}-${prob.sub}`;
+        const firstTime = !state.hopSolved[probKey];
+        state.hopSolved[probKey] = true;
+        if (firstTime) {
+          addCoins(30, `Tadpole Hop Champion! ${prob.start} - ${prob.sub} = ${prob.ans}!`);
+        } else {
+          saveState();
+          playSound('coin');
+          showBanner('🐸', `Awesome bonus hop! ${prob.start} - ${prob.sub} = ${prob.ans}!`, 'emerald');
+        }
         awardStar('mathlab', 'Explode the Number & Tadpole Hop Champion');
+        updateHopButtonsUI();
       } else {
         playSound('oops');
         showBanner('🐸', `Hop your Tadpole on the number line: start at ${prob.start}, hop -${prob.onesHop} to ${prob.start - prob.onesHop}, then jump back by 10s!`, 'amber');
+      }
+    });
+
+    document.getElementById('hopFinalInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('verifyHopFinalBtn').click();
       }
     });
 
@@ -3773,26 +4425,94 @@
       initRetellPuzzle();
       renderSportscasterStage();
       evaluateGratitudeSentence();
+      if (drawCanvas) {
+        drawCanvas.dataset.hydrated = '';
+        if (drawCanvas.width > 0 && drawCanvas.height > 0) {
+          restoreDrawingToCanvas();
+        }
+      }
       renderFlashcard();
       renderExplodeProblem();
       renderHopProblem();
       renderSignOffList();
+      applyMediaAudioPreference();
       syncInlineFormAndTelemetry();
     }
 
+    // Inline 2-tap confirmation helper (avoids window.confirm(), which Fire Kids WebViews can suppress)
+    const twoTapResetHandles = [];
+    function disarmAllTwoTapButtons() {
+      twoTapResetHandles.forEach((fn) => fn());
+    }
+
+    function bindTwoTapConfirm(btn, confirmLabel, onConfirm) {
+      if (!btn) return;
+      let timerId = null;
+      let origHtml = null;
+      let origClass = null;
+
+      const disarm = () => {
+        if (timerId) {
+          clearTimeout(timerId);
+          timerId = null;
+        }
+        if (btn.dataset.armed === '1') {
+          btn.dataset.armed = '';
+          if (origHtml !== null) btn.innerHTML = origHtml;
+          if (origClass !== null) btn.className = origClass;
+        }
+      };
+      twoTapResetHandles.push(disarm);
+
+      btn.addEventListener('click', () => {
+        if (btn.dataset.armed === '1') {
+          disarm();
+          onConfirm();
+          return;
+        }
+        origHtml = btn.innerHTML;
+        origClass = btn.className;
+        btn.dataset.armed = '1';
+        btn.textContent = confirmLabel;
+        btn.className = 'px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold shadow transition';
+        timerId = setTimeout(disarm, 4000);
+      });
+    }
+
     // RESET DAILY PROGRESS: Clears today's interactive exercise boards for a fresh daily run
-    // while keeping Weekly Coins, 5 Arena Stars, and Mon-Thu Parent Hub Sign-Offs intact!
+    // while keeping Weekly Coins, Streak, 5 Arena Stars, and Mon-Thu Parent Hub Sign-Offs intact!
     function resetDailyProgressOnly() {
-      state.streak = 0;
+      state.affirmationClaimed = false;
       state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
+      state.ritualStepRewarded = { deck: false, body: false, eyes: false, retell: false };
+      state.ritualAllBonusClaimed = false;
+      state.karateIdx = 0;
       state.karateChopped = {};
       state.karatePatternDone = {};
       state.karateFused = {};
+      state.selectedSortWord = null;
       state.sortedWords = {};
+      state.sortedWordsRewarded = {};
       state.crackedLocks = {};
+      state.crackedLocksRewarded = {};
+      state.spellTestIdx = 0;
       state.spellTestCorrect = {};
+      state.retellRewarded = {};
+      state.pondCoinsEarned = 0;
       state.pass1Done = false;
+      state.pass1Rewarded = false;
       state.pass2Done = false;
+      state.pass2Rewarded = false;
+      state.gratitudeClaimed = false;
+      state.explodeSolved = {};
+      state.hopPpwClaimed = {};
+      state.hopSolved = {};
+
+      const spellInput = document.getElementById('spellTestInput');
+      if (spellInput) spellInput.value = '';
+      const hintBox = document.getElementById('spellTestHintBox');
+      if (hintBox) hintBox.classList.add('hidden');
+
       pondGame.bubblesCaught = 0;
       pondGame.playerCol = 2;
       pondGame.playerRow = 1;
@@ -3801,11 +4521,19 @@
       saveState();
       refreshAllViews();
       playSound('onair');
-      showBanner('🔄', 'Daily Practice Boards Reset for Today! (Your Weekly Coins, Arena Stars & Parent Hub Sign-Offs are safely kept!)', 'emerald');
+      showBanner('🔄', 'Daily Practice Boards Reset for Today! (Your Weekly Coins, Streak, Arena Stars & Parent Hub Sign-Offs are safely kept!)', 'emerald');
     }
 
-    document.getElementById('topResetDailyBtn').addEventListener('click', resetDailyProgressOnly);
-    document.getElementById('modalResetDailyBtn').addEventListener('click', resetDailyProgressOnly);
+    bindTwoTapConfirm(
+      document.getElementById('topResetDailyBtn'),
+      '⚠️ Tap Again to Reset Daily',
+      resetDailyProgressOnly
+    );
+    bindTwoTapConfirm(
+      document.getElementById('modalResetDailyBtn'),
+      '⚠️ Tap Again to Reset Daily',
+      resetDailyProgressOnly
+    );
 
     function renderSignOffList() {
       const list = document.getElementById('signOffList');
@@ -3827,17 +4555,75 @@
       });
     }
 
+    function resetPasteSyncInputMode() {
+      const snapInput = document.getElementById('syncJsonSnapshotInput');
+      const applyBtn = document.getElementById('applyPastedJsonBtn');
+      if (snapInput) {
+        snapInput.setAttribute('readonly', 'readonly');
+        snapInput.placeholder = 'Live JSON sync snapshot...';
+      }
+      if (applyBtn) {
+        applyBtn.textContent = '📥 Paste & Restore';
+      }
+    }
+
     function openParentAndSyncModal() {
+      resetPasteSyncInputMode();
       saveState();
       renderSignOffList();
+      updateVoiceDiagnosticUI();
       document.getElementById('parentModal').classList.remove('hidden');
+    }
+
+    function closeParentAndSyncModal() {
+      disarmAllTwoTapButtons();
+      resetPasteSyncInputMode();
+      syncInlineFormAndTelemetry();
+      document.getElementById('parentModal').classList.add('hidden');
     }
 
     document.getElementById('openHubBtn').addEventListener('click', openParentAndSyncModal);
     document.getElementById('topSyncBtn').addEventListener('click', openParentAndSyncModal);
+    document.getElementById('closeHubBtn').addEventListener('click', closeParentAndSyncModal);
 
-    document.getElementById('closeHubBtn').addEventListener('click', () => {
-      document.getElementById('parentModal').classList.add('hidden');
+    // Close Parent Hub on backdrop click or Escape key
+    document.getElementById('parentModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closeParentAndSyncModal();
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modal = document.getElementById('parentModal');
+        if (modal && !modal.classList.contains('hidden')) {
+          closeParentAndSyncModal();
+        }
+      }
+    });
+
+    // Voice Engine & Fire Tablet Audio Diagnostic handlers
+    document.getElementById('testVoiceEngineBtn').addEventListener('click', () => {
+      if (state.muted) {
+        showBanner('🔇', 'Sound is currently muted! Tap the 🔇 button in the top bar to hear the voice test.', 'amber');
+        return;
+      }
+      speakText('tadpole. The tiny tadpole wiggled its tail in the pond!');
+      updateVoiceDiagnosticUI();
+      showBanner('🔊', 'Playing Voice Test ("tadpole")! If your Fire Tablet is quiet, toggle Tablet Media Audio to Forced ON.', 'emerald');
+    });
+
+    document.getElementById('toggleMediaAudioBtn').addEventListener('click', () => {
+      state.forceMediaAudio = !state.forceMediaAudio;
+      applyMediaAudioPreference();
+      saveState();
+      playSound('coin');
+      showBanner(
+        state.forceMediaAudio ? '📱' : '🔊',
+        state.forceMediaAudio
+          ? 'Tablet Media Audio Forced ON! Spoken words will stream through the unrestricted HTML5 audio channel.'
+          : 'Tablet Media Audio set back to Auto (Native TTS with 300ms Media Audio fallback).',
+        'emerald'
+      );
     });
 
     // Force Resync button
@@ -3849,16 +4635,89 @@
       showBanner('💾', `Local Sync Verified at ${state.lastSavedAt}! Coins, Stars & Parent Hub Sign-Offs are locked in.`, 'emerald');
     });
 
+    // Clean, XSS-safe Self-Contained HTML Baker (clones DOM, strips runtime Tailwind styles & open modals)
+    function buildBakedHtmlDocument() {
+      saveState();
+      const fullPayload = getSerializablePayload({ includeDrawing: true });
+      const compactPayload = getSerializablePayload({ includeDrawing: false });
+      const compactJsonStr = JSON.stringify(compactPayload);
+      const safeSerialized = JSON.stringify(fullPayload)
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')
+        .replace(/&/g, '\\u0026')
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
+
+      const cloneDoc = document.documentElement.cloneNode(true);
+
+      // Remove runtime-injected Tailwind Play CDN <style> sheets so downloaded HTML doesn't duplicate them
+      cloneDoc.querySelectorAll('head style').forEach((styleEl) => {
+        if (styleEl.id !== 'app-custom-styles') {
+          styleEl.remove();
+        }
+      });
+
+      // Reset transient overlays, modals, and hints so baked HTML always boots cleanly
+      ['parentModal', 'feedbackBanner', 'grandPrizeBanner', 'spellTestHintBox', 'flashVisualDots', 'karatePostChopArea'].forEach((id) => {
+        const el = cloneDoc.querySelector(`#${id}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      // Reset stage views & nav tabs to Stage 0 (Ready Check) for a clean boot
+      cloneDoc.querySelectorAll('.stage-view').forEach((el) => {
+        el.classList.toggle('hidden', el.id !== 'view-ritual');
+      });
+      cloneDoc.querySelectorAll('.nav-tab').forEach((btn) => {
+        const isRitual = btn.getAttribute('data-tab') === 'ritual';
+        btn.className = isRitual
+          ? 'nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-amber-400 text-slate-950 shadow'
+          : 'nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition bg-slate-800/90 text-slate-200 hover:bg-slate-700';
+      });
+
+      // Clear dynamically populated containers so boot renders fresh DOM from baked state
+      [
+        'wordSoundboardGrid', 'karateWordTabs', 'karateChopContainer', 'karatePatternChoices',
+        'unsortedWordBank', 'vaultColumnsContainer', 'mysteryGrid', 'retellPool', 'retellSlots',
+        'flashChoicesGrid', 'signOffList', 'hopSvg'
+      ].forEach((id) => {
+        const el = cloneDoc.querySelector(`#${id}`);
+        if (el) el.innerHTML = '';
+      });
+
+      // Reset paste input and keep inline hidden state form synchronized
+      const cloneSnapInput = cloneDoc.querySelector('#syncJsonSnapshotInput');
+      if (cloneSnapInput) {
+        cloneSnapInput.setAttribute('readonly', 'readonly');
+        cloneSnapInput.setAttribute('value', '');
+        cloneSnapInput.value = '';
+      }
+      const cloneApplyBtn = cloneDoc.querySelector('#applyPastedJsonBtn');
+      if (cloneApplyBtn) cloneApplyBtn.textContent = '📥 Paste & Restore';
+
+      const cloneHiddenJson = cloneDoc.querySelector('#quest-hidden-state-json');
+      if (cloneHiddenJson) cloneHiddenJson.setAttribute('value', compactJsonStr);
+      const cloneHiddenCoins = cloneDoc.querySelector('#quest-hidden-coins');
+      if (cloneHiddenCoins) cloneHiddenCoins.setAttribute('value', String(state.coins));
+      const cloneHiddenStars = cloneDoc.querySelector('#quest-hidden-stars');
+      if (cloneHiddenStars) cloneHiddenStars.setAttribute('value', String(Object.values(state.stars).filter(Boolean).length));
+      const cloneHiddenSignoffs = cloneDoc.querySelector('#quest-hidden-signoffs');
+      if (cloneHiddenSignoffs) {
+        cloneHiddenSignoffs.setAttribute('value', Object.keys(state.signOff).filter((k) => state.signOff[k]).join(','));
+      }
+
+      // Bake state directly into <script id="baked-state-script"> without String.replace $& pitfalls
+      const bakedScript = cloneDoc.querySelector('#baked-state-script');
+      if (bakedScript) {
+        bakedScript.textContent = `\n    window.__VIOLET_QUEST_STATE__ = ${safeSerialized};\n  `;
+      }
+
+      return '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
+    }
+
     // Download Self-Contained Updated HTML (Vinyl Vault index.html Baker Pattern)
     document.getElementById('downloadBakedHtmlBtn').addEventListener('click', () => {
-      saveState();
-      const payload = getSerializablePayload();
-      const serialized = JSON.stringify(payload);
-      let htmlSource = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      htmlSource = htmlSource.replace(
-        /<script id="baked-state-script">[\s\S]*?<\/script>/,
-        `<script id="baked-state-script">\n    window.__VIOLET_QUEST_STATE__ = ${serialized};\n  <\/script>`
-      );
+      disarmAllTwoTapButtons();
+      const htmlSource = buildBakedHtmlDocument();
       const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -3875,7 +4734,7 @@
     // Export Portable JSON Sync File
     document.getElementById('exportJsonBtn').addEventListener('click', () => {
       saveState();
-      const payload = getSerializablePayload();
+      const payload = getSerializablePayload({ includeDrawing: true });
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -3891,7 +4750,8 @@
 
     // Import / Resync JSON File
     document.getElementById('importJsonFileInput').addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
+      const inputEl = e.target;
+      const file = inputEl.files && inputEl.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
@@ -3906,24 +4766,39 @@
         } catch (err) {
           playSound('oops');
           showBanner('⚠️', 'Could not parse that JSON sync file. Please check the file and try again.', 'amber');
+        } finally {
+          inputEl.value = '';
         }
+      };
+      reader.onerror = () => {
+        inputEl.value = '';
+        playSound('oops');
+        showBanner('⚠️', 'Could not read that file. Please try selecting it again.', 'amber');
       };
       reader.readAsText(file);
     });
 
     // Copy & Paste Snapshot JSON Controls
     document.getElementById('copySyncJsonBtn').addEventListener('click', () => {
+      resetPasteSyncInputMode();
       saveState();
       const snapInput = document.getElementById('syncJsonSnapshotInput');
       snapInput.select();
+      const fallbackCopy = () => {
+        try {
+          document.execCommand('copy');
+        } catch (e) {
+          // Ignore legacy copy errors
+        }
+      };
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(snapInput.value);
+          navigator.clipboard.writeText(snapInput.value).catch(fallbackCopy);
         } else {
-          document.execCommand('copy');
+          fallbackCopy();
         }
       } catch (e) {
-        document.execCommand('copy');
+        fallbackCopy();
       }
       playSound('coin');
       showBanner('📋', 'Copied live Local Sync JSON code to clipboard!', 'emerald');
@@ -3931,16 +4806,18 @@
 
     document.getElementById('applyPastedJsonBtn').addEventListener('click', () => {
       const snapInput = document.getElementById('syncJsonSnapshotInput');
+      const applyBtn = document.getElementById('applyPastedJsonBtn');
       if (snapInput.hasAttribute('readonly')) {
         snapInput.removeAttribute('readonly');
         snapInput.value = '';
-        snapInput.placeholder = 'Paste your saved Sync JSON code here, then click Paste & Restore again...';
+        snapInput.placeholder = 'Paste your saved Sync JSON code here, then click Apply Pasted JSON...';
+        if (applyBtn) applyBtn.textContent = '✅ Apply Pasted JSON';
         snapInput.focus();
         return;
       }
       try {
         const parsed = JSON.parse(snapInput.value.trim());
-        snapInput.setAttribute('readonly', 'readonly');
+        resetPasteSyncInputMode();
         applyPayloadToState(parsed);
         saveState();
         refreshAllViews();
@@ -3952,34 +4829,74 @@
       }
     });
 
-    // Full Weekly Reset
-    document.getElementById('resetProgressBtn').addEventListener('click', () => {
+    // Full Weekly Reset (2-tap guarded)
+    function resetFullWeeklyProgress() {
       state.coins = 0;
       state.streak = 0;
+      state.affirmationClaimed = false;
       state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
+      state.ritualStepRewarded = { deck: false, body: false, eyes: false, retell: false };
+      state.ritualAllBonusClaimed = false;
       state.stars = { karate: false, vaults: false, metamorphosis: false, sportscaster: false, mathlab: false };
+      state.karateIdx = 0;
       state.karateChopped = {};
       state.karatePatternDone = {};
       state.karateFused = {};
+      state.selectedSortWord = null;
       state.sortedWords = {};
+      state.sortedWordsRewarded = {};
       state.crackedLocks = {};
+      state.crackedLocksRewarded = {};
+      state.spellTestIdx = 0;
       state.spellTestCorrect = {};
+      state.retellRewarded = {};
+      state.pondCoinsEarned = 0;
       state.pass1Done = false;
+      state.pass1Rewarded = false;
       state.pass2Done = false;
+      state.pass2Rewarded = false;
       state.gratitudeText = '';
+      state.gratitudeClaimed = false;
       if (document.getElementById('gratitudeInput')) document.getElementById('gratitudeInput').value = '';
+      if (document.getElementById('spellTestInput')) document.getElementById('spellTestInput').value = '';
+      if (document.getElementById('spellTestHintBox')) document.getElementById('spellTestHintBox').classList.add('hidden');
+      state.drawingDataUrl = '';
+      if (drawCanvas && drawCtx) {
+        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        drawCanvas.dataset.hasStrokes = '';
+        drawCanvas.dataset.hydrated = '';
+      }
       state.flashSolvedCount = 0;
+      state.explodeSolved = {};
+      state.hopPpwClaimed = {};
+      state.hopSolved = {};
       Object.keys(state.signOff).forEach((k) => { state.signOff[k] = false; });
+
+      pondGame.bubblesCaught = 0;
+      pondGame.playerCol = 2;
+      pondGame.playerRow = 1;
+      spawnPondBubble();
+      drawPondGame();
+      window.__VIOLET_QUEST_STATE__ = null;
+
       saveState();
       refreshAllViews();
+      playSound('onair');
       showBanner('🔄', 'Full Weekly Progress Reset for a brand-new week!', 'amber');
-    });
+    }
+
+    bindTwoTapConfirm(
+      document.getElementById('resetProgressBtn'),
+      '⚠️ Tap Again to Reset Whole Week',
+      resetFullWeeklyProgress
+    );
 
     // =====================================================
     // 13. INITIALIZATION ON LOAD
     // =====================================================
     window.addEventListener('load', () => {
       loadSavedState();
+      applyMediaAudioPreference();
       updateHeaderReadouts();
       updateTimerUI();
       renderRitual();
@@ -3995,6 +4912,7 @@
       renderExplodeProblem();
       renderHopProblem();
       syncInlineFormAndTelemetry();
+      updateVoiceDiagnosticUI();
     });
   </script>
 </body>
