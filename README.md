@@ -1,10 +1,5 @@
 # 🐸👑 Violet's Championship Quest: Long /O/ & Metamorphosis Game Show!
 
-[](https://krunked-fpv.github.io/violets_homework/)
-[](https://github.com/krunked-fpv/violets_homework)
-[](https://krunked-fpv.github.io/violets_homework/)
-[](https://github.com/krunked-fpv/violets_homework)
-
 **[🎮 PLAY VIOLET'S CHAMPIONSHIP QUEST LIVE (krunked-fpv.github.io/violets_homework) 🚀](https://krunked-fpv.github.io/violets_homework/)** • **[📦 GitHub Repository](https://github.com/krunked-fpv/violets_homework)** • **[🖥️ Companion Google Slides Game Show](https://docs.google.com/presentation/d/1oSDU7vfsShmhrNtLXLWaLAwuksxUnW3rqZwtxFD1Wv4/edit)** • **[📄 Printable 5-Star Practice Playbook Doc](https://docs.google.com/document/d/1toRghnHExDVKz3tHK-JaKdJVPER23ySkDWJlyjACcxU/edit)**
 
 ## 🌟 What Is This Project?
@@ -17,9 +12,9 @@ So Violet never loses her weekly **Champion Coins**, **5 Arena Stars**, or **Mon
 
 | Persistence & Reset Layer | Header Control / Engine | How It Protects Violet's Weekly Progress |
 | :--- | :--- | :--- |
-| **1. Top-Bar `🔄 Reset Daily` Button** | `🔄 Reset Daily` button in top navigation bar | Clears today's practice boards (Karate Chop words, Long `/o/` Vault sorts, 5-Finger Retell cards, Teleprompter passes, and Math Lab inputs) for a fresh daily rep while **preserving** cumulative weekly Champion Coins, Arena Stars (`0/5`), Streak, and Mon–Thu Parent Hub sign-offs. |
-| **2. Self-Contained `💾 Local Sync` & HTML Baker** | `💾 Local Sync` modal + `<form id="quest-inline-state-form">` + `window.__VIOLET_QUEST_STATE__` | Modeled after the [Discogs Vinyl Vault](https://github.com/krunked-fpv/discogs_collection). Click **💾 Download Updated Game HTML (Bake Progress In)** to save a fresh `index.html` with all current points, stars, and sign-offs baked directly inside the HTML file, or export/import `violet_quest_sync.json` and clipboard sync strings. |
-| **3. Shadow-Cookie Auto-Healer (`kv1_*`)** | `<script id="krunked-cookie-vault-v1">` in `<head>` (400-day `SameSite=Lax` cookies) | Defends against tablet OS and mobile browser `localStorage` eviction. Hooks `Storage.prototype.setItem`, `removeItem`, and `clear`, automatically strips heavy base64 `<canvas>` Gratitude Scene drawings (`data:image/...`) to stay under the 4 KB per-cookie limit, chunks `violet_championship_quest_v1_nov16` into 3.2 KB cookies (`Max-Age=34560000`), restores `localStorage` at boot before the game initializes, and updates the shared `krunked_family_pulse` (`Path=/`) root cookie across `krunked-fpv.github.io`. |
+| **1. Top-Bar `🔄 Reset Daily` Button** | `🔄 Reset Daily` (2-tap guarded) in top navigation bar | Clears today's practice boards (Ready Check, Karate Chop words, Long `/o/` Vault sorts, 5-Finger Retell cards, Teleprompter passes, and Math Lab inputs) for a fresh daily rep while **preserving** cumulative weekly Champion Coins, Arena Stars (`0/5`), Streak, Gratitude drawing/sentence, and Mon–Thu Parent Hub sign-offs. |
+| **2. Self-Contained `💾 Local Sync` & HTML Baker** | `💾 Local Sync` modal + `<form id="quest-inline-state-form">` + `window.__VIOLET_QUEST_STATE__` | Modeled after the [Discogs Vinyl Vault](https://github.com/krunked-fpv/discogs_collection). Click **💾 Download Updated Game HTML (Bake Progress In)** to save a clean, self-contained `index.html` with all current points, stars, drawing, and sign-offs baked directly inside the HTML file, or export/import `violet_quest_sync.json` and clipboard sync strings. |
+| **3. Shadow-Cookie Auto-Healer (`kv1_*`)** | `<script id="krunked-cookie-vault-v1">` in `<head>` (400-day `SameSite=Lax` cookies) | Defends against tablet OS and mobile browser `localStorage` eviction. Hooks `Storage.prototype.setItem`, `removeItem`, and `clear`, automatically strips heavy base64 `<canvas>` Gratitude Scene drawings (`data:image/...`) to stay under the 4 KB per-cookie limit, chunks `violet_quest_nov16_v1` into 3.2 KB cookies (`Max-Age=34560000`), restores `localStorage` at boot before the game initializes, and updates the shared `krunked_family_pulse` (`Path=/`) root cookie across `krunked-fpv.github.io`. |
 
 ### Patching, Rollback & Console Diagnostics
 
@@ -35,11 +30,11 @@ So Violet never loses her weekly **Champion Coins**, **5 Arena Stars**, or **Mon
 
 ## 🔊 Amazon Fire Kids Tablet 3-Part Spoken-Word Audio Engine
 
-Because the **Amazon Kids (FreeTime) Web Browser** runs inside a restricted child profile that frequently blocks `window.speechSynthesis` or drops audio when `cancel()` and `speak()` fire together, `index.html` includes a dedicated 3-part spoken-word fallback while leaving native desktop and phone TTS untouched:
+Because the **Amazon Kids (FreeTime) Web Browser** runs inside a restricted child profile that frequently blocks `window.speechSynthesis` or drops audio when `cancel()` and `speak()` fire together, `index.html` includes a dedicated 3-part spoken-word fallback (plus a live **Voice Engine & Fire Tablet Audio Diagnostic** panel inside **📋 Parent Hub**) while leaving native desktop and phone TTS untouched:
 
 1. **60ms Chromium/Fire OS `cancel()` Debounce:** Prevents the Android WebView race condition where `speechSynthesis.cancel()` silences the immediately following `speak()` utterance.
 2. **Flexible `en-US` / `en_US` Locale Matching:** Normalizes underscore and hyphen locale tags on Fire OS without assigning broken voice objects when `getVoices()` returns empty.
-3. **300ms Watchdog & HTML5 `<audio>` Dictionary MP3 / Streamed TTS Fallback:** If `speechSynthesis.onstart` does not fire within `300ms` (or immediately when Fire/Silk Kids browser is detected), the game automatically streams real dictionary pronunciation MP3s and TTS audio through a shared HTML5 `<audio>` media element—using the exact same unrestricted media channel as the game show's **On-Air Chime**, **Crowd Fanfare**, and **Drumroll**.
+3. **300ms Watchdog, 2.5s Endpoint Timeout & HTML5 `<audio>` Dictionary MP3 / Streamed TTS Fallback:** If `speechSynthesis.onstart` does not fire within `300ms` (or immediately when Fire/Silk Kids browser is detected or **Tablet Media Audio: Forced ON** is enabled in Parent Hub), the game streams real dictionary pronunciation MP3s and TTS audio through a shared HTML5 `<audio>` media element—with a `2.5s` per-URL timeout so filtered endpoints never hang—using the exact same unrestricted media channel as the game show's **On-Air Chime**, **Crowd Fanfare**, and **Drumroll**.
 
 ## 🕹️ Inside the 6 Game Show Stages (1-Hour MTSS Routine)
 
