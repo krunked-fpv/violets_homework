@@ -884,6 +884,18 @@
     canvas#pieDashCanvas, canvas#drawCanvas {
       touch-action: none;
     }
+    .selection\:bg-pink-500\/40::selection { background-color: rgb(236 72 153 / 0.4); }
+    .selection\:text-amber-100::selection { color: rgb(254 243 199); }
+    .opacity-50 { opacity: 0.5; }
+    #feedbackBanner {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(92vw, 42rem);
+      z-index: 55;
+      cursor: pointer;
+    }
   </style>
   <script id="baked-state-script">
     window.__VIOLET_QUEST_STATE__ = null;
@@ -981,8 +993,8 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-3 py-4 sm:py-6 space-y-5 pb-16">
-    <!-- Toast Feedback Banner -->
-    <div id="feedbackBanner" class="hidden rounded-2xl px-4 py-3 border shadow-lg flex items-center gap-3 text-sm sm:text-base font-bold transition">
+    <!-- Floating Toast Feedback Banner (visible above Parent Hub modal and scrolled stages) -->
+    <div id="feedbackBanner" role="status" aria-live="polite" title="Tap to dismiss" class="hidden rounded-2xl px-4 py-3 border shadow-2xl flex items-center gap-3 text-sm sm:text-base font-bold transition backdrop-blur-md">
       <span id="feedbackEmoji" class="text-2xl shrink-0">✨</span>
       <span id="feedbackText" class="leading-snug"></span>
     </div>
@@ -1224,6 +1236,9 @@
               <button id="bakeoffClueBtn" type="button" class="glitter-btn px-4 py-2.5 rounded-xl bg-purple-800 hover:bg-purple-700 border border-pink-300/40 text-pink-100 font-bold text-sm">
                 💡 Phonics Hint
               </button>
+              <button id="bakeoffNextBtn" type="button" class="glitter-btn px-4 py-2.5 rounded-xl bg-purple-900 hover:bg-purple-800 border border-pink-300/40 text-amber-200 font-bold text-sm">
+                ➡️ Next Word
+              </button>
             </div>
             <div id="bakeoffHintBox" class="hidden rounded-xl bg-amber-500/15 border border-amber-400/45 px-4 py-2.5 text-sm font-bold text-amber-200"></div>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5">
@@ -1309,7 +1324,7 @@
 
         <div class="flex flex-wrap items-center justify-between gap-3 max-w-2xl mx-auto">
           <div id="dashCaughtWord" class="text-sm font-extrabold text-amber-200">
-            ✨ Tap "Start Dash!" or drag right on the bakery screen!
+            ✨ Tap "Start Dash!" — then drag your finger on the screen or tap ⬅️ / ➡️!
           </div>
           <div class="flex items-center gap-2">
             <button id="dashLeftBtn" type="button" class="glitter-btn px-5 py-2.5 rounded-xl bg-purple-800 hover:bg-purple-700 border border-pink-300/40 text-white font-extrabold text-base">
@@ -1400,7 +1415,7 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-xs font-extrabold text-amber-200">Frosting Colors:</span>
-              <button type="button" data-color="#f472b6" class="color-swatch w-7 h-7 rounded-full bg-pink-400 border-2 border-white shadow" title="Sparkle Pink"></button>
+              <button type="button" data-color="#f472b6" class="color-swatch w-7 h-7 rounded-full bg-pink-400 border-2 border-white scale-110 shadow" title="Sparkle Pink"></button>
               <button type="button" data-color="#c084fc" class="color-swatch w-7 h-7 rounded-full bg-purple-400 border-2 border-purple-200/40" title="Violet Purple"></button>
               <button type="button" data-color="#fbbf24" class="color-swatch w-7 h-7 rounded-full bg-amber-400 border-2 border-purple-200/40" title="Pumpkin Gold"></button>
               <button type="button" data-color="#fb923c" class="color-swatch w-7 h-7 rounded-full bg-orange-400 border-2 border-purple-200/40" title="Cinnamon Orange"></button>
@@ -1438,7 +1453,7 @@
             </span>
             <h2 class="text-xl sm:text-2xl font-bold text-amber-200 mt-1">🧮 Bakery Math Lab</h2>
             <p class="text-xs sm:text-sm text-pink-100/85">
-              Slow down and recount carefully! Master 3 Mix-the-Bowl problems, 2 Bakery Trail hops, OR 10 <strong class="text-amber-300">+5</strong> Flashcards to unlock Star #5!
+              Slow down and recount carefully! Master 3 Mix-the-Bowl problems, 2 Bakery Trail stories, 2 Coin Checkouts, OR 10 <strong class="text-amber-300">+5</strong> Flashcards to unlock Star #5!
             </p>
           </div>
           <div class="flex flex-wrap gap-1.5">
@@ -1829,8 +1844,8 @@
         word: 'cupcake', jar: 'jar-ae', pattern: 'Magic a_e + C-Rule', compound: true,
         part1: 'cup', part2: 'cake', syllables: ['cup', 'cake'],
         rulePrompt: 'Which letter starts BOTH parts for the /k/ sound in this sweet treat?',
-        ruleChoices: ['Both start with C (not K!)', 'Both start with K', 'Uses vowel team oa'],
-        ruleCorrectIdx: 0,
+        ruleChoices: ['Both start with K', 'Both start with C (not K!)', 'Uses vowel team oa'],
+        ruleCorrectIdx: 1,
         hint: 'Compound word! Part 1 rhymes with "up" and starts with C. Part 2 has Magic a_e and also starts with C!',
         sentence: 'Chef Violet frosted a purple glitter cupcake for Thanksgiving!'
       },
@@ -1838,15 +1853,15 @@
         word: 'pancake', jar: 'jar-ae', pattern: 'Magic a_e + C-Rule', compound: true,
         part1: 'pan', part2: 'cake', syllables: ['pan', 'cake'],
         rulePrompt: 'What phonics secret makes the second part say its long A name?',
-        ruleChoices: ['C-rule + Magic silent e (a_e)', 'Bossy-R or', 'Vowel team oa'],
-        ruleCorrectIdx: 0,
+        ruleChoices: ['Bossy-R or', 'Vowel team oa', 'C-rule + Magic silent e (a_e)'],
+        ruleCorrectIdx: 2,
         hint: 'Compound word! A flat breakfast treat cooked in a frying ___ + a Magic a_e party treat starting with C!',
         sentence: 'Dad flipped a golden pumpkin pancake high into the air!'
       },
       {
         word: 'apron', jar: 'jar-ay', pattern: 'Open Syllable a', compound: false,
         syllables: ['a', 'pron'],
-        hint: '2 syllables! Starts with an open long A all by itself, then p-r-o-n. Chefs tie it around their waist!',
+        hint: '2 syllables! Starts with an open long A all by itself, followed by a /pr/ blend. Chefs tie it around their waist!',
         sentence: 'Violet tied on her sparkly pink apron before mixing the batter.'
       },
       {
@@ -1886,8 +1901,8 @@
         word: 'cornbread', jar: 'jar-or', pattern: 'Bossy-R or + C-Rule', compound: true,
         part1: 'corn', part2: 'bread', syllables: ['corn', 'bread'],
         rulePrompt: 'What two phonics secrets team up in the first part of this bakery side dish?',
-        ruleChoices: ['Starts with C (not K) + Bossy-R or', 'Starts with K + Magic a_e', 'Vowel team ay + silent e'],
-        ruleCorrectIdx: 0,
+        ruleChoices: ['Starts with K + Magic a_e', 'Starts with C (not K) + Bossy-R or', 'Vowel team ay + silent e'],
+        ruleCorrectIdx: 1,
         hint: 'Compound word! Part 1 starts with C (not K!) + Bossy-R o-r, followed by a baked loaf word with ea!',
         sentence: 'Golden sweet cornbread baked beside the pumpkin pies.'
       },
@@ -1895,24 +1910,24 @@
         word: 'popcorn', jar: 'jar-or', pattern: 'Bossy-R or + C-Rule', compound: true,
         part1: 'pop', part2: 'corn', syllables: ['pop', 'corn'],
         rulePrompt: 'Which letter starts the second root word for the /k/ sound?',
-        ruleChoices: ['Letter C + Bossy-R or', 'Letter K + Bossy-R ar', 'Vowel team oa'],
-        ruleCorrectIdx: 0,
-        hint: 'Compound word! Part 1 goes P-O-P, and Part 2 starts with C (not K!) + Bossy-R o-r!',
+        ruleChoices: ['Letter K + Bossy-R ar', 'Vowel team oa', 'Letter C + Bossy-R or'],
+        ruleCorrectIdx: 2,
+        hint: 'Compound word! Part 1 rhymes with "hop", and Part 2 starts with C (not K!) + Bossy-R o-r!',
         sentence: 'Paris Ridge students cheer for crunchy popcorn on Popcorn Friday!'
       }
     ];
 
     const PADLOCK_WORDS = [
-      { word: 'cupcake', display: '_up_ake', prompt: 'Both /k/ sounds use C!', answer: 'c ... c', options: ['c ... c', 'k ... k', 'c ... k'] },
-      { word: 'pancake', display: 'pan_ak_', prompt: 'C-rule + Magic silent e!', answer: 'c ... e', options: ['c ... e', 'k ... a', 'c ... o'] },
+      { word: 'cupcake', display: '_up_ake', prompt: 'Both /k/ sounds use C!', answer: 'c ... c', options: ['k ... k', 'c ... c', 'c ... k'] },
+      { word: 'pancake', display: 'pan_ak_', prompt: 'C-rule + Magic silent e!', answer: 'c ... e', options: ['k ... a', 'c ... o', 'c ... e'] },
       { word: 'apron', display: '_pron', prompt: 'Open syllable Long A!', answer: 'a', options: ['a', 'ai', 'ay'] },
-      { word: 'daytime', display: 'd__time', prompt: 'Long A team at end of first part!', answer: 'ay', options: ['ay', 'ai', 'oa'] },
-      { word: 'toast', display: 't__st', prompt: 'Long O vowel team in middle!', answer: 'oa', options: ['oa', 'ow', 'ay'] },
+      { word: 'daytime', display: 'd__time', prompt: 'Long A team at end of first part!', answer: 'ay', options: ['ai', 'ay', 'oa'] },
+      { word: 'toast', display: 't__st', prompt: 'Long O vowel team in middle!', answer: 'oa', options: ['ow', 'ay', 'oa'] },
       { word: 'stove', display: 'st_v_', prompt: 'Magic silent e makes O long!', answer: 'o ... e', options: ['o ... e', 'a ... e', 'o ... a'] },
-      { word: 'harvest', display: 'h__vest', prompt: 'Bossy-R sound in autumn!', answer: 'ar', options: ['ar', 'or', 'er'] },
-      { word: 'butter', display: 'butt__', prompt: 'Bossy-R ending!', answer: 'er', options: ['er', 'ar', 'or'] },
-      { word: 'cornbread', display: 'c__nbread', prompt: 'Bossy-R sound after C!', answer: 'or', options: ['or', 'ar', 'er'] },
-      { word: 'popcorn', display: 'pop_orn', prompt: 'C vs K rule on root word!', answer: 'c', options: ['c', 'k', 'ck'] }
+      { word: 'harvest', display: 'h__vest', prompt: 'Bossy-R sound in autumn!', answer: 'ar', options: ['or', 'ar', 'er'] },
+      { word: 'butter', display: 'butt__', prompt: 'Bossy-R ending!', answer: 'er', options: ['ar', 'or', 'er'] },
+      { word: 'cornbread', display: 'c__nbread', prompt: 'Bossy-R sound after C!', answer: 'or', options: ['ar', 'or', 'er'] },
+      { word: 'popcorn', display: 'pop_orn', prompt: 'C vs K rule on root word!', answer: 'c', options: ['k', 'ck', 'c'] }
     ];
 
     const HARVEST_CYCLES = {
@@ -2025,6 +2040,7 @@
       muted: false,
       forceMediaAudio: false,
       lastSavedAt: 'Not yet saved',
+      lastSavedTs: 0,
       stars: { slicer: false, spices: false, harvest: false, storybook: false, mathlab: false },
       signOff: { sun: false, mon: false, tue: false, bonus: false },
       // Daily interactive fields
@@ -2045,6 +2061,7 @@
       activeCycle: 'pumpkin',
       retellCompleted: {},
       dashBestCatches: 0,
+      dashCoinsEarnedToday: 0,
       scriptIdx: 0,
       pass1Done: false,
       pass2Done: false,
@@ -2053,6 +2070,7 @@
       drawingDataUrl: '',
       flashFilter: 'challenger',
       flashSolvedCount: 0,
+      flashCoinsEarnedToday: 0,
       mixIdx: 0,
       mixSolved: {},
       trailIdx: 0,
@@ -2065,11 +2083,41 @@
       timerRunning: false
     };
 
+    function isPlainObject(val) {
+      return !!val && typeof val === 'object' && !Array.isArray(val);
+    }
+
+    function isValidStatePayload(data) {
+      if (!isPlainObject(data)) return false;
+      return (
+        'coins' in data ||
+        'stars' in data ||
+        'signOff' in data ||
+        'ritualChecks' in data ||
+        'weekId' in data
+      );
+    }
+
+    function payloadProgressScore(data) {
+      if (!isPlainObject(data)) return 0;
+      const coins = typeof data.coins === 'number' ? data.coins : 0;
+      const stars = isPlainObject(data.stars) ? Object.values(data.stars).filter(Boolean).length : 0;
+      const signOffs = isPlainObject(data.signOff) ? Object.values(data.signOff).filter(Boolean).length : 0;
+      const drawingBonus = typeof data.drawingDataUrl === 'string' && data.drawingDataUrl.startsWith('data:image/') ? 10 : 0;
+      return coins + stars * 100 + signOffs * 25 + drawingBonus;
+    }
+
+    function findFirstUnmasteredBakeoffIdx() {
+      const idx = SPELLING_WORDS.findIndex((w) => !state.bakeoffCorrect[w.word]);
+      return idx >= 0 ? idx : 0;
+    }
+
     function getSerializablePayload({ includeDrawing = true } = {}) {
       return {
         version: 1,
         weekId: SESSION_METADATA.weekId,
         savedAt: state.lastSavedAt,
+        savedAtMs: state.lastSavedTs,
         coins: state.coins,
         streak: state.streak,
         muted: state.muted,
@@ -2089,12 +2137,14 @@
         bakeoffCorrect: { ...state.bakeoffCorrect },
         retellCompleted: { ...state.retellCompleted },
         dashBestCatches: state.dashBestCatches,
+        dashCoinsEarnedToday: state.dashCoinsEarnedToday,
         pass1Done: state.pass1Done,
         pass2Done: state.pass2Done,
         thankfulSentence: state.thankfulSentence,
         thankfulClaimed: state.thankfulClaimed,
         drawingDataUrl: includeDrawing ? state.drawingDataUrl : '',
         flashSolvedCount: state.flashSolvedCount,
+        flashCoinsEarnedToday: state.flashCoinsEarnedToday,
         mixSolved: { ...state.mixSolved },
         trailPpwUnlocked: { ...state.trailPpwUnlocked },
         trailSolved: { ...state.trailSolved },
@@ -2103,43 +2153,59 @@
     }
 
     function applyPayloadToState(data) {
-      if (!data || typeof data !== 'object') return false;
-      if (typeof data.coins === 'number') state.coins = Math.max(0, Math.floor(data.coins));
-      if (typeof data.streak === 'number') state.streak = Math.max(0, Math.floor(data.streak));
+      if (!isValidStatePayload(data)) return false;
+      if (typeof data.coins === 'number' && Number.isFinite(data.coins)) state.coins = Math.max(0, Math.floor(data.coins));
+      if (typeof data.streak === 'number' && Number.isFinite(data.streak)) state.streak = Math.max(0, Math.floor(data.streak));
       if (typeof data.muted === 'boolean') state.muted = data.muted;
       if (typeof data.forceMediaAudio === 'boolean') state.forceMediaAudio = data.forceMediaAudio;
       if (typeof data.savedAt === 'string') state.lastSavedAt = data.savedAt;
-      if (data.stars && typeof data.stars === 'object') {
+      if (typeof data.savedAtMs === 'number' && Number.isFinite(data.savedAtMs)) state.lastSavedTs = Math.max(0, data.savedAtMs);
+      if (isPlainObject(data.stars)) {
         Object.keys(state.stars).forEach((k) => { state.stars[k] = !!data.stars[k]; });
       }
-      if (data.signOff && typeof data.signOff === 'object') {
+      if (isPlainObject(data.signOff)) {
         Object.keys(state.signOff).forEach((k) => { state.signOff[k] = !!data.signOff[k]; });
       }
       if (typeof data.affirmationClaimed === 'boolean') state.affirmationClaimed = data.affirmationClaimed;
-      if (data.ritualChecks) Object.assign(state.ritualChecks, data.ritualChecks);
-      if (data.ritualStepRewarded) Object.assign(state.ritualStepRewarded, data.ritualStepRewarded);
+      if (isPlainObject(data.ritualChecks)) {
+        Object.keys(state.ritualChecks).forEach((k) => { state.ritualChecks[k] = !!data.ritualChecks[k]; });
+      }
+      if (isPlainObject(data.ritualStepRewarded)) {
+        Object.keys(state.ritualStepRewarded).forEach((k) => { state.ritualStepRewarded[k] = !!data.ritualStepRewarded[k]; });
+      }
       if (typeof data.ritualAllBonusClaimed === 'boolean') state.ritualAllBonusClaimed = data.ritualAllBonusClaimed;
-      if (data.slicerSliced) state.slicerSliced = { ...data.slicerSliced };
-      if (data.slicerRuleDone) state.slicerRuleDone = { ...data.slicerRuleDone };
-      if (data.slicerFused) state.slicerFused = { ...data.slicerFused };
-      if (data.sortedWords) state.sortedWords = { ...data.sortedWords };
-      if (data.sortedWordsRewarded) state.sortedWordsRewarded = { ...data.sortedWordsRewarded };
-      if (data.crackedPadlocks) state.crackedPadlocks = { ...data.crackedPadlocks };
-      if (data.bakeoffCorrect) state.bakeoffCorrect = { ...data.bakeoffCorrect };
-      if (data.retellCompleted) state.retellCompleted = { ...data.retellCompleted };
-      if (typeof data.dashBestCatches === 'number') state.dashBestCatches = data.dashBestCatches;
+      if (isPlainObject(data.slicerSliced)) state.slicerSliced = { ...data.slicerSliced };
+      if (isPlainObject(data.slicerRuleDone)) state.slicerRuleDone = { ...data.slicerRuleDone };
+      if (isPlainObject(data.slicerFused)) state.slicerFused = { ...data.slicerFused };
+      if (isPlainObject(data.sortedWords)) state.sortedWords = { ...data.sortedWords };
+      if (isPlainObject(data.sortedWordsRewarded)) state.sortedWordsRewarded = { ...data.sortedWordsRewarded };
+      if (isPlainObject(data.crackedPadlocks)) state.crackedPadlocks = { ...data.crackedPadlocks };
+      if (isPlainObject(data.bakeoffCorrect)) state.bakeoffCorrect = { ...data.bakeoffCorrect };
+      if (isPlainObject(data.retellCompleted)) state.retellCompleted = { ...data.retellCompleted };
+      if (typeof data.dashBestCatches === 'number' && Number.isFinite(data.dashBestCatches)) state.dashBestCatches = Math.max(0, Math.floor(data.dashBestCatches));
+      if (typeof data.dashCoinsEarnedToday === 'number' && Number.isFinite(data.dashCoinsEarnedToday)) state.dashCoinsEarnedToday = Math.max(0, Math.floor(data.dashCoinsEarnedToday));
       if (typeof data.pass1Done === 'boolean') state.pass1Done = data.pass1Done;
       if (typeof data.pass2Done === 'boolean') state.pass2Done = data.pass2Done;
-      if (typeof data.thankfulSentence === 'string') state.thankfulSentence = data.thankfulSentence;
-      if (typeof data.thankfulClaimed === 'boolean') state.thankfulClaimed = data.thankfulClaimed;
-      if (typeof data.drawingDataUrl === 'string' && data.drawingDataUrl.startsWith('data:image/')) {
-        state.drawingDataUrl = data.drawingDataUrl;
+      if (typeof data.thankfulSentence === 'string') {
+        state.thankfulSentence = data.thankfulSentence;
+        const tInput = document.getElementById('thankfulInput');
+        if (tInput) tInput.value = state.thankfulSentence;
       }
-      if (typeof data.flashSolvedCount === 'number') state.flashSolvedCount = data.flashSolvedCount;
-      if (data.mixSolved) state.mixSolved = { ...data.mixSolved };
-      if (data.trailPpwUnlocked) state.trailPpwUnlocked = { ...data.trailPpwUnlocked };
-      if (data.trailSolved) state.trailSolved = { ...data.trailSolved };
-      if (data.coinSolved) state.coinSolved = { ...data.coinSolved };
+      if (typeof data.thankfulClaimed === 'boolean') state.thankfulClaimed = data.thankfulClaimed;
+      if (typeof data.drawingDataUrl === 'string') {
+        if (data.drawingDataUrl.startsWith('data:image/')) {
+          state.drawingDataUrl = data.drawingDataUrl;
+        } else if (data.drawingDataUrl === '') {
+          state.drawingDataUrl = '';
+        }
+      }
+      if (typeof data.flashSolvedCount === 'number' && Number.isFinite(data.flashSolvedCount)) state.flashSolvedCount = Math.max(0, Math.floor(data.flashSolvedCount));
+      if (typeof data.flashCoinsEarnedToday === 'number' && Number.isFinite(data.flashCoinsEarnedToday)) state.flashCoinsEarnedToday = Math.max(0, Math.floor(data.flashCoinsEarnedToday));
+      if (isPlainObject(data.mixSolved)) state.mixSolved = { ...data.mixSolved };
+      if (isPlainObject(data.trailPpwUnlocked)) state.trailPpwUnlocked = { ...data.trailPpwUnlocked };
+      if (isPlainObject(data.trailSolved)) state.trailSolved = { ...data.trailSolved };
+      if (isPlainObject(data.coinSolved)) state.coinSolved = { ...data.coinSolved };
+      state.bakeoffIdx = findFirstUnmasteredBakeoffIdx();
       return true;
     }
 
@@ -2176,8 +2242,11 @@
       }
     }
 
-    function saveState() {
-      state.lastSavedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    function saveState({ touchTimestamp = true } = {}) {
+      if (touchTimestamp) {
+        state.lastSavedTs = Date.now();
+        state.lastSavedAt = new Date(state.lastSavedTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
       const payload = getSerializablePayload({ includeDrawing: true });
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -2198,30 +2267,56 @@
     }
 
     function loadSavedState() {
-      let loaded = false;
+      let localPayload = null;
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
-          loaded = applyPayloadToState(JSON.parse(raw));
+          const parsed = JSON.parse(raw);
+          if (isValidStatePayload(parsed)) localPayload = parsed;
         }
       } catch (e) {}
 
-      if (!loaded && window.__VIOLET_QUEST_STATE__ && typeof window.__VIOLET_QUEST_STATE__ === 'object') {
-        loaded = applyPayloadToState(window.__VIOLET_QUEST_STATE__);
-        if (loaded) saveState();
-      }
-
-      if (!loaded) {
+      let bakedPayload = null;
+      if (isValidStatePayload(window.__VIOLET_QUEST_STATE__)) {
+        bakedPayload = window.__VIOLET_QUEST_STATE__;
+      } else {
         try {
           const hiddenRaw = document.getElementById('quest-hidden-state-json')?.value;
           if (hiddenRaw && hiddenRaw.startsWith('{')) {
-            loaded = applyPayloadToState(JSON.parse(hiddenRaw));
-            if (loaded) saveState();
+            const parsedHidden = JSON.parse(hiddenRaw);
+            if (isValidStatePayload(parsedHidden)) bakedPayload = parsedHidden;
           }
         } catch (e) {}
       }
 
-      syncInlineFormAndTelemetry();
+      let loaded = false;
+      let loadedFromBaked = false;
+      if (bakedPayload && localPayload) {
+        const bakedTs = typeof bakedPayload.savedAtMs === 'number' ? bakedPayload.savedAtMs : 0;
+        const localTs = typeof localPayload.savedAtMs === 'number' ? localPayload.savedAtMs : 0;
+        if (bakedTs > localTs) {
+          loaded = applyPayloadToState(bakedPayload);
+          loadedFromBaked = loaded;
+        } else if (localTs > bakedTs) {
+          loaded = applyPayloadToState(localPayload);
+        } else if (payloadProgressScore(bakedPayload) > payloadProgressScore(localPayload)) {
+          loaded = applyPayloadToState(bakedPayload);
+          loadedFromBaked = loaded;
+        } else {
+          loaded = applyPayloadToState(localPayload);
+        }
+      } else if (bakedPayload) {
+        loaded = applyPayloadToState(bakedPayload);
+        loadedFromBaked = loaded;
+      } else if (localPayload) {
+        loaded = applyPayloadToState(localPayload);
+      }
+
+      if (loadedFromBaked) {
+        saveState({ touchTimestamp: false });
+      } else {
+        syncInlineFormAndTelemetry();
+      }
       return loaded;
     }
 
@@ -2727,12 +2822,19 @@
         amber: 'bg-amber-950/90 border-amber-400/60 text-amber-100',
         pink: 'bg-pink-950/90 border-pink-400/60 text-pink-100'
       };
-      el.className = `rounded-2xl px-4 py-3 border shadow-lg flex items-center gap-3 text-sm sm:text-base font-bold transition ${tones[tone] || tones.emerald}`;
+      el.className = `rounded-2xl px-4 py-3 border shadow-2xl backdrop-blur-md flex items-center gap-3 text-sm sm:text-base font-bold transition ${tones[tone] || tones.emerald}`;
       document.getElementById('feedbackEmoji').textContent = emoji;
       document.getElementById('feedbackText').textContent = message;
       el.classList.remove('hidden');
       if (bannerTimer) clearTimeout(bannerTimer);
       bannerTimer = setTimeout(() => el.classList.add('hidden'), 5200);
+    }
+    const feedbackBannerEl = document.getElementById('feedbackBanner');
+    if (feedbackBannerEl) {
+      feedbackBannerEl.addEventListener('click', () => {
+        if (bannerTimer) { clearTimeout(bannerTimer); bannerTimer = null; }
+        feedbackBannerEl.classList.add('hidden');
+      });
     }
 
     function updateTopHud() {
@@ -2770,6 +2872,9 @@
 
     // Navigation
     function switchTab(tabId) {
+      if (tabId !== 'harvest' && typeof pausePieDash === 'function') {
+        pausePieDash();
+      }
       state.activeTab = tabId;
       document.querySelectorAll('.stage-view').forEach((sec) => {
         sec.classList.toggle('hidden', sec.id !== `view-${tabId}`);
@@ -2791,7 +2896,13 @@
 
     document.getElementById('muteBtn').addEventListener('click', () => {
       state.muted = !state.muted;
-      if (state.muted) stopFallbackAudioPlayback();
+      if (state.muted) {
+        activeSpeechSeqId += 1;
+        stopFallbackAudioPlayback();
+        try {
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        } catch (e) {}
+      }
       saveState();
       updateTopHud();
       showBanner(state.muted ? '🔇' : '🔊', state.muted ? 'Bakery audio muted.' : 'Bakery audio & voice ON!', 'pink');
@@ -2813,15 +2924,21 @@
       document.getElementById('timerToggleBtn').textContent = state.timerRunning ? 'Pause' : 'Start';
     }
     document.getElementById('timerToggleBtn').addEventListener('click', () => {
+      if (!state.timerRunning && state.timerRemainingSec <= 0) {
+        state.timerRemainingSec = 3600;
+      }
       state.timerRunning = !state.timerRunning;
       if (state.timerRunning) {
+        if (timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
-          if (state.timerRemainingSec > 0) {
+          if (state.timerRemainingSec > 1) {
             state.timerRemainingSec -= 1;
             renderTimer();
           } else {
+            state.timerRemainingSec = 0;
             state.timerRunning = false;
             clearInterval(timerInterval);
+            timerInterval = null;
             playSound('fanfare');
             showBanner('⏰', '1-Hour Bakery Sprint Complete! Amazing work, Chef Violet!', 'amber');
             renderTimer();
@@ -2850,6 +2967,9 @@
         awardCoins(5);
         launchSparkles(35);
         showBanner('🌟', 'Affirmation claimed! +5 Bakery Coins — You really CAN, Chef Violet!', 'amber');
+      } else {
+        playSound('click');
+        showBanner('🌟', 'Encore Affirmation! You really CAN change the universe, Chef Violet!', 'pink');
       }
       renderRitual();
     });
@@ -3025,16 +3145,21 @@
           cb.className = `glitter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold border transition ${
             isRuleDone && isCorrectChoice
               ? 'bg-emerald-400 text-purple-950 border-emerald-200'
-              : 'bg-purple-900 hover:bg-purple-800 text-pink-100 border-pink-400/40'
+              : isRuleDone
+                ? 'bg-purple-950/70 text-pink-200/60 border-purple-500/40 opacity-50'
+                : 'bg-purple-900 hover:bg-purple-800 text-pink-100 border-pink-400/40'
           }`;
           cb.textContent = choiceText;
           cb.addEventListener('click', () => {
+            if (state.slicerRuleDone[current.word]) {
+              playSound('click');
+              showBanner('✨', isFused ? `"${current.word}" is already baked! Pick the next pie tab above!` : `Phonics secret unlocked! Now tap ✨ Fuse Recipe below!`, 'emerald');
+              return;
+            }
             if (isCorrectChoice) {
-              if (!state.slicerRuleDone[current.word]) {
-                state.slicerRuleDone[current.word] = true;
-                awardCoins(5);
-                showBanner('✨', `Spot on! ${choiceText} — now tap Fuse Recipe!`, 'emerald');
-              }
+              state.slicerRuleDone[current.word] = true;
+              awardCoins(5);
+              showBanner('✨', `Spot on! ${choiceText} — now tap Fuse Recipe! (+5 Coins)`, 'emerald');
               renderSlicer();
             } else {
               playSound('error');
@@ -3161,13 +3286,15 @@
           if (targetObj && targetObj.jar === jar.id) {
             state.sortedWords[targetObj.word] = jar.id;
             state.selectedSortWord = null;
-            if (!state.sortedWordsRewarded[targetObj.word]) {
+            const earnedNew = !state.sortedWordsRewarded[targetObj.word];
+            if (earnedNew) {
               state.sortedWordsRewarded[targetObj.word] = true;
               awardCoins(5);
             } else {
+              playSound('click');
               saveState();
             }
-            showBanner('🫙', `Perfect! "${targetObj.word}" locks into ${jar.label}! (+5 Coins)`, 'emerald');
+            showBanner('🫙', `Perfect! "${targetObj.word}" locks into ${jar.label}!${earnedNew ? ' (+5 Coins)' : ''}`, 'emerald');
             checkSpicesStarUnlock();
             renderSpicesSorter();
           } else {
@@ -3209,19 +3336,25 @@
           btn.className = `px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold border transition ${
             done && opt === p.answer
               ? 'bg-emerald-400 text-purple-950 border-emerald-200'
-              : 'bg-purple-900 hover:bg-purple-800 text-pink-100 border-pink-400/40'
+              : done
+                ? 'bg-purple-950/70 text-pink-200/60 border-purple-500/40 opacity-50'
+                : 'bg-purple-900 hover:bg-purple-800 text-pink-100 border-pink-400/40'
           }`;
           btn.textContent = opt;
           btn.addEventListener('click', () => {
+            if (state.crackedPadlocks[p.word]) {
+              playSound('click');
+              speakText(p.word);
+              showBanner('🔓', `"${p.word}" is already unlocked! Great practice!`, 'emerald');
+              return;
+            }
             if (opt === p.answer) {
-              if (!state.crackedPadlocks[p.word]) {
-                state.crackedPadlocks[p.word] = true;
-                awardCoins(5);
-                speakText(p.word);
-                showBanner('🔓', `Padlock Popped! "${p.word}" unlocked! (+5 Coins)`, 'emerald');
-                checkSpicesStarUnlock();
-                renderPadlocks();
-              }
+              state.crackedPadlocks[p.word] = true;
+              awardCoins(5);
+              speakText(p.word);
+              showBanner('🔓', `Padlock Popped! "${p.word}" unlocked! (+5 Coins)`, 'emerald');
+              checkSpicesStarUnlock();
+              renderPadlocks();
             } else {
               playSound('error');
               showBanner('🐢', 'Wait and listen carefully to the sounds — try another key!', 'amber');
@@ -3233,9 +3366,23 @@
       });
     }
 
+    function advanceBakeoffIndex() {
+      for (let step = 1; step <= SPELLING_WORDS.length; step++) {
+        const cand = (state.bakeoffIdx + step) % SPELLING_WORDS.length;
+        if (!state.bakeoffCorrect[SPELLING_WORDS[cand].word]) {
+          state.bakeoffIdx = cand;
+          return true;
+        }
+      }
+      state.bakeoffIdx = (state.bakeoffIdx + 1) % SPELLING_WORDS.length;
+      return false;
+    }
+
     function renderBakeoff() {
       const done = Object.keys(state.bakeoffCorrect).length;
-      document.getElementById('bakeoffCount').textContent = `Word ${state.bakeoffIdx + 1} of 10 • ${done} / 10 Correct`;
+      const item = SPELLING_WORDS[state.bakeoffIdx];
+      const badge = state.bakeoffCorrect[item.word] ? ' ✓' : '';
+      document.getElementById('bakeoffCount').textContent = `Word ${state.bakeoffIdx + 1} of 10${badge} • ${done} / 10 Correct`;
     }
 
     document.getElementById('bakeoffHearBtn').addEventListener('click', () => {
@@ -3250,6 +3397,15 @@
       box.classList.remove('hidden');
     });
 
+    document.getElementById('bakeoffNextBtn').addEventListener('click', () => {
+      advanceBakeoffIndex();
+      playSound('click');
+      document.getElementById('bakeoffInput').value = '';
+      document.getElementById('bakeoffHintBox').classList.add('hidden');
+      document.getElementById('bakeoffFeedback').textContent = '';
+      renderBakeoff();
+    });
+
     function checkBakeoffWord() {
       const input = document.getElementById('bakeoffInput');
       const fb = document.getElementById('bakeoffFeedback');
@@ -3258,21 +3414,34 @@
       if (!guess) return;
 
       if (guess === item.word) {
-        if (!state.bakeoffCorrect[item.word]) {
+        const earnedNew = !state.bakeoffCorrect[item.word];
+        if (earnedNew) {
           state.bakeoffCorrect[item.word] = true;
           awardCoins(8);
+        } else {
+          playSound('coin');
         }
-        fb.className = 'text-sm font-extrabold text-emerald-300';
-        fb.textContent = `✅ Golden Bake! "${item.word}" is spelled perfectly! Moving to next recipe word...`;
         input.value = '';
         document.getElementById('bakeoffHintBox').classList.add('hidden');
         checkSpicesStarUnlock();
-        state.bakeoffIdx = (state.bakeoffIdx + 1) % SPELLING_WORDS.length;
+        const totalMastered = Object.keys(state.bakeoffCorrect).length;
+        fb.className = 'text-sm font-extrabold text-emerald-300';
+        if (totalMastered >= SPELLING_WORDS.length) {
+          launchSparkles(70);
+          fb.textContent = `🏆 10 / 10 MASTER BAKER! "${item.word}" nailed! Every bakery spelling word is mastered!`;
+          showBanner('🏆', '10 / 10 Audio Bake-Off Mastered! Amazing spelling, Chef Violet!', 'amber');
+          state.bakeoffIdx = (state.bakeoffIdx + 1) % SPELLING_WORDS.length;
+        } else {
+          fb.textContent = `✅ Golden Bake! "${item.word}" is spelled perfectly!${earnedNew ? ' (+8 Coins)' : ''} Ready for the next word!`;
+          advanceBakeoffIndex();
+        }
         renderBakeoff();
       } else {
         playSound('error');
         fb.className = 'text-sm font-extrabold text-amber-300';
-        if (guess.includes('k') && item.word.includes('c') && !guess.includes('c')) {
+        const guessKCount = (guess.match(/k/g) || []).length;
+        const targetKCount = (item.word.match(/k/g) || []).length;
+        if (guessKCount > targetKCount && item.word.includes('c')) {
           fb.textContent = '🐢 Pause & check Mrs. Ulrich\'s C vs. K rule! Try using C and arm-tap the sounds!';
         } else {
           fb.textContent = '🐢 Slow down, arm-tap each syllable on your arm, and check the vowel team or Bossy-R!';
@@ -3290,10 +3459,21 @@
     let retellPoolIds = [];
     let retellPlacedIds = [];
 
+    function fisherYatesShuffle(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = tmp;
+      }
+      return copy;
+    }
+
     function resetRetellCycle(cycleKey) {
       state.activeCycle = cycleKey;
       const steps = HARVEST_CYCLES[cycleKey].steps;
-      retellPoolIds = steps.map((s) => s.id).sort(() => Math.random() - 0.5);
+      retellPoolIds = fisherYatesShuffle(steps.map((s) => s.id));
       // Guarantee shuffled order isn't already identical to answer
       if (retellPoolIds.every((id, idx) => id === steps[idx].id)) {
         retellPoolIds.reverse();
@@ -3313,6 +3493,9 @@
       const poolEl = document.getElementById('retellPool');
       const slotsEl = document.getElementById('retellSlots');
       const statusEl = document.getElementById('retellStatus');
+      const lgColsClass = cycle.steps.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-5';
+      poolEl.className = `grid grid-cols-1 sm:grid-cols-2 ${lgColsClass} gap-2.5`;
+      slotsEl.className = `grid grid-cols-1 sm:grid-cols-2 ${lgColsClass} gap-2.5`;
       poolEl.innerHTML = '';
       slotsEl.innerHTML = '';
 
@@ -3393,12 +3576,22 @@
       }
       const allRight = cycle.steps.every((s, idx) => retellPlacedIds[idx] === s.id);
       if (allRight) {
-        if (!state.retellCompleted[state.activeCycle]) {
+        const earnedNew = !state.retellCompleted[state.activeCycle];
+        if (earnedNew) {
           state.retellCompleted[state.activeCycle] = true;
           awardCoins(15);
           launchSparkles(55);
+        } else {
+          playSound('coin');
+          launchSparkles(30);
         }
-        showBanner('🎃', `Brilliant 5-Finger Retell! You sequenced ${cycle.title} perfectly! (+15 Coins)`, 'emerald');
+        showBanner(
+          '🎃',
+          earnedNew
+            ? `Brilliant 5-Finger Retell! You sequenced ${cycle.title} perfectly! (+15 Coins)`
+            : `Encore Retell! You sequenced ${cycle.title} perfectly again!`,
+          'emerald'
+        );
         renderRetell();
       } else {
         playSound('error');
@@ -3407,6 +3600,7 @@
     });
 
     // --- Turkey Pie-Tray Dash Canvas Arcade ---
+    const DASH_DAILY_COIN_CAP = 20;
     const dashCanvas = document.getElementById('pieDashCanvas');
     const dashCtx = dashCanvas ? dashCanvas.getContext('2d') : null;
     const pieDash = {
@@ -3418,6 +3612,20 @@
       spawnTick: 0,
       animId: null
     };
+
+    function pausePieDash() {
+      if (!pieDash.running && !pieDash.animId) return;
+      pieDash.running = false;
+      if (pieDash.animId) {
+        cancelAnimationFrame(pieDash.animId);
+        pieDash.animId = null;
+      }
+      const btn = document.getElementById('dashStartBtn');
+      if (btn) {
+        btn.textContent = pieDash.catches > 0 && pieDash.catches < 10 ? '▶️ Resume Dash!' : '▶️ Start Dash!';
+      }
+      drawPieDash();
+    }
 
     function drawPieDash() {
       if (!dashCtx) return;
@@ -3440,14 +3648,16 @@
 
       // Falling items
       pieDash.items.forEach((it) => {
+        dashCtx.fillStyle = '#ffffff';
         dashCtx.font = '28px sans-serif';
         dashCtx.textAlign = 'center';
         dashCtx.fillText(it.emoji, it.x, it.y);
         if (it.label) {
-          dashCtx.fillStyle = it.bad ? 'rgba(244,63,94,0.85)' : 'rgba(244,114,182,0.88)';
-          dashCtx.fillRect(it.x - 36, it.y + 6, 72, 18);
-          dashCtx.fillStyle = '#fff';
           dashCtx.font = 'bold 11px Inter, sans-serif';
+          const pillW = Math.max(72, Math.ceil(dashCtx.measureText(it.label).width) + 14);
+          dashCtx.fillStyle = it.bad ? 'rgba(244,63,94,0.88)' : 'rgba(244,114,182,0.9)';
+          dashCtx.fillRect(it.x - pillW / 2, it.y + 6, pillW, 18);
+          dashCtx.fillStyle = '#fff';
           dashCtx.fillText(it.label, it.x, it.y + 19);
         }
       });
@@ -3457,6 +3667,7 @@
       dashCtx.fillRect(pieDash.trayX, H - 34, pieDash.trayW, 14);
       dashCtx.fillStyle = '#f472b6';
       dashCtx.fillRect(pieDash.trayX + 8, H - 22, pieDash.trayW - 16, 6);
+      dashCtx.fillStyle = '#ffffff';
       dashCtx.font = '24px sans-serif';
       dashCtx.textAlign = 'center';
       dashCtx.fillText('🦃✨', pieDash.trayX + pieDash.trayW / 2, H - 38);
@@ -3467,7 +3678,15 @@
         dashCtx.fillStyle = '#fde68a';
         dashCtx.font = 'bold 22px Fredoka, sans-serif';
         dashCtx.textAlign = 'center';
-        dashCtx.fillText('🥧 Tap "Start Dash!" to Catch Bakery Treats! ✨', W / 2, H / 2 - 6);
+        dashCtx.fillText(
+          pieDash.catches >= 10
+            ? '🏆 10 / 10 Treats Caught! Tap "Play Again!" ✨'
+            : pieDash.catches > 0
+              ? '⏸️ Paused — Tap "Resume Dash!" to Keep Catching!'
+              : '🥧 Tap "Start Dash!" to Catch Bakery Treats! ✨',
+          W / 2,
+          H / 2 - 6
+        );
         dashCtx.fillStyle = '#f9a8d4';
         dashCtx.font = 'bold 14px Inter, sans-serif';
         dashCtx.fillText('Catch 10 Pies, Cupcakes & Popcorn — Dodge Burnt Toast!', W / 2, H / 2 + 22);
@@ -3475,6 +3694,7 @@
     }
 
     function stepPieDash() {
+      pieDash.animId = null;
       if (!pieDash.running) { drawPieDash(); return; }
       const W = dashCanvas.width;
       const H = dashCanvas.height;
@@ -3485,7 +3705,7 @@
         const treatEmojis = ['🥧', '🧁', '🍿', '🥞', '🌽'];
         const wordObj = SPELLING_WORDS[Math.floor(Math.random() * SPELLING_WORDS.length)];
         pieDash.items.push({
-          x: 44 + Math.random() * (W - 88),
+          x: 52 + Math.random() * (W - 104),
           y: -15,
           vy: 2.1 + Math.random() * 1.4,
           bad: isBad,
@@ -3505,8 +3725,15 @@
             pieDash.catches += 1;
             if (pieDash.catches > state.dashBestCatches) state.dashBestCatches = pieDash.catches;
             document.getElementById('dashScore').textContent = `Treats: ${pieDash.catches} / 10`;
-            document.getElementById('dashCaughtWord').textContent = `✨ Caught "${it.label.toUpperCase()}"! Say it out loud!`;
-            awardCoins(2);
+            if (state.dashCoinsEarnedToday < DASH_DAILY_COIN_CAP) {
+              state.dashCoinsEarnedToday += 2;
+              document.getElementById('dashCaughtWord').textContent = `✨ Caught "${it.label.toUpperCase()}"! Say it out loud! (+2 🪙)`;
+              awardCoins(2);
+            } else {
+              document.getElementById('dashCaughtWord').textContent = `✨ Caught "${it.label.toUpperCase()}"! Bonus Practice — say it out loud!`;
+              playSound('coin');
+              saveState();
+            }
             speakText(it.label);
             if (pieDash.catches >= 10) {
               pieDash.running = false;
@@ -3532,17 +3759,23 @@
     }
 
     document.getElementById('dashStartBtn').addEventListener('click', () => {
-      pieDash.running = !pieDash.running;
       if (pieDash.running) {
-        if (pieDash.catches >= 10) pieDash.catches = 0;
-        pieDash.items = [];
-        document.getElementById('dashScore').textContent = `Treats: ${pieDash.catches} / 10`;
-        document.getElementById('dashStartBtn').textContent = '⏸️ Pause Dash';
-        stepPieDash();
-      } else {
-        document.getElementById('dashStartBtn').textContent = '▶️ Resume Dash!';
-        drawPieDash();
+        pausePieDash();
+        return;
       }
+      if (pieDash.animId) {
+        cancelAnimationFrame(pieDash.animId);
+        pieDash.animId = null;
+      }
+      if (pieDash.catches >= 10 || pieDash.catches === 0) {
+        pieDash.catches = 0;
+        pieDash.items = [];
+        pieDash.spawnTick = 32; // Spawn first treat promptly
+      }
+      pieDash.running = true;
+      document.getElementById('dashScore').textContent = `Treats: ${pieDash.catches} / 10`;
+      document.getElementById('dashStartBtn').textContent = '⏸️ Pause Dash';
+      stepPieDash();
     });
     document.getElementById('dashLeftBtn').addEventListener('click', () => moveTray(-56));
     document.getElementById('dashRightBtn').addEventListener('click', () => moveTray(56));
@@ -3550,18 +3783,31 @@
     if (dashCanvas) {
       const handlePointer = (e) => {
         const rect = dashCanvas.getBoundingClientRect();
+        if (!rect.width) return;
         const scaleX = dashCanvas.width / rect.width;
         const x = (e.clientX - rect.left) * scaleX;
         pieDash.trayX = Math.max(8, Math.min(dashCanvas.width - pieDash.trayW - 8, x - pieDash.trayW / 2));
         drawPieDash();
       };
-      dashCanvas.addEventListener('pointerdown', handlePointer);
-      dashCanvas.addEventListener('pointermove', (e) => { if (e.buttons || e.pointerType === 'touch') handlePointer(e); });
+      dashCanvas.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        handlePointer(e);
+      });
+      dashCanvas.addEventListener('pointermove', (e) => {
+        if (e.buttons || e.pointerType === 'touch') {
+          e.preventDefault();
+          handlePointer(e);
+        }
+      });
     }
     window.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('parentModal');
+      const modalOpen = modal && !modal.classList.contains('hidden');
+      const tag = document.activeElement ? document.activeElement.tagName : '';
+      if (modalOpen || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (state.activeTab === 'harvest' && pieDash.running) {
-        if (e.key === 'ArrowLeft') moveTray(-42);
-        if (e.key === 'ArrowRight') moveTray(42);
+        if (e.key === 'ArrowLeft') { e.preventDefault(); moveTray(-42); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); moveTray(42); }
       }
     });
 
@@ -3595,6 +3841,20 @@
       if (tInput && state.thankfulSentence && !tInput.value) {
         tInput.value = state.thankfulSentence;
       }
+      const tStatus = document.getElementById('thankfulStatus');
+      const tBtn = document.getElementById('thankfulCheckBtn');
+      if (tStatus) {
+        if (state.thankfulClaimed) {
+          tStatus.className = 'text-xs sm:text-sm font-extrabold text-emerald-300';
+          tStatus.textContent = '💖 Thankful Menu Card Stamped! Beautiful complete sentence, Chef Violet!';
+        } else {
+          tStatus.className = 'text-xs sm:text-sm font-bold text-pink-200';
+          tStatus.textContent = 'Checklist: Capital letter • Spaces • Ending mark (. ! ?)';
+        }
+      }
+      if (tBtn) {
+        tBtn.textContent = state.thankfulClaimed ? '✅ Update Menu Card (Stamped ✓)' : '✅ Stamp Menu Card (+10 🪙)';
+      }
       if ((state.pass1Done && state.pass2Done) || state.thankfulClaimed) {
         unlockStar('storybook', 'Golden Spoon Storyteller');
       }
@@ -3615,6 +3875,9 @@
         state.pass1Done = true;
         awardCoins(10);
         showBanner('📖', 'Awesome smooth reading on Pass 1! Now try Pass 2 with silly character voices for the "quotes"!', 'emerald');
+      } else {
+        playSound('click');
+        showBanner('📖', 'Encore Pass 1 reading! Super smooth, Chef Violet!', 'pink');
       }
       renderStorybook();
     });
@@ -3624,6 +3887,10 @@
         awardCoins(10);
         launchSparkles(45);
         showBanner('🎭', 'Bravo! Amazing character voices inside the quotation marks! (+10 Coins)', 'emerald');
+      } else {
+        playSound('click');
+        launchSparkles(25);
+        showBanner('🎭', 'Encore character voices! Your expressive reading shines!', 'pink');
       }
       renderStorybook();
     });
@@ -3637,8 +3904,8 @@
     document.getElementById('thankfulCheckBtn').addEventListener('click', () => {
       const txt = (document.getElementById('thankfulInput').value || '').trim();
       const status = document.getElementById('thankfulStatus');
-      const hasCap = /^[A-Z]/.test(txt);
-      const hasEnd = /[.!?]$/.test(txt);
+      const hasCap = /^["“”'‘’(\s]*[A-Z]/.test(txt);
+      const hasEnd = /[.!?]["“”'‘’)\s]*$/.test(txt);
       const wordCount = txt.split(/\s+/).filter(Boolean).length;
       if (!hasCap || !hasEnd || wordCount < 4) {
         playSound('error');
@@ -3647,15 +3914,18 @@
         return;
       }
       state.thankfulSentence = txt;
-      if (!state.thankfulClaimed) {
+      const earnedNew = !state.thankfulClaimed;
+      if (earnedNew) {
         state.thankfulClaimed = true;
         awardCoins(10);
         launchSparkles(50);
       } else {
+        playSound('coin');
         saveState();
       }
       status.className = 'text-xs sm:text-sm font-extrabold text-emerald-300';
       status.textContent = '💖 Thankful Menu Card Stamped! Beautiful complete sentence, Chef Violet!';
+      showBanner('💖', earnedNew ? 'Thankful Menu Card Stamped! (+10 Coins)' : 'Thankful Menu Card Updated & Saved!', 'emerald');
       speakText(txt);
       renderStorybook();
     });
@@ -3664,6 +3934,8 @@
     const drawCanvas = document.getElementById('drawCanvas');
     const drawCtx = drawCanvas ? drawCanvas.getContext('2d') : null;
     let isDrawing = false;
+    let lastDrawPoint = null;
+    let didDrawInStroke = false;
     let brushColor = '#f472b6';
     let glitterBrushOn = true;
 
@@ -3681,42 +3953,79 @@
     if (drawCanvas && drawCtx) {
       const getCanvasPos = (e) => {
         const rect = drawCanvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return null;
         return {
           x: (e.clientX - rect.left) * (drawCanvas.width / rect.width),
           y: (e.clientY - rect.top) * (drawCanvas.height / rect.height)
         };
       };
-      drawCanvas.addEventListener('pointerdown', (e) => {
-        isDrawing = true;
-        const p = getCanvasPos(e);
+      const sprinkleGlitterNear = (p) => {
+        drawCtx.fillStyle = Math.random() < 0.5 ? '#fde68a' : '#ffffff';
         drawCtx.beginPath();
-        drawCtx.moveTo(p.x, p.y);
+        drawCtx.arc(p.x + (Math.random() - 0.5) * 14, p.y + (Math.random() - 0.5) * 14, 1.8, 0, Math.PI * 2);
+        drawCtx.fill();
+      };
+      drawCanvas.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        const p = getCanvasPos(e);
+        if (!p) return;
+        isDrawing = true;
+        didDrawInStroke = true;
+        lastDrawPoint = p;
+        try { drawCanvas.setPointerCapture(e.pointerId); } catch (_) {}
+        // Render a crisp single-tap dot immediately on touch/click
+        drawCtx.fillStyle = brushColor;
+        drawCtx.beginPath();
+        drawCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        drawCtx.fill();
+        if (glitterBrushOn) sprinkleGlitterNear(p);
       });
       drawCanvas.addEventListener('pointermove', (e) => {
         if (!isDrawing) return;
+        e.preventDefault();
         const p = getCanvasPos(e);
+        if (!p || !lastDrawPoint) return;
         drawCtx.lineCap = 'round';
         drawCtx.lineJoin = 'round';
         drawCtx.lineWidth = 6;
         drawCtx.strokeStyle = brushColor;
+        drawCtx.beginPath();
+        drawCtx.moveTo(lastDrawPoint.x, lastDrawPoint.y);
         drawCtx.lineTo(p.x, p.y);
         drawCtx.stroke();
+        lastDrawPoint = p;
         if (glitterBrushOn && Math.random() < 0.45) {
-          drawCtx.fillStyle = Math.random() < 0.5 ? '#fde68a' : '#ffffff';
-          drawCtx.beginPath();
-          drawCtx.arc(p.x + (Math.random() - 0.5) * 14, p.y + (Math.random() - 0.5) * 14, 1.8, 0, Math.PI * 2);
-          drawCtx.fill();
+          sprinkleGlitterNear(p);
         }
       });
-      const endStroke = () => { isDrawing = false; };
+      const endStroke = (e) => {
+        if (!isDrawing) return;
+        isDrawing = false;
+        lastDrawPoint = null;
+        if (e && e.pointerId !== undefined) {
+          try { drawCanvas.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+        if (didDrawInStroke) {
+          didDrawInStroke = false;
+          try {
+            state.drawingDataUrl = drawCanvas.toDataURL('image/png');
+            saveState();
+          } catch (_) {}
+        }
+      };
       drawCanvas.addEventListener('pointerup', endStroke);
+      drawCanvas.addEventListener('pointercancel', endStroke);
       drawCanvas.addEventListener('pointerleave', endStroke);
     }
 
     document.querySelectorAll('.color-swatch').forEach((sw) => {
       sw.addEventListener('click', () => {
         brushColor = sw.getAttribute('data-color');
-        document.querySelectorAll('.color-swatch').forEach((b) => b.classList.remove('border-white', 'scale-110'));
+        document.querySelectorAll('.color-swatch').forEach((b) => {
+          b.classList.remove('border-white', 'scale-110');
+          b.classList.add('border-purple-200/40');
+        });
+        sw.classList.remove('border-purple-200/40');
         sw.classList.add('border-white', 'scale-110');
       });
     });
@@ -3768,12 +4077,14 @@
     }
 
     // --- Math Mode A: +5 Flashcard Sprint ---
+    const FLASH_DAILY_COIN_CAP = 80;
     let currentCard = FLASHCARD_DECK[0];
     function pickNextFlashcard() {
       const pool = state.flashFilter === 'challenger'
         ? FLASHCARD_DECK.filter((c) => c.group === 'challenger')
         : FLASHCARD_DECK;
-      currentCard = pool[Math.floor(Math.random() * pool.length)];
+      const filtered = pool.length > 1 ? pool.filter((c) => c !== currentCard) : pool;
+      currentCard = filtered[Math.floor(Math.random() * filtered.length)];
       renderFlashcard();
     }
 
@@ -3782,6 +4093,8 @@
       document.getElementById('flashScoreBadge').textContent = `${state.flashSolvedCount} Solved`;
       const hintBox = document.getElementById('flashVisualDots');
       hintBox.classList.add('hidden');
+      const hintToggleBtn = document.getElementById('flashHintToggleBtn');
+      if (hintToggleBtn) hintToggleBtn.textContent = '💡 Show Make-a-10 / Visual Dot Helper';
       const dotsA = '🟣'.repeat(currentCard.a);
       const dotsB = '🟡'.repeat(currentCard.b);
       hintBox.innerHTML = `<div class="mb-1 text-amber-200">${currentCard.tip}</div><div class="tracking-widest">${dotsA} + ${dotsB}</div>`;
@@ -3802,8 +4115,15 @@
         btn.addEventListener('click', () => {
           if (val === currentCard.ans) {
             state.flashSolvedCount += 1;
-            awardCoins(4);
-            showBanner('⚡', `Awesome! ${currentCard.a} + ${currentCard.b} = ${currentCard.ans}! (+4 Coins)`, 'emerald');
+            if (state.flashCoinsEarnedToday < FLASH_DAILY_COIN_CAP) {
+              state.flashCoinsEarnedToday += 4;
+              awardCoins(4);
+              showBanner('⚡', `Awesome! ${currentCard.a} + ${currentCard.b} = ${currentCard.ans}! (+4 Coins)`, 'emerald');
+            } else {
+              playSound('coin');
+              saveState();
+              showBanner('⚡', `Awesome! ${currentCard.a} + ${currentCard.b} = ${currentCard.ans}! (Bonus Practice!)`, 'emerald');
+            }
             checkMathStarUnlock();
             pickNextFlashcard();
           } else {
@@ -3825,51 +4145,53 @@
     document.getElementById('flashFilterChallenger').addEventListener('click', () => { state.flashFilter = 'challenger'; pickNextFlashcard(); });
     document.getElementById('flashFilterAll').addEventListener('click', () => { state.flashFilter = 'all'; pickNextFlashcard(); });
     document.getElementById('flashHintToggleBtn').addEventListener('click', () => {
-      document.getElementById('flashVisualDots').classList.toggle('hidden');
+      const box = document.getElementById('flashVisualDots');
+      const nowHidden = box.classList.toggle('hidden');
+      document.getElementById('flashHintToggleBtn').textContent = nowHidden
+        ? '💡 Show Make-a-10 / Visual Dot Helper'
+        : '🙈 Hide Visual Dot Helper';
     });
     document.getElementById('flashNextBtn').addEventListener('click', pickNextFlashcard);
 
     // --- Math Mode B: Mix-the-Bowl Expanded Notation ---
+    const MIX_INPUT_IDS = ['mixA10', 'mixA1', 'mixB10', 'mixB1', 'mixSumTens', 'mixSumOnes', 'mixFinalTotal'];
     function renderMixProblem() {
       const p = MIX_PROBLEMS[state.mixIdx];
       const solved = Object.keys(state.mixSolved).length;
-      document.getElementById('mixProblemTitle').textContent = `Mix #${state.mixIdx + 1}: ${p.a} + ${p.b} ${state.mixSolved[p.id] ? '✅' : ''}`;
+      const isSolved = !!state.mixSolved[p.id];
+      document.getElementById('mixProblemTitle').textContent = `Mix #${state.mixIdx + 1}: ${p.a} + ${p.b}${isSolved ? ' ✅' : ''}`;
       document.getElementById('mixProgressBadge').textContent = `${solved} / ${MIX_PROBLEMS.length} Mixed`;
       document.getElementById('mixHintText').textContent = p.story;
-      ['mixA10', 'mixA1', 'mixB10', 'mixB1', 'mixSumTens', 'mixSumOnes', 'mixFinalTotal'].forEach((id) => {
+      document.getElementById('mixCheckBtn').textContent = isSolved ? '🥣 Check Mix (Solved ✓)' : '🥣 Check Mix (+10 🪙)';
+      MIX_INPUT_IDS.forEach((id) => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
       document.getElementById('mixFeedback').textContent = '';
     }
 
-    document.getElementById('mixPrevBtn').addEventListener('click', () => {
-      state.mixIdx = (state.mixIdx - 1 + MIX_PROBLEMS.length) % MIX_PROBLEMS.length;
-      renderMixProblem();
-    });
-    document.getElementById('mixNextBtn').addEventListener('click', () => {
-      state.mixIdx = (state.mixIdx + 1) % MIX_PROBLEMS.length;
-      renderMixProblem();
-    });
-    document.getElementById('mixCheckBtn').addEventListener('click', () => {
+    function checkMixProblem() {
       const p = MIX_PROBLEMS[state.mixIdx];
       const a10 = Math.floor(p.a / 10) * 10;
       const a1 = p.a % 10;
       const b10 = Math.floor(p.b / 10) * 10;
       const b1 = p.b % 10;
-      const vA10 = Number(document.getElementById('mixA10').value);
-      const vA1 = Number(document.getElementById('mixA1').value);
-      const vB10 = Number(document.getElementById('mixB10').value);
-      const vB1 = Number(document.getElementById('mixB1').value);
-      const vST = Number(document.getElementById('mixSumTens').value);
-      const vSO = Number(document.getElementById('mixSumOnes').value);
-      const vTot = Number(document.getElementById('mixFinalTotal').value);
       const fb = document.getElementById('mixFeedback');
+
+      const rawVals = MIX_INPUT_IDS.map((id) => (document.getElementById(id).value || '').trim());
+      if (rawVals.some((v) => v === '')) {
+        playSound('error');
+        fb.className = 'text-sm font-extrabold text-amber-300 text-center';
+        fb.textContent = '🐢 Fill in all 7 mixing boxes (Tens, Ones, Add Tens, Add Ones, and Grand Total) before checking!';
+        return;
+      }
+
+      const [vA10, vA1, vB10, vB1, vST, vSO, vTot] = rawVals.map(Number);
 
       if (vA10 !== a10 || vA1 !== a1 || vB10 !== b10 || vB1 !== b1) {
         playSound('error');
         fb.className = 'text-sm font-extrabold text-amber-300 text-center';
-        fb.textContent = `🐢 Check your bowls! Break ${p.a} into tens (${a10}) + ones (${a1}), and ${p.b} into tens + ones!`;
+        fb.textContent = `🐢 Slow down and check your bowls! Break ${p.a} into its Tens + Ones, and break ${p.b} into its Tens + Ones!`;
         return;
       }
       if (vST !== a10 + b10 || vSO !== a1 + b1) {
@@ -3884,20 +4206,77 @@
         fb.textContent = `🐢 One last check! Combine ${a10 + b10} + ${a1 + b1} carefully!`;
         return;
       }
-      if (!state.mixSolved[p.id]) {
+      const earnedNew = !state.mixSolved[p.id];
+      if (earnedNew) {
         state.mixSolved[p.id] = true;
         awardCoins(10);
         launchSparkles(45);
+      } else {
+        playSound('coin');
       }
       fb.className = 'text-sm font-extrabold text-emerald-300 text-center';
-      fb.textContent = `🥣 BOOM! ${p.a} + ${p.b} = ${p.a + p.b}! Perfect Expanded Form!`;
+      fb.textContent = `🥣 BOOM! ${p.a} + ${p.b} = ${p.a + p.b}! Perfect Expanded Form!${earnedNew ? ' (+10 Coins)' : ''}`;
       speakText(`Boom! ${p.a} plus ${p.b} equals ${p.a + p.b}!`);
       checkMathStarUnlock();
+      document.getElementById('mixProblemTitle').textContent = `Mix #${state.mixIdx + 1}: ${p.a} + ${p.b} ✅`;
+      document.getElementById('mixCheckBtn').textContent = '🥣 Check Mix (Solved ✓)';
       document.getElementById('mixProgressBadge').textContent = `${Object.keys(state.mixSolved).length} / ${MIX_PROBLEMS.length} Mixed`;
+    }
+
+    document.getElementById('mixPrevBtn').addEventListener('click', () => {
+      state.mixIdx = (state.mixIdx - 1 + MIX_PROBLEMS.length) % MIX_PROBLEMS.length;
+      renderMixProblem();
+    });
+    document.getElementById('mixNextBtn').addEventListener('click', () => {
+      state.mixIdx = (state.mixIdx + 1) % MIX_PROBLEMS.length;
+      renderMixProblem();
+    });
+    document.getElementById('mixCheckBtn').addEventListener('click', checkMixProblem);
+    MIX_INPUT_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') checkMixProblem();
+        });
+      }
     });
 
     // --- Math Mode C: Part-Part-Whole & Bakery Trail Open Number Line ---
     let trailHops = [];
+
+    function updateTrailLockUI() {
+      const p = TRAIL_PROBLEMS[state.trailIdx];
+      const unlocked = !!state.trailPpwUnlocked[p.id];
+      const solved = !!state.trailSolved[p.id];
+
+      const btn1 = document.getElementById('ppwQuestionBtn1');
+      const btn2 = document.getElementById('ppwQuestionBtn2');
+      if (btn1) {
+        btn1.className = unlocked
+          ? 'glitter-btn px-3.5 py-1.5 rounded-xl bg-purple-950/70 border border-purple-500/40 text-xs sm:text-sm font-extrabold text-pink-200/60 opacity-50'
+          : 'glitter-btn px-3.5 py-1.5 rounded-xl bg-purple-800 hover:bg-purple-700 border border-pink-300/40 text-xs sm:text-sm font-extrabold text-white';
+      }
+      if (btn2) {
+        btn2.textContent = unlocked
+          ? '✅ Finding a MISSING PART (Subtract — Unlocked!)'
+          : '✂️ Finding a MISSING PART (Subtract)';
+        btn2.className = unlocked
+          ? 'glitter-btn px-3.5 py-1.5 rounded-xl bg-emerald-400 text-purple-950 border border-emerald-200 text-xs sm:text-sm font-extrabold shadow'
+          : 'glitter-btn px-3.5 py-1.5 rounded-xl bg-purple-800 hover:bg-purple-700 border border-pink-300/40 text-xs sm:text-sm font-extrabold text-white';
+      }
+      ['trailHop1Btn', 'trailHopFriendlyBtn', 'trailHop10Btn', 'trailUndoBtn', 'trailResetBtn', 'trailCheckBtn'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('opacity-50', !unlocked);
+      });
+      const checkBtn = document.getElementById('trailCheckBtn');
+      if (checkBtn) {
+        checkBtn.textContent = solved ? '✅ Check (Solved ✓)' : '✅ Check (+10 🪙)';
+      }
+      const storyEl = document.getElementById('ppwStoryText');
+      if (storyEl) {
+        storyEl.textContent = `Story #${state.trailIdx + 1}${solved ? ' ✅' : ''}: ${p.story}`;
+      }
+    }
 
     function drawTrailSvg() {
       const p = TRAIL_PROBLEMS[state.trailIdx];
@@ -3908,13 +4287,14 @@
       trailHops.forEach((h) => { cur -= h; pts.push(cur); });
       const totalHopped = p.start - cur;
 
-      // Map x from right (620) to left (70)
+      // Map x from right (615) to left (85)
       const maxSpan = Math.max(p.sub + 6, totalHopped + 4, 30);
       const xFor = (val) => 615 - ((p.start - val) / maxSpan) * 530;
 
       let markup = `<line x1="45" y1="108" x2="645" y2="108" stroke="#f472b6" stroke-width="4" stroke-linecap="round" />`;
       markup += `<text x="340" y="22" fill="#fde68a" font-size="14" font-weight="800" text-anchor="middle">Hopped Back: -${totalHopped} of -${p.sub} • Current Spot: ${cur}</text>`;
 
+      let lastArcLabelX = Infinity;
       for (let i = 0; i < trailHops.length; i++) {
         const fromVal = pts[i];
         const toVal = pts[i + 1];
@@ -3923,14 +4303,25 @@
         const midX = (x1 + x2) / 2;
         const arcH = trailHops[i] >= 10 ? 52 : 34;
         markup += `<path d="M ${x1} 106 Q ${midX} ${106 - arcH} ${x2} 106" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="${trailHops[i] >= 10 ? '' : '4 3'}" />`;
-        markup += `<text x="${midX}" y="${106 - arcH + 10}" fill="#fde68a" font-size="13" font-weight="800" text-anchor="middle">-${trailHops[i]}</text>`;
+        if (i === trailHops.length - 1 || Math.abs(lastArcLabelX - midX) >= 24) {
+          markup += `<text x="${midX}" y="${106 - arcH + 10}" fill="#fde68a" font-size="13" font-weight="800" text-anchor="middle">-${trailHops[i]}</text>`;
+          lastArcLabelX = midX;
+        }
       }
 
+      const lastX = xFor(pts[pts.length - 1]);
+      let lastPointLabelX = Infinity;
       pts.forEach((val, idx) => {
         const x = xFor(val);
+        const isFirst = idx === 0;
         const isLast = idx === pts.length - 1;
-        markup += `<circle cx="${x}" cy="108" r="${isLast ? 8 : 6}" fill="${isLast ? '#34d399' : '#f472b6'}" stroke="#fff" stroke-width="2" />`;
-        markup += `<text x="${x}" y="134" fill="${isLast ? '#6ee7b7' : '#fbcfe8'}" font-size="14" font-weight="800" text-anchor="middle">${val}</text>`;
+        markup += `<circle cx="${x}" cy="108" r="${isLast ? 8 : 5}" fill="${isLast ? '#34d399' : '#f472b6'}" stroke="#fff" stroke-width="2" />`;
+        const clearOfPrev = Math.abs(lastPointLabelX - x) >= 26;
+        const clearOfLast = isLast || Math.abs(x - lastX) >= 26;
+        if (isLast || (isFirst && clearOfLast) || (clearOfPrev && clearOfLast)) {
+          markup += `<text x="${x}" y="134" fill="${isLast ? '#6ee7b7' : '#fbcfe8'}" font-size="14" font-weight="800" text-anchor="middle">${val}</text>`;
+          lastPointLabelX = x;
+        }
       });
 
       svg.innerHTML = markup;
@@ -3939,35 +4330,72 @@
     function renderTrailProblem() {
       const p = TRAIL_PROBLEMS[state.trailIdx];
       trailHops = [];
-      document.getElementById('ppwStoryText').textContent = `Story #${state.trailIdx + 1}: ${p.story}`;
       document.getElementById('trailProgressBadge').textContent = `${Object.keys(state.trailSolved).length} / ${TRAIL_PROBLEMS.length} Solved`;
       document.getElementById('trailAnswerInput').value = '';
       const unlocked = !!state.trailPpwUnlocked[p.id];
       document.getElementById('trailFeedback').className = 'text-sm font-bold text-pink-200';
       document.getElementById('trailFeedback').textContent = unlocked
         ? '✅ Detective Unlocked! Now hop backward to Friendly Tens on the Open Number Line!'
-        : '🔎 Step 1: Tap whether we are finding the WHOLE or a MISSING PART!';
+        : '🔒 Step 1 First: Tap whether we are finding the WHOLE or a MISSING PART to unlock hopping!';
+      updateTrailLockUI();
       drawTrailSvg();
     }
 
     document.getElementById('ppwQuestionBtn1').addEventListener('click', () => {
+      const p = TRAIL_PROBLEMS[state.trailIdx];
+      if (state.trailPpwUnlocked[p.id]) {
+        playSound('click');
+        showBanner('🔎', 'Step 1 is already unlocked — we are finding a MISSING PART, so hop backward!', 'emerald');
+        return;
+      }
       playSound('error');
       showBanner('🐢', 'Wait! We already know the starting WHOLE total — some treats left the rack, so we are finding a MISSING PART!', 'amber');
     });
     document.getElementById('ppwQuestionBtn2').addEventListener('click', () => {
       const p = TRAIL_PROBLEMS[state.trailIdx];
-      if (!state.trailPpwUnlocked[p.id]) {
+      const earnedNew = !state.trailPpwUnlocked[p.id];
+      if (earnedNew) {
         state.trailPpwUnlocked[p.id] = true;
         awardCoins(5);
+      } else {
+        playSound('click');
       }
+      updateTrailLockUI();
       document.getElementById('trailFeedback').className = 'text-sm font-extrabold text-emerald-300';
       document.getElementById('trailFeedback').textContent = '✅ Great Detective work! Missing Part = Subtract! Try jumping to a Friendly Ten first!';
-      showBanner('🔎', 'Yes! We are finding a MISSING PART, so we hop backward! (+5 Coins)', 'emerald');
+      showBanner(
+        '🔎',
+        earnedNew
+          ? 'Yes! We are finding a MISSING PART, so we hop backward! (+5 Coins)'
+          : 'Detective Gate Unlocked! Now hop backward to Friendly Tens!',
+        'emerald'
+      );
     });
 
+    function requireTrailPpwGate() {
+      const p = TRAIL_PROBLEMS[state.trailIdx];
+      if (!state.trailPpwUnlocked[p.id]) {
+        playSound('error');
+        const fb = document.getElementById('trailFeedback');
+        if (fb) {
+          fb.className = 'text-sm font-extrabold text-amber-300';
+          fb.textContent = '🔒 Step 1 Detective Gate first! Tap whether we are finding the WHOLE or a MISSING PART above!';
+        }
+        showBanner('🔎', 'Complete Step 1 Detective Gate first! Are we finding the WHOLE or a MISSING PART?', 'amber');
+        return false;
+      }
+      return true;
+    }
+
     function addTrailHop(step) {
+      if (!requireTrailPpwGate()) return;
       const p = TRAIL_PROBLEMS[state.trailIdx];
       const used = trailHops.reduce((a, b) => a + b, 0);
+      if (used >= p.sub) {
+        playSound('coin');
+        showBanner('🎉', `You already hopped back all -${p.sub}! Type your landing number in Answer? and tap Check!`, 'emerald');
+        return;
+      }
       if (used + step > p.sub) {
         playSound('error');
         showBanner('🐢', `Careful! You only need to hop back ${p.sub - used} more (total -${p.sub})!`, 'amber');
@@ -3981,14 +4409,29 @@
     document.getElementById('trailHop1Btn').addEventListener('click', () => addTrailHop(1));
     document.getElementById('trailHop10Btn').addEventListener('click', () => addTrailHop(10));
     document.getElementById('trailHopFriendlyBtn').addEventListener('click', () => {
+      if (!requireTrailPpwGate()) return;
       const p = TRAIL_PROBLEMS[state.trailIdx];
-      const cur = p.start - trailHops.reduce((a, b) => a + b, 0);
+      const used = trailHops.reduce((a, b) => a + b, 0);
+      if (used >= p.sub) {
+        playSound('coin');
+        showBanner('🎉', `You already hopped back all -${p.sub}! Type your landing number in Answer? and tap Check!`, 'emerald');
+        return;
+      }
+      const cur = p.start - used;
       const ones = cur % 10;
       const hop = ones > 0 ? ones : 10;
       addTrailHop(hop);
     });
-    document.getElementById('trailUndoBtn').addEventListener('click', () => { trailHops.pop(); drawTrailSvg(); });
-    document.getElementById('trailResetBtn').addEventListener('click', () => { trailHops = []; drawTrailSvg(); });
+    document.getElementById('trailUndoBtn').addEventListener('click', () => {
+      if (!requireTrailPpwGate()) return;
+      trailHops.pop();
+      drawTrailSvg();
+    });
+    document.getElementById('trailResetBtn').addEventListener('click', () => {
+      if (!requireTrailPpwGate()) return;
+      trailHops = [];
+      drawTrailSvg();
+    });
     document.getElementById('trailPrevBtn').addEventListener('click', () => {
       state.trailIdx = (state.trailIdx - 1 + TRAIL_PROBLEMS.length) % TRAIL_PROBLEMS.length;
       renderTrailProblem();
@@ -3997,48 +4440,85 @@
       state.trailIdx = (state.trailIdx + 1) % TRAIL_PROBLEMS.length;
       renderTrailProblem();
     });
-    document.getElementById('trailCheckBtn').addEventListener('click', () => {
+    function checkTrailAnswer() {
+      if (!requireTrailPpwGate()) return;
       const p = TRAIL_PROBLEMS[state.trailIdx];
-      const guess = Number(document.getElementById('trailAnswerInput').value);
+      const raw = (document.getElementById('trailAnswerInput').value || '').trim();
       const fb = document.getElementById('trailFeedback');
+      if (raw === '') {
+        playSound('error');
+        fb.className = 'text-sm font-extrabold text-amber-300';
+        fb.textContent = '🐢 Hop on the Open Number Line above, then type your landing number in Answer?!';
+        return;
+      }
+      const guess = Number(raw);
       if (guess === p.ans) {
-        if (!state.trailSolved[p.id]) {
+        const earnedNew = !state.trailSolved[p.id];
+        if (earnedNew) {
           state.trailSolved[p.id] = true;
           awardCoins(10);
           launchSparkles(45);
+        } else {
+          playSound('coin');
         }
         fb.className = 'text-sm font-extrabold text-emerald-300';
-        fb.textContent = `🛤️ Spot On! ${p.start} − ${p.sub} = ${p.ans}!`;
+        fb.textContent = `🛤️ Spot On! ${p.start} − ${p.sub} = ${p.ans}!${earnedNew ? ' (+10 Coins)' : ''}`;
         checkMathStarUnlock();
+        updateTrailLockUI();
         document.getElementById('trailProgressBadge').textContent = `${Object.keys(state.trailSolved).length} / ${TRAIL_PROBLEMS.length} Solved`;
       } else {
         playSound('error');
         fb.className = 'text-sm font-extrabold text-amber-300';
         fb.textContent = '🐢 Use the Open Number Line hops above to land on Friendly Tens, then check your landing number!';
       }
+    }
+    document.getElementById('trailCheckBtn').addEventListener('click', checkTrailAnswer);
+    document.getElementById('trailAnswerInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkTrailAnswer();
     });
 
     // --- Math Mode D: Slow-Down Bakery Checkout (Mixed Coins) ---
+    const MAX_TRAY_COINS = 30;
     let currentTrayCoins = [];
     function renderCoinProblem() {
       const p = COIN_PROBLEMS[state.coinIdx];
-      document.getElementById('coinItemTitle').textContent = `${p.name} — ${p.target}¢ ${state.coinSolved[p.id] ? '✅' : ''}`;
+      const isSolved = !!state.coinSolved[p.id];
+      document.getElementById('coinItemTitle').textContent = `${p.name} — ${p.target}¢${isSolved ? ' ✅' : ''}`;
       document.getElementById('coinProgressBadge').textContent = `${Object.keys(state.coinSolved).length} / ${COIN_PROBLEMS.length} Checked Out`;
+      document.getElementById('coinCheckBtn').textContent = isSolved ? '✅ Ring Up! (Checked Out ✓)' : '✅ Ring Up! (+10 🪙)';
       const sum = currentTrayCoins.reduce((a, b) => a + b, 0);
       document.getElementById('coinRunningTotal').textContent = `Total: ${sum}¢`;
       const tray = document.getElementById('coinTrayDisplay');
+      tray.innerHTML = '';
       if (!currentTrayCoins.length) {
-        tray.innerHTML = '<span>Tap coins above (biggest coins first!) to match the exact price!</span>';
+        const hint = document.createElement('span');
+        hint.textContent = 'Tap coins above (biggest coins first!) to match the exact price!';
+        tray.appendChild(hint);
       } else {
-        tray.innerHTML = currentTrayCoins.map((c) => {
+        currentTrayCoins.forEach((c, idx) => {
           const lbl = c === 25 ? '25¢ Q' : c === 10 ? '10¢ D' : c === 5 ? '5¢ N' : '1¢ P';
-          return `<span class="px-2.5 py-1 rounded-full bg-amber-400/25 border border-amber-300/60 text-amber-100 text-xs font-extrabold">${lbl}</span>`;
-        }).join('');
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.title = 'Tap to remove this coin';
+          pill.className = 'px-2.5 py-1 rounded-full bg-amber-400/25 hover:bg-amber-500/30 border border-amber-300/60 text-amber-100 text-xs font-extrabold transition';
+          pill.textContent = `${lbl} ×`;
+          pill.addEventListener('click', () => {
+            currentTrayCoins.splice(idx, 1);
+            playSound('click');
+            renderCoinProblem();
+          });
+          tray.appendChild(pill);
+        });
       }
     }
 
     document.querySelectorAll('.coin-add-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (currentTrayCoins.length >= MAX_TRAY_COINS) {
+          playSound('error');
+          showBanner('🐢', 'Counter full! Tap a coin pill to remove it, or tap Clear Tray and use bigger coins!', 'amber');
+          return;
+        }
         const val = Number(btn.getAttribute('data-coin'));
         currentTrayCoins.push(val);
         playSound('click');
@@ -4067,21 +4547,34 @@
       const sum = currentTrayCoins.reduce((a, b) => a + b, 0);
       const fb = document.getElementById('coinFeedback');
       if (sum === p.target) {
-        if (!state.coinSolved[p.id]) {
+        const earnedNew = !state.coinSolved[p.id];
+        if (earnedNew) {
           state.coinSolved[p.id] = true;
           awardCoins(10);
           launchSparkles(40);
+        } else {
+          playSound('coin');
         }
         fb.className = 'text-sm font-extrabold text-emerald-300';
-        fb.textContent = `🪙 Cha-Ching! Exact change ${p.target}¢ for ${p.name}!`;
+        fb.textContent = `🪙 Cha-Ching! Exact change ${p.target}¢ for ${p.name}!${earnedNew ? ' (+10 Coins)' : ''}`;
         checkMathStarUnlock();
         renderCoinProblem();
       } else {
         playSound('error');
         fb.className = 'text-sm font-extrabold text-amber-300';
-        fb.textContent = sum < p.target
-          ? `🐢 You have ${sum}¢ — need ${p.target - sum}¢ more! Hint: ${p.tip}`
-          : `🐢 Whoa, ${sum}¢ is ${sum - p.target}¢ too high! Tap Clear Tray and count biggest coins first!`;
+        if (sum < p.target) {
+          const rem = p.target - sum;
+          const nextCoinCue = rem >= 25
+            ? 'Try adding a 25¢ Quarter first!'
+            : rem >= 10
+              ? 'Try adding a 10¢ Dime next!'
+              : rem >= 5
+                ? 'Try adding a 5¢ Nickel next!'
+                : 'Count up the last cents with 1¢ Pennies!';
+          fb.textContent = `🐢 You have ${sum}¢ — need ${rem}¢ more! ${nextCoinCue}`;
+        } else {
+          fb.textContent = `🐢 Whoa, ${sum}¢ is ${sum - p.target}¢ too high! Tap any coin pill to remove it, or Clear Tray and count biggest coins first!`;
+        }
       }
     });
 
@@ -4119,7 +4612,7 @@
 
     // RESET DAILY PROGRESS: Clears today's practice boards while keeping
     // Weekly Coins, Streak, 5 Bakery Stars, Thankful Card/Drawing & Sign-Offs intact!
-    function resetDailyProgressOnly() {
+    function resetDailyProgressOnly({ silent = false } = {}) {
       state.affirmationClaimed = false;
       state.ritualChecks = { deck: false, body: false, eyes: false, retell: false };
       state.ritualStepRewarded = { deck: false, body: false, eyes: false, retell: false };
@@ -4135,33 +4628,53 @@
       state.bakeoffIdx = 0;
       state.bakeoffCorrect = {};
       state.retellCompleted = {};
+      state.dashCoinsEarnedToday = 0;
+      state.scriptIdx = 0;
       state.pass1Done = false;
       state.pass2Done = false;
       state.flashSolvedCount = 0;
+      state.flashCoinsEarnedToday = 0;
+      state.mixIdx = 0;
       state.mixSolved = {};
+      state.trailIdx = 0;
       state.trailPpwUnlocked = {};
       state.trailSolved = {};
+      state.coinIdx = 0;
       state.coinSolved = {};
 
+      if (pieDash.animId) {
+        cancelAnimationFrame(pieDash.animId);
+        pieDash.animId = null;
+      }
       pieDash.running = false;
       pieDash.catches = 0;
       pieDash.items = [];
+      pieDash.spawnTick = 0;
       currentTrayCoins = [];
+
       const bIn = document.getElementById('bakeoffInput');
       if (bIn) bIn.value = '';
       const bHint = document.getElementById('bakeoffHintBox');
       if (bHint) bHint.classList.add('hidden');
+      ['bakeoffFeedback', 'mixFeedback', 'coinFeedback'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '';
+      });
       const dashScoreEl = document.getElementById('dashScore');
       if (dashScoreEl) dashScoreEl.textContent = 'Treats: 0 / 10';
       const dashBtn = document.getElementById('dashStartBtn');
       if (dashBtn) dashBtn.textContent = '▶️ Start Dash!';
+      const dashWordEl = document.getElementById('dashCaughtWord');
+      if (dashWordEl) dashWordEl.textContent = '✨ Tap "Start Dash!" — then drag your finger on the screen or tap ⬅️ / ➡️!';
 
       resetRetellCycle(state.activeCycle);
       drawPieDash();
       saveState();
       refreshAllViews();
-      playSound('fanfare');
-      showBanner('🔄', 'Daily Bakery Boards Reset for Today! (Your Weekly Coins, Streak, Bakery Stars & Parent Hub Sign-Offs are safely kept!)', 'emerald');
+      if (!silent) {
+        playSound('fanfare');
+        showBanner('🔄', 'Daily Bakery Boards Reset for Today! (Your Weekly Coins, Streak, Bakery Stars & Parent Hub Sign-Offs are safely kept!)', 'emerald');
+      }
     }
 
     function resetFullWeeklyProgress() {
@@ -4173,10 +4686,14 @@
       state.thankfulClaimed = false;
       state.drawingDataUrl = '';
       state.dashBestCatches = 0;
+      state.timerRunning = false;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      state.timerRemainingSec = 3600;
       const tIn = document.getElementById('thankfulInput');
       if (tIn) tIn.value = '';
       restoreDrawingCanvas();
-      resetDailyProgressOnly();
+      resetDailyProgressOnly({ silent: true });
+      playSound('fanfare');
       showBanner('🗑️', 'Full Weekly Progress Reset! Ready for a brand-new week in the Bakery!', 'pink');
     }
 
@@ -4220,8 +4737,13 @@
     }
 
     function openParentAndSyncModal() {
+      pausePieDash();
       resetPasteSyncInputMode();
-      saveState();
+      if (state.lastSavedTs > 0) {
+        saveState({ touchTimestamp: false });
+      } else {
+        syncInlineFormAndTelemetry();
+      }
       renderSignOffList();
       updateVoiceDiagnosticUI();
       document.getElementById('parentModal').classList.remove('hidden');
@@ -4315,11 +4837,20 @@
       [
         'wordSoundboardGrid', 'slicerWordTabs', 'slicerContainer', 'slicerArmTapBtns', 'slicerRuleChoices',
         'unsortedWordBank', 'jarColumnsContainer', 'padlockGrid', 'retellPool', 'retellSlots',
-        'flashChoicesGrid', 'signOffList', 'trailSvg'
+        'flashChoicesGrid', 'signOffList', 'trailSvg', 'bakeoffFeedback', 'mixFeedback', 'trailFeedback', 'coinFeedback'
       ].forEach((id) => {
         const el = cloneDoc.querySelector(`#${id}`);
         if (el) el.innerHTML = '';
       });
+
+      const cloneDashScore = cloneDoc.querySelector('#dashScore');
+      if (cloneDashScore) cloneDashScore.textContent = 'Treats: 0 / 10';
+      const cloneDashStart = cloneDoc.querySelector('#dashStartBtn');
+      if (cloneDashStart) cloneDashStart.textContent = '▶️ Start Dash!';
+      const cloneDashWord = cloneDoc.querySelector('#dashCaughtWord');
+      if (cloneDashWord) cloneDashWord.textContent = '✨ Tap "Start Dash!" — then drag your finger on the screen or tap ⬅️ / ➡️!';
+      const cloneFlashHintBtn = cloneDoc.querySelector('#flashHintToggleBtn');
+      if (cloneFlashHintBtn) cloneFlashHintBtn.textContent = '💡 Show Make-a-10 / Visual Dot Helper';
 
       const cloneSnap = cloneDoc.querySelector('#syncJsonSnapshotInput');
       if (cloneSnap) {
@@ -4356,7 +4887,7 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
       playSound('fanfare');
       showBanner('🥧', 'Downloaded self-contained index.html with all Coins, Stars & Sign-Offs baked right in!', 'emerald');
     });
@@ -4372,7 +4903,7 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
       playSound('coin');
       showBanner('📤', 'Exported violet_bakery_sync.json snapshot!', 'emerald');
     });
@@ -4393,6 +4924,9 @@
             refreshAllViews();
             playSound('fanfare');
             showBanner('📥', 'Restored Violet\'s Bakery progress from JSON file!', 'emerald');
+          } else {
+            playSound('error');
+            showBanner('⚠️', 'That file is not a valid Violet Bakery Sync JSON snapshot.', 'amber');
           }
         } catch (err) {
           playSound('error');
@@ -4404,7 +4938,7 @@
     });
 
     document.getElementById('copyJsonBtn').addEventListener('click', async () => {
-      saveState();
+      if (state.lastSavedTs > 0) saveState({ touchTimestamp: false });
       const compact = JSON.stringify(getSerializablePayload({ includeDrawing: false }));
       try {
         await navigator.clipboard.writeText(compact);
@@ -4413,7 +4947,15 @@
         const inp = document.getElementById('syncJsonSnapshotInput');
         inp.value = compact;
         inp.select();
-        showBanner('📋', 'JSON snapshot highlighted — tap Copy on your device!', 'pink');
+        let legacyCopied = false;
+        try { legacyCopied = document.execCommand('copy'); } catch (_) {}
+        showBanner(
+          '📋',
+          legacyCopied
+            ? 'Copied compact JSON sync code to clipboard!'
+            : 'JSON snapshot highlighted — tap Copy on your device!',
+          legacyCopied ? 'emerald' : 'pink'
+        );
       }
     });
 
@@ -4437,6 +4979,9 @@
           refreshAllViews();
           playSound('fanfare');
           showBanner('✅', 'Restored Violet\'s Bakery progress from pasted JSON!', 'emerald');
+        } else {
+          playSound('error');
+          showBanner('⚠️', 'That JSON is not a valid Violet Bakery Sync snapshot!', 'amber');
         }
       } catch (e) {
         playSound('error');
@@ -4473,7 +5018,6 @@
       resetRetellCycle('pumpkin');
       restoreDrawingCanvas();
       refreshAllViews();
-      saveState();
     });
   })();
   </script>
