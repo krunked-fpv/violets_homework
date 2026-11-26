@@ -3,3 +3,4 @@
 *.cookie_bak
 *.md
 !README.md
+dna/
